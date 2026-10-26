@@ -16,6 +16,12 @@ Before enabling operational data, select one neighborhood/ward with the project 
 | Restoration evidence | Pending | Explicit observed restoration with source and reviewer |
 | Official API | Not connected | Documented access, permission, schema and failure behavior |
 
+### Pilot research status (26 October 2026)
+
+The intended pilot is **one ward or neighborhood within Sylhet City Corporation**, selected only after its boundary and provider are evidenced. No ward has been designated as verified. The following hostnames were attempted through the cloud proxy as candidate official-source locations: `bpdb.gov.bd`, `scc.gov.bd`, and `sylhet.gov.bd`. Each HTTPS CONNECT returned **403 Domain forbidden** under the current restricted egress policy; no page content, ownership claim, ward list, provider coverage or notice was obtained. These are research targets, **not citations or confirmed authorities**. The same root and `www` hostnames have been added to the environment configuration draft for review. After that policy is applied, check the actual sites, their redirects and source provenance before choosing the pilot. A source being accessible does not itself establish that a ward is served by a particular feeder.
+
+To mark a pilot verified, record: the precise ward/neighborhood label; its parent chain and publication URL; provider coverage evidence; the reviewer and review date; and an original notice whose stated scope actually matches that area. If an official notice only names a feeder, do not map it to the ward without separate provider evidence. Keep status unknown when any link is missing.
+
 ## User flows
 1. Visitor chooses an area → sees unknown/known status, separated schedules and reports, provenance and freshness → opens original notice.
 2. User registers/signs in → saves locations → reports power off/back/still off for their own connection → receives confirmation without implying area-wide restoration.
@@ -35,7 +41,7 @@ Before enabling operational data, select one neighborhood/ward with the project 
 ## Architecture
 React + TypeScript + Vite; React Router; Tailwind CSS v4 + DaisyUI v5; React Icons; React Hot Toast. Self-hosted Bengali font avoids a runtime font CDN dependency. FastAPI + SQLAlchemy + Alembic with PostgreSQL 17. Public endpoints include health, development-only demo areas, notices, schedules, locations, reports and recorded events. Authenticated endpoints provide reports and saved areas; admin endpoints manage reviewed operational records.
 
-Next increments should add resource routers, typed request/response schemas and transactional services. Put source adapters behind an ingestion boundary: normalize to reviewable drafts; never publish directly. API pagination should return items, total, page and page_size; whitelist sort keys and enforce size limits.
+Operational routers use typed request schemas and bounded pagination with whitelisted sort keys. A future official-source adapter should normalize incoming material to reviewable drafts and never publish it directly. Service-layer separation and an independent security review remain deployment work.
 
 ## Authentication implementation and remaining hardening
 Bcrypt password hashing with a documented 72-byte input limit; normalize and uniquely constrain emails. Short-lived JWT access tokens held in memory. Random refresh tokens stored hashed in `refresh_sessions`; rotate on every refresh, detect replay and revoke the family. Use HttpOnly, Secure, SameSite cookies scoped to refresh endpoints, explicit trusted origins and CSRF protection. Logout revokes sessions and clears cookies. Password reset uses hashed, expiring, single-use tokens, generic responses and rate limiting; reset invalidates sessions. Never log tokens. Admin permission checks must run on the server for every protected operation. No demo users or login credentials are seeded. Local SMTP uses Mailpit; public mail delivery requires configuration. Ingress rate limiting and independent security review remain before public deployment.
