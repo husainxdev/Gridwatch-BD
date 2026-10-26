@@ -1,0 +1,15 @@
+# Replace the domain and paths after obtaining a host and TLS-ready DNS.
+gridwatch.example.org {
+    encode zstd gzip
+    handle /api/* {
+        reverse_proxy 127.0.0.1:8000
+    }
+    root * /srv/gridwatch/frontend/dist
+    try_files {path} /index.html
+    file_server
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+        X-Frame-Options DENY
+    }
+}
