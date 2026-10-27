@@ -28,6 +28,8 @@ try:
     run([".venv/bin/alembic", "upgrade", "head"], cwd=backend, env=env)
     run([".venv/bin/pytest", "-q"], cwd=backend, env=env)
     run([".venv/bin/alembic", "check"], cwd=backend, env=env)
+    run([".venv/bin/alembic", "downgrade", "0001"], cwd=backend, env=env)
+    run([".venv/bin/alembic", "upgrade", "head"], cwd=backend, env=env)
 finally:
     run(
         [

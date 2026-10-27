@@ -23,6 +23,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [checking, setChecking] = useState(true);
   useEffect(() => {
     let active = true;
+    const clear = () => setUser(null);
+    window.addEventListener("gridwatch-session-ended", clear);
     renewToken()
       .then((result) => {
         if (active) {
@@ -35,6 +37,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       });
     return () => {
       active = false;
+      window.removeEventListener("gridwatch-session-ended", clear);
     };
   }, []);
   async function signIn(email: string, password: string) {
@@ -59,12 +62,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setUser(result.user);
   }
   async function signOut() {
-    try {
-      if (csrf()) await api("/api/auth/logout", { method: "POST" }, false);
-    } finally {
-      setAccessToken(null);
-      setUser(null);
-    }
+    if (!csrf())
+      throw new Error(
+        "Session cookie missing. Reload to verify session status.",
+      );
+    await api("/api/auth/logout", { method: "POST" }, false);
+    setAccessToken(null);
+    setUser(null);
   }
   return (
     <Context.Provider value={{ user, checking, signIn, signUp, signOut }}>

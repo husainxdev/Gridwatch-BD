@@ -30,3 +30,17 @@ Checked items are implemented locally. Days are a priority guide, not a deadline
 | 7 | Hosted deployment and submission | Live smoke tests and verified pilot |
 
 Outstanding risk: actual pilot location/provider data and published notice sources have not been verified. Until then the operational database is intentionally empty after setup and the home screen uses labeled fictional fixtures. Public deployment also needs ingress rate limiting, independent security review, backups and live verification.
+
+## Sections 3–4 verification scope
+
+- [x] Strict signup schema, normalized identity uniqueness and bcrypt byte boundaries.
+- [x] Hashed rotating/revocable sessions, concurrency/reuse policy and immediate access revocation.
+- [x] Single-use password reset, SMTP/Mailpit adapters, trusted links and generic responses.
+- [x] Explicit CORS/CSRF, secure deployment cookies and configurable process-local rate limits.
+- [x] Location roots/children/details/ancestors/search, subtree validation and normalized uniqueness.
+- [x] Real frontend cascade/search, session restoration and current-user saved areas.
+- [x] Migration 0002 and 27 isolated PostgreSQL integration tests.
+- [x] Desktop/mobile Chromium integration journeys, including delayed 401 single-refresh handling.
+- [ ] Production SMTP delivery and hosted-domain cookie verification (credentials/domain unavailable).
+
+See [the phase guide](AUTH-LOCATIONS.md) for commands, manual checks and known deployment limitations. Earlier checked sections describe existing local capabilities, not production certification.

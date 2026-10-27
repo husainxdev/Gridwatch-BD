@@ -1,11 +1,13 @@
 """Integration checks use rollback-only transactions against migrated PostgreSQL."""
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError, OperationalError
+
 from app.db import SessionLocal, get_db
 from app.main import app, settings
 from app.models import DemoArea, Location, Notice, OutageEvent, Report, Schedule, User
@@ -47,7 +49,7 @@ def test_live_and_ready(client):
     assert client.get("/api/health/ready").json() == {
         "status": "ready",
         "database": "connected",
-        "schema": "0001",
+        "schema": "0002",
     }
 
 
@@ -102,7 +104,7 @@ def test_seed_refuses_production(monkeypatch):
 
 def test_schedule_requires_positive_interval(db, records):
     location, _ = records
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     notice = Notice(
         title="Test",
         body="Test",
@@ -123,7 +125,7 @@ def test_schedule_requires_positive_interval(db, records):
 
 def test_restoration_requires_evidence(db, records):
     location, user = records
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     db.add(
         OutageEvent(
             location_id=location.id,
@@ -147,7 +149,7 @@ def test_report_idempotency_constraint(db, records):
                 location_id=location.id,
                 user_id=user.id,
                 kind="power_off",
-                observed_at=datetime.now(timezone.utc),
+                observed_at=datetime.now(UTC),
                 idempotency_key=key,
             )
         )
@@ -171,7 +173,7 @@ def test_location_verification_requires_source(db):
 
 def test_expired_schedule_does_not_create_restoration(db, records):
     location, user = records
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     notice = Notice(
         title="Test",
         body="Test",

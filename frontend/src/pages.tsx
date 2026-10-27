@@ -1,3 +1,4 @@
+import { LocationPicker } from "./components/LocationPicker";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -6,6 +7,7 @@ import {
   bdToIso,
   localInputTime,
   shortTime,
+  setAccessToken,
   type Event,
   type Location,
   type Notice,
@@ -128,6 +130,15 @@ export function AuthPage({
   const { user, signIn, signUp } = useSession();
   const nav = useNavigate(),
     [params] = useSearchParams();
+  const [resetToken] = useState(
+    () =>
+      new URLSearchParams(window.location.hash.slice(1)).get("token") ||
+      params.get("token"),
+  );
+  useEffect(() => {
+    if (mode === "reset")
+      window.history.replaceState(null, "", window.location.pathname);
+  }, [mode]);
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [success, setSuccess] = useState("");
@@ -139,6 +150,13 @@ export function AuthPage({
     const email = String(fd.get("email") || ""),
       password = String(fd.get("password") || "");
     try {
+      if (mode === "register" || mode === "reset") {
+        const bytes = new TextEncoder().encode(password).length;
+        if (bytes < 8 || bytes > 72)
+          throw new Error(
+            "পাসওয়ার্ড ৮–৭২ UTF-8 বাইট হতে হবে (বাংলা অক্ষরে একাধিক বাইট লাগে)।",
+          );
+      }
       if (mode === "login") await signIn(email, password);
       if (mode === "register")
         await signUp(email, password, String(fd.get("name") || ""));
@@ -153,8 +171,9 @@ export function AuthPage({
       if (mode === "reset") {
         await api("/api/auth/password-reset/confirm", {
           method: "POST",
-          body: JSON.stringify({ token: params.get("token"), password }),
+          body: JSON.stringify({ token: resetToken, password }),
         });
+        setAccessToken(null);
         toast.success("পাসওয়ার্ড বদলানো হয়েছে");
         nav("/login");
         return;
@@ -213,7 +232,9 @@ export function AuthPage({
                 type="password"
                 name="password"
                 required
-                minLength={8}
+                autoComplete={
+                  mode === "login" ? "current-password" : "new-password"
+                }
                 maxLength={72}
               />
             </Field>
@@ -258,53 +279,33 @@ export function RequireUser({
   return <>{children}</>;
 }
 
+let rememberedArea = "";
 function useAreaSelection() {
   const areas = useData<Page<Location>>("/api/locations?page_size=100");
-  const [selected, setSelected] = useState("");
-  useEffect(() => {
-    if (
-      areas.data?.items.length &&
-      !areas.data.items.some((x) => x.id === selected)
-    )
-      setSelected(
-        areas.data.items.find((x) => x.verification_status === "verified")
-          ?.id || "",
-      );
-  }, [areas.data, selected]);
+  const [selected, updateSelected] = useState(rememberedArea);
+  const setSelected = (value: string) => {
+    rememberedArea = value;
+    updateSelected(value);
+  };
+  const detail = useData<Location>(
+    selected ? `/api/locations/${selected}` : "/api/health/live",
+  );
   return {
     areas,
     selected,
     setSelected,
-    area: areas.data?.items.find((x) => x.id === selected),
+    area: selected && detail.data?.id === selected ? detail.data : undefined,
   };
 }
 function AreaChooser({
-  items,
   value,
   onChange,
 }: {
   items: Location[];
   value: string;
-  onChange: (x: string) => void;
+  onChange: (value: string) => void;
 }) {
-  return (
-    <Field label="যাচাইকৃত এলাকা">
-      <select
-        className="select select-bordered"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">এলাকা বাছুন</option>
-        {items
-          .filter((x) => x.verification_status === "verified")
-          .map((x) => (
-            <option key={x.id} value={x.id}>
-              {x.name_bn} · {x.kind}
-            </option>
-          ))}
-      </select>
-    </Field>
-  );
+  return <LocationPicker value={value} onChange={onChange} />;
 }
 export function Dashboard() {
   const { user } = useSession();
@@ -397,9 +398,9 @@ export function Dashboard() {
           </div>
         )}
         {!selected && !areas.loading && (
-          <EmptyState title="যাচাইকৃত এলাকা নেই">
-            অ্যাডমিনকে প্রথমে ছোট পাইলট এলাকা ও উৎস যাচাই করতে হবে। নমুনা এলাকা
-            এখানে আসে না।
+          <EmptyState title="একটি যাচাইকৃত এলাকা বাছুন">
+            তালিকা বা অনুসন্ধান থেকে এলাকা বাছুন। এলাকা না থাকলে অ্যাডমিনকে
+            প্রথমে পাইলট এলাকা ও উৎস যাচাই করতে হবে। নমুনা এলাকা এখানে আসে না।
           </EmptyState>
         )}
       </Card>
@@ -748,6 +749,10 @@ function AdminAreas({
         slug: f.get("slug"),
         kind: f.get("kind"),
         parent_id: f.get("parent_id") || null,
+        aliases: String(f.get("aliases") || "")
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean),
       };
     if (
       await action.run(() =>
@@ -783,6 +788,13 @@ function AdminAreas({
               defaultValue={edit?.name_en}
               required
               minLength={2}
+            />
+          </Field>
+          <Field label="বিকল্প নাম (কমা দিয়ে আলাদা করুন)">
+            <input
+              name="aliases"
+              className="input input-bordered"
+              defaultValue={edit?.aliases?.join(", ") || ""}
             />
           </Field>
           <Field label="Slug">

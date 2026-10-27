@@ -13,6 +13,8 @@ export type Page<T> = {
 export type Location = {
   id: string;
   parent_id: string | null;
+  ancestor_names?: string[];
+  aliases: string[];
   kind: string;
   name_bn: string;
   name_en: string;
@@ -71,6 +73,10 @@ export function renewToken() {
         setAccessToken(result.access_token);
         return result;
       })
+      .catch((error) => {
+        setAccessToken(null);
+        throw error;
+      })
       .finally(() => {
         refreshing = null;
       });
@@ -78,6 +84,8 @@ export function renewToken() {
 }
 export function setAccessToken(value: string | null) {
   accessToken = value;
+  if (value === null)
+    window.dispatchEvent(new Event("gridwatch-session-ended"));
 }
 export function csrf() {
   return (
@@ -92,6 +100,7 @@ export async function api<T>(
   options: RequestInit = {},
   retry = true,
 ): Promise<T> {
+  const attemptedAccessToken = accessToken;
   const headers = new Headers(options.headers);
   if (options.body) headers.set("Content-Type", "application/json");
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
@@ -109,7 +118,8 @@ export async function api<T>(
     path != "/api/auth/refresh"
   ) {
     try {
-      await renewToken();
+      // Another request may have already refreshed while this 401 was in flight.
+      if (attemptedAccessToken === accessToken) await renewToken();
       return api<T>(path, options, false);
     } catch {
       setAccessToken(null);
@@ -119,7 +129,16 @@ export async function api<T>(
     let detail = "অনুরোধটি সম্পন্ন করা যায়নি।";
     try {
       const data = await response.json();
-      detail = typeof data.detail === "string" ? data.detail : detail;
+      detail = Array.isArray(data.fields)
+        ? data.fields
+            .map(
+              (f: { field: string; message: string }) =>
+                `${f.field.replace(/^body\./, "")}: ${f.message}`,
+            )
+            .join("; ")
+        : typeof data.detail === "string"
+          ? data.detail
+          : detail;
     } catch {}
     throw new Error(detail);
   }

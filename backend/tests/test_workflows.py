@@ -1,12 +1,14 @@
 """End-to-end API correctness against an isolated migrated PostgreSQL test database."""
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
 from fastapi.testclient import TestClient
 from sqlalchemy import select
+
 from app.db import SessionLocal
 from app.main import app
-from app.models import User, OutageEvent
+from app.models import User
 from app.security import digest
 
 client = TestClient(app, headers={"Origin": "http://localhost:5173"})
@@ -14,7 +16,10 @@ uid = uuid.uuid4().hex
 email = f"user-{uid}@example.com"
 admin_email = f"admin-{uid}@example.com"
 password = "long-enough-password"
-now = lambda: datetime.now(timezone.utc).isoformat()
+
+
+def now():
+    return datetime.now(UTC).isoformat()
 
 
 def register(address):
@@ -149,7 +154,7 @@ def test_complete_workflow(monkeypatch):
     )
     assert notice.status_code == 201, notice.text
     nid = notice.json()["id"]
-    start = datetime.now(timezone.utc) + timedelta(hours=1)
+    start = datetime.now(UTC) + timedelta(hours=1)
     end = start + timedelta(hours=1)
     schedule = {
         "notice_id": nid,
@@ -230,9 +235,7 @@ def test_complete_workflow(monkeypatch):
         headers=headers(admin_token),
         json={
             "location_id": district_id,
-            "started_at": (
-                datetime.now(timezone.utc) - timedelta(minutes=5)
-            ).isoformat(),
+            "started_at": (datetime.now(UTC) - timedelta(minutes=5)).isoformat(),
             "start_evidence": "Verified test evidence",
         },
     )
@@ -308,6 +311,9 @@ def test_session_rotation_replay_logout_and_password_reset(monkeypatch):
         401,
         403,
     )
+    live_token = client.post(
+        "/api/auth/login", json={"email": reset_email, "password": password}
+    ).json()["access_token"]
     sent = []
 
     class FakeSMTP:
@@ -353,6 +359,8 @@ def test_session_rotation_replay_logout_and_password_reset(monkeypatch):
         json={"token": raw, "password": "new-secret-password"},
     )
     assert changed.status_code == 200, changed.text
+    assert client.get("/api/auth/me", headers=headers(live_token)).status_code == 401
+    assert client.post("/api/auth/refresh", headers=csrf_headers()).status_code == 401
     assert (
         client.post(
             "/api/auth/password-reset/confirm",

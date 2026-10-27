@@ -44,3 +44,7 @@ With the production environment loaded, run `backend/.venv/bin/alembic upgrade h
 After DNS, TLS and services are ready, verify `/api/health/live`, `/api/health/ready` and the HTML shell over HTTPS. Register a throwaway account, log in, refresh, log out, request a password reset through a secure mail channel, and confirm the old token cannot be reused. Verify non-admin requests to admin routes return 403. Verify that no operational records or real pilot claims appear until sources are reviewed. Recheck mobile layout, access logs, backup restoration and ingress rate limits. Record the actual domain and test results for the submission package.
 
 A real area must be verified by a person before entering official notices. No official feed, feeder mapping or provider access has been assumed by this repository.
+
+## Authentication configuration
+
+Use the same HTTPS origin for frontend and API; separate-site deployments are unsupported. See [Sections 3–4](AUTH-LOCATIONS.md) for exact cookie paths, CSRF and token lifetimes. `AUTH_RATE_LIMIT=60` / `AUTH_RATE_WINDOW_SECONDS=60` provide per-process limits only. Apply shared ingress limits before public exposure. Never log request bodies, Authorization headers, cookies or reset links. Current readiness requires schema `0002`.

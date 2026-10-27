@@ -2,19 +2,22 @@
 
 import uuid
 from datetime import datetime
+
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
     UniqueConstraint,
     func,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
+
 from .db import Base
 
 
@@ -32,6 +35,7 @@ class Record:
 
 class Location(Record, Base):
     __tablename__ = "locations"
+    aliases: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]")
     name_bn: Mapped[str] = mapped_column(String(160))
     name_en: Mapped[str] = mapped_column(String(160))
     kind: Mapped[str] = mapped_column(String(32))
@@ -43,6 +47,22 @@ class Location(Record, Base):
     source_url: Mapped[str | None] = mapped_column(Text)
     verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     __table_args__ = (
+        Index(
+            "uq_location_bn",
+            parent_id,
+            kind,
+            func.lower(func.btrim(name_bn)),
+            unique=True,
+            postgresql_nulls_not_distinct=True,
+        ),
+        Index(
+            "uq_location_en",
+            parent_id,
+            kind,
+            func.lower(func.btrim(name_en)),
+            unique=True,
+            postgresql_nulls_not_distinct=True,
+        ),
         CheckConstraint(
             "kind IN ('division','district','upazila','city_corporation','union','ward','village','neighborhood')",
             name="location_kind",
@@ -68,7 +88,10 @@ class User(Record, Base):
     password_hash: Mapped[str] = mapped_column(Text)
     role: Mapped[str] = mapped_column(String(10), default="user")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    __table_args__ = (CheckConstraint("role IN ('admin','user')", name="user_role"),)
+    __table_args__ = (
+        CheckConstraint("role IN ('admin','user')", name="user_role"),
+        Index("uq_user_normalized_email", func.lower(func.btrim(email)), unique=True),
+    )
 
 
 class SavedArea(Base):
@@ -90,6 +113,13 @@ class RefreshSession(Record, Base):
     family_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), index=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    replaced_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey(
+            "refresh_sessions.id",
+            ondelete="SET NULL",
+            name="refresh_sessions_replaced_by_id_fkey",
+        )
+    )
 
 
 class PasswordReset(Record, Base):

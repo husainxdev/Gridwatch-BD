@@ -1,14 +1,17 @@
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlalchemy import select, text
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
+
+from .api import router as api_router
+from .auth import router as auth_router
 from .config import get_settings
 from .db import get_db
 from .models import DemoArea
-from .auth import router as auth_router
 from .security import secret_key
-from .api import router as api_router
 
 settings = get_settings()
 secret_key()  # fail startup instead of serving auth with a missing/weak signing secret
@@ -21,7 +24,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
-    allow_headers=["Content-Type"],
+    allow_headers=["Content-Type", "Authorization", "X-CSRF-Token"],
+    allow_credentials=True,
 )
 
 
@@ -37,7 +41,7 @@ def ready(db: Session = Depends(get_db)):
         revision = db.execute(
             text("SELECT version_num FROM alembic_version")
         ).scalar_one()
-        if revision != "0001":
+        if revision != "0002":
             raise HTTPException(503, "Database migration required")
     except SQLAlchemyError:
         raise HTTPException(503, "Database unavailable or migration required") from None
@@ -69,3 +73,38 @@ def demo_areas(db: Session = Depends(get_db)):
 
 app.include_router(auth_router)
 app.include_router(api_router)
+
+# Do not reflect Pydantic's raw input (passwords/reset tokens) in API responses.
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(request, exc):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": "Invalid request",
+            "fields": [
+                {
+                    "field": ".".join(map(str, e["loc"])),
+                    "message": e["msg"],
+                    "code": e["type"],
+                }
+                for e in exc.errors()
+            ],
+        },
+    )
+
+
+@app.exception_handler(SQLAlchemyError)
+async def database_error(request, exc):
+    return JSONResponse(
+        status_code=503, content={"detail": "Database operation unavailable"}
+    )
+
+
+@app.exception_handler(IntegrityError)
+async def integrity_error(request, exc):
+    return JSONResponse(
+        status_code=409,
+        content={"detail": "Record conflicts with an existing or referenced record"},
+    )

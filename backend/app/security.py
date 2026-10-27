@@ -3,22 +3,24 @@
 import hashlib
 import secrets
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
 import bcrypt
 import jwt
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import select, update
+from sqlalchemy import update
 from sqlalchemy.orm import Session
+
 from .config import get_settings
 from .db import get_db
-from .models import RefreshSession, User
+from .models import RefreshSession, SavedArea, User
 
 bearer = HTTPBearer(auto_error=False)
 
 
 def now():
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def digest(value: str):
@@ -92,10 +94,12 @@ def current_user(
             credentials.credentials,
             secret_key(),
             algorithms=["HS256"],
-            options={"require": ["sub", "exp", "iat"]},
+            options={"require": ["sub", "sid", "type", "exp", "iat"]},
         )
         if claims.get("type") != "access":
             raise ValueError("Wrong token type")
+        if not isinstance(claims["sub"], str) or not isinstance(claims["sid"], str):
+            raise ValueError("Invalid identity claim")
         uid = uuid.UUID(claims["sub"])
         sid = uuid.UUID(claims["sid"])
     except (jwt.PyJWTError, ValueError, KeyError):
@@ -112,6 +116,19 @@ def current_user(
     if user is None or not user.is_active:
         raise HTTPException(401, "Account inactive")
     return user
+
+
+# current_user validates both authentication and active status.
+active_user = current_user
+
+
+def owned_saved_area(
+    location_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    user: User = Depends(active_user),
+):
+    """Ownership is the server-derived composite key, never a submitted user_id."""
+    return db.get(SavedArea, {"user_id": user.id, "location_id": location_id})
 
 
 def admin_user(user: User = Depends(current_user)):
@@ -156,5 +173,9 @@ def put_auth_cookies(response, refresh: str, csrf: str):
 def clear_auth_cookies(response):
     for name in ("gridwatch_refresh", "gridwatch_csrf"):
         response.delete_cookie(
-            name, path="/" if name == "gridwatch_csrf" else "/api/auth"
+            name,
+            path="/" if name == "gridwatch_csrf" else "/api/auth",
+            secure=get_settings().app_env == "production",
+            httponly=name == "gridwatch_refresh",
+            samesite="strict",
         )

@@ -5,6 +5,7 @@ A Bengali-first load shedding and power outage management university project. Th
 - [Scope, sources, user flows and data rules](docs/SCOPE.md)
 - [Progress and seven-day work sequence](docs/PROGRESS.md)
 - [Database design](docs/DATABASE.md)
+- [Sections 3–4 API, security, email and testing guide](docs/AUTH-LOCATIONS.md)
 - [Deployment recipe and live verification checklist](docs/DEPLOYMENT.md)
 
 ## Local requirements and setup
@@ -56,6 +57,9 @@ Public API docs are available locally at `/docs`. Unverified notice entries are 
 ```bash
 # Creates and drops an isolated migrated PostgreSQL database; safe for local development
 python3 scripts/test.py
+backend/.venv/bin/ruff check backend
+npm run lint --prefix frontend
+npm run format:check --prefix frontend
 npm run build --prefix frontend
 curl --fail http://127.0.0.1:8000/api/health/live
 curl --fail http://127.0.0.1:8000/api/health/ready

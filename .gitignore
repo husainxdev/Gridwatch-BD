@@ -8,3 +8,6 @@ __pycache__/
 .playwright/
 *.tsbuildinfo
 .cache/
+
+frontend/test-results/
+frontend/playwright-report/

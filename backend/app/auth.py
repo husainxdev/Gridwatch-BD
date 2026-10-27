@@ -2,17 +2,20 @@ import secrets
 import smtplib
 import ssl
 import uuid
-import jwt
 from datetime import timedelta
 from email.message import EmailMessage
 from urllib.parse import quote
+
+import jwt
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+
 from .config import get_settings
 from .db import get_db
+from .limiting import limit_auth
 from .models import PasswordReset, RefreshSession, User
 from .security import (
     access_token,
@@ -29,10 +32,13 @@ from .security import (
     secret_key,
 )
 
-router = APIRouter(prefix="/api/auth", tags=["authentication"])
+router = APIRouter(
+    prefix="/api/auth", tags=["authentication"], dependencies=[Depends(limit_auth)]
+)
 
 
 class Credentials(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     email: EmailStr
     password: str
 
@@ -42,10 +48,12 @@ class Register(Credentials):
 
 
 class ResetRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     email: EmailStr
 
 
 class ResetConfirm(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     token: str
     password: str
 
@@ -59,8 +67,11 @@ def user_dict(user):
     }
 
 
-def signed_in(response, db, user, family=None):
+def signed_in(response, db, user, family=None, previous=None):
     refresh, session_id = new_refresh(db, user, family)
+    db.flush()
+    if previous:
+        previous.replaced_by_id = session_id
     put_auth_cookies(response, refresh, secrets.token_urlsafe(32))
     db.commit()
     return {
@@ -96,7 +107,9 @@ def register(body: Register, response: Response, db: Session = Depends(get_db)):
 
 @router.post("/login")
 def login(body: Credentials, response: Response, db: Session = Depends(get_db)):
-    user = db.scalar(select(User).where(User.email == body.email.lower().strip()))
+    user = db.scalar(
+        select(User).where(User.email == body.email.lower().strip()).with_for_update()
+    )
     if (
         not user
         or not user.is_active
@@ -117,6 +130,14 @@ def refresh(request: Request, response: Response, db: Session = Depends(get_db))
     raw = request.cookies.get("gridwatch_refresh")
     if not raw:
         raise HTTPException(401, "Session expired")
+    # Serialize session creation/revocation on the user, then lock the token.
+    # Password reset and logout take the same user lock before revoking sessions.
+    owner_id = db.scalar(
+        select(RefreshSession.user_id).where(RefreshSession.token_hash == digest(raw))
+    )
+    if owner_id is None:
+        raise HTTPException(401, "Session expired")
+    user = db.scalar(select(User).where(User.id == owner_id).with_for_update())
     session = db.scalar(
         select(RefreshSession)
         .where(RefreshSession.token_hash == digest(raw))
@@ -130,11 +151,10 @@ def refresh(request: Request, response: Response, db: Session = Depends(get_db))
         raise HTTPException(401, "Session revoked")
     if session.expires_at < now():
         raise HTTPException(401, "Session expired")
-    user = db.get(User, session.user_id)
     if not user or not user.is_active:
         raise HTTPException(401, "Account inactive")
     session.revoked_at = now()
-    return signed_in(response, db, user, session.family_id)
+    return signed_in(response, db, user, session.family_id, session)
 
 
 @router.post("/logout", status_code=204)
@@ -146,6 +166,7 @@ def logout(request: Request, response: Response, db: Session = Depends(get_db)):
             select(RefreshSession).where(RefreshSession.token_hash == digest(raw))
         )
         if session:
+            db.scalar(select(User).where(User.id == session.user_id).with_for_update())
             revoke_family(db, session.family_id)
     authorization = request.headers.get("authorization", "")
     if authorization.startswith("Bearer "):
@@ -159,6 +180,11 @@ def logout(request: Request, response: Response, db: Session = Depends(get_db)):
             if claims.get("type") == "access":
                 access_session = db.get(RefreshSession, uuid.UUID(claims["sid"]))
                 if access_session and str(access_session.user_id) == claims.get("sub"):
+                    db.scalar(
+                        select(User)
+                        .where(User.id == access_session.user_id)
+                        .with_for_update()
+                    )
                     revoke_family(db, access_session.family_id)
         except (jwt.PyJWTError, ValueError, KeyError):
             pass
@@ -199,7 +225,7 @@ def request_reset(body: ResetRequest, db: Session = Depends(get_db)):
         message.set_content(
             "Reset your password within 20 minutes: "
             + settings.frontend_url.rstrip("/")
-            + "/reset?token="
+            + "/reset#token="
             + quote(raw)
         )
         try:
@@ -213,9 +239,13 @@ def request_reset(body: ResetRequest, db: Session = Depends(get_db)):
                 smtp.send_message(message)
         except (OSError, smtplib.SMTPException):
             db.rollback()
-            raise HTTPException(503, "Mail service unavailable") from None
+            return {
+                "message": "If the account is eligible, reset instructions are sent when mail delivery is available."
+            }
         db.commit()
-    return {"message": "If the account exists, a reset link has been sent."}
+    return {
+        "message": "If the account is eligible, reset instructions are sent when mail delivery is available."
+    }
 
 
 @router.post("/password-reset/confirm")
@@ -231,7 +261,7 @@ def confirm_reset(body: ResetConfirm, db: Session = Depends(get_db)):
         hashed = hash_password(body.password)
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from None
-    user = db.get(User, record.user_id)
+    user = db.scalar(select(User).where(User.id == record.user_id).with_for_update())
     if not user or not user.is_active:
         raise HTTPException(400, "Invalid reset link")
     user.password_hash = hashed

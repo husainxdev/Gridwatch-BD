@@ -1,15 +1,19 @@
 """Operational API. Demo fixtures are never queried by these endpoints."""
 
+import unicodedata
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field, HttpUrl, field_validator
-from sqlalchemy import func, or_, select, update
+from sqlalchemy import String, cast, func, or_, select, text, update
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
+
 from .db import get_db
 from .models import Location, Notice, OutageEvent, Report, SavedArea, Schedule, User
-from .security import admin_user, current_user, now
+from .security import admin_user, current_user, now, owned_saved_area
 
 router = APIRouter(prefix="/api", tags=["operational data"])
 KINDS = {
@@ -36,6 +40,28 @@ class Page(BaseModel):
 
 
 class LocationInput(BaseModel):
+    aliases: list[str] = Field(default_factory=list, max_length=20)
+
+    @field_validator("aliases")
+    @classmethod
+    def normalize_aliases(cls, values):
+        aliases = list(
+            dict.fromkeys(
+                " ".join(unicodedata.normalize("NFKC", v).split()) for v in values
+            )
+        )
+        if any(not 2 <= len(v) <= 160 for v in aliases):
+            raise ValueError("Aliases must contain 2–160 characters")
+        return aliases
+
+    @field_validator("name_bn", "name_en", check_fields=False)
+    @classmethod
+    def normalize_name(cls, value):
+        result = " ".join(unicodedata.normalize("NFKC", value).split())
+        if len(result) < 2:
+            raise ValueError("Name too short")
+        return result
+
     name_bn: str = Field(min_length=2, max_length=160)
     name_en: str = Field(min_length=2, max_length=160)
     slug: str = Field(pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$", max_length=180)
@@ -150,6 +176,7 @@ def loc_json(r):
     return {
         "id": r.id,
         "parent_id": r.parent_id,
+        "aliases": r.aliases,
         "kind": r.kind,
         "name_bn": r.name_bn,
         "name_en": r.name_en,
@@ -215,22 +242,55 @@ def event_json(r):
 def locations(
     db: Session = Depends(get_db),
     parent_id: uuid.UUID | None = None,
+    roots_only: bool = False,
+    kind: str | None = None,
+    status: Literal["verified", "unverified"] | None = None,
     search: str | None = Query(None, max_length=100),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
 ):
     stmt = select(Location)
+    if roots_only:
+        stmt = stmt.where(Location.parent_id.is_(None))
+    if kind:
+        if kind not in KINDS:
+            raise HTTPException(422, "Invalid location type")
+        stmt = stmt.where(Location.kind == kind)
+    if status:
+        stmt = stmt.where(Location.verification_status == status)
     if parent_id:
         stmt = stmt.where(Location.parent_id == parent_id)
     if search:
-        stmt = stmt.where(
-            or_(
-                Location.name_bn.ilike("%" + search + "%"),
-                Location.name_en.ilike("%" + search + "%"),
-            )
-        )
+        predicates = [
+            Location.name_bn.ilike("%" + search + "%"),
+            Location.name_en.ilike("%" + search + "%"),
+            cast(Location.aliases, String).ilike("%" + search + "%"),
+        ]
+        try:
+            predicates.append(Location.id == uuid.UUID(search))
+        except ValueError:
+            pass
+        stmt = stmt.where(or_(*predicates))
+
+    def render_location(node):
+        item = loc_json(node)
+        names = []
+        seen = {node.id}
+        while node.parent_id:
+            node = db.get(Location, node.parent_id)
+            if node is None or node.id in seen:
+                break
+            seen.add(node.id)
+            names.append(node.name_bn)
+        item["ancestor_names"] = list(reversed(names))
+        return item
+
     return list_page(
-        db, stmt.order_by(Location.name_en, Location.id), page, page_size, loc_json
+        db,
+        stmt.order_by(Location.name_en, Location.id),
+        page,
+        page_size,
+        render_location,
     )
 
 
@@ -240,6 +300,7 @@ def create_location(
     db: Session = Depends(get_db),
     admin: User = Depends(admin_user),
 ):
+    db.execute(text("SELECT pg_advisory_xact_lock(34001)"))
     parent = find(db, Location, body.parent_id) if body.parent_id else None
     if (parent.kind if parent else None) not in KINDS[body.kind]:
         raise HTTPException(422, "Invalid location parent")
@@ -259,10 +320,14 @@ def edit_location(
     db: Session = Depends(get_db),
     admin: User = Depends(admin_user),
 ):
+    db.execute(text("SELECT pg_advisory_xact_lock(34001)"))
     item = find(db, Location, location_id)
     parent = find(db, Location, body.parent_id) if body.parent_id else None
     if (parent.kind if parent else None) not in KINDS[body.kind]:
         raise HTTPException(422, "Invalid location parent")
+    children = db.scalars(select(Location).where(Location.parent_id == item.id)).all()
+    if any(body.kind not in KINDS[child.kind] for child in children):
+        raise HTTPException(422, "Change would invalidate existing children")
     cursor = parent
     while cursor:
         if cursor.id == item.id:
@@ -305,6 +370,7 @@ def verify_location(
     db: Session = Depends(get_db),
     admin: User = Depends(admin_user),
 ):
+    db.execute(text("SELECT pg_advisory_xact_lock(34001)"))
     item = find(db, Location, location_id)
     item.source_url = str(body.source_url)
     item.verified_at = now()
@@ -320,6 +386,7 @@ def delete_location(
     db: Session = Depends(get_db),
     admin: User = Depends(admin_user),
 ):
+    db.execute(text("SELECT pg_advisory_xact_lock(34001)"))
     item = find(db, Location, location_id)
     if any(
         db.scalar(
@@ -536,9 +603,12 @@ def save_area(
     loc = find(db, Location, location_id)
     if loc.verification_status != "verified":
         raise HTTPException(422, "Area is not verified")
-    if not db.get(SavedArea, {"user_id": user.id, "location_id": location_id}):
-        db.add(SavedArea(user_id=user.id, location_id=location_id))
-        db.commit()
+    db.execute(
+        insert(SavedArea)
+        .values(user_id=user.id, location_id=location_id)
+        .on_conflict_do_nothing()
+    )
+    db.commit()
     return {"saved": True}
 
 
@@ -546,9 +616,8 @@ def save_area(
 def unsave_area(
     location_id: uuid.UUID,
     db: Session = Depends(get_db),
-    user: User = Depends(current_user),
+    entry: SavedArea | None = Depends(owned_saved_area),
 ):
-    entry = db.get(SavedArea, {"user_id": user.id, "location_id": location_id})
     if entry:
         db.delete(entry)
         db.commit()
@@ -699,3 +768,41 @@ def activity_conflicts(body: ActivityInput, db: Session = Depends(get_db)):
         if not rows
         else "Activity overlaps an announced outage; actual interruption may differ.",
     }
+
+
+@router.get("/locations/{location_id}")
+def location_detail(location_id: uuid.UUID, db: Session = Depends(get_db)):
+    return loc_json(find(db, Location, location_id))
+
+
+@router.get("/locations/{location_id}/ancestors")
+def location_ancestors(location_id: uuid.UUID, db: Session = Depends(get_db)):
+    node = find(db, Location, location_id)
+    items = []
+    seen = {node.id}
+    while node.parent_id:
+        node = find(db, Location, node.parent_id)
+        if node.id in seen:
+            raise HTTPException(409, "Invalid location hierarchy")
+        seen.add(node.id)
+        items.append(loc_json(node))
+    return {"items": list(reversed(items))}
+
+
+@router.get("/locations/{location_id}/children")
+def location_children(
+    location_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+):
+    find(db, Location, location_id)
+    return list_page(
+        db,
+        select(Location)
+        .where(Location.parent_id == location_id)
+        .order_by(Location.name_en, Location.id),
+        page,
+        page_size,
+        loc_json,
+    )

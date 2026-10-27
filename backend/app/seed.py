@@ -1,7 +1,9 @@
 """Idempotent demo-only seed. No real accounts, official notices or feeder claims."""
 
 import uuid
+
 from sqlalchemy import select
+
 from .config import get_settings
 from .db import SessionLocal
 from .models import DemoArea
