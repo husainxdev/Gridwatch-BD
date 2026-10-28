@@ -24,6 +24,9 @@ export type Location = {
   updated_at: string;
 };
 export type Notice = {
+  version: number;
+  lifecycle: string;
+  is_demo: boolean;
   id: string;
   title: string;
   body: string;
@@ -34,6 +37,11 @@ export type Notice = {
   updated_at: string;
 };
 export type Schedule = {
+  version: number;
+  lifecycle: string;
+  category: string;
+  coverage: { id: string; name_bn: string }[];
+  coverage_scope: string;
   id: string;
   notice_id: string;
   location_id: string;
@@ -144,7 +152,8 @@ export async function api<T>(
   }
   return response.status === 204 ? (undefined as T) : response.json();
 }
-export function shortTime(value: string) {
+export function shortTime(value: string | null) {
+  if (!value) return "প্রকাশের সময় অজানা";
   return new Intl.DateTimeFormat("bn-BD", {
     timeZone: "Asia/Dhaka",
     dateStyle: "medium",

@@ -1,3 +1,9 @@
+import {
+  PublicationActions,
+  ObservationPanel,
+  PublishedSchedules,
+  ReportReview,
+} from "./evidence-ui";
 import { LocationPicker } from "./components/LocationPicker";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
@@ -40,6 +46,7 @@ function useData<T>(path: string) {
   useEffect(() => {
     let active = true;
     setLoading(true);
+    setData(null);
     setError("");
     api<T>(path)
       .then((x) => {
@@ -67,8 +74,15 @@ function useAsyncAction(reload?: () => void) {
     setBusy(true);
     setError("");
     try {
-      await action();
+      const result = await action();
       toast.success(success);
+      if (
+        result &&
+        typeof result === "object" &&
+        "warning" in result &&
+        result.warning
+      )
+        toast(String(result.warning));
       reload?.();
       return true;
     } catch (e) {
@@ -331,22 +345,39 @@ export function Dashboard() {
     saved.reload();
   });
   const [reportBusy, setReportBusy] = useState(false);
+  const [pendingReport, setPendingReport] = useState<{
+    location_id: string;
+    kind: string;
+    observed_at: string;
+    idempotency_key: string;
+  } | null>(null);
+  const [reportNote, setReportNote] = useState("");
+  const [reportError, setReportError] = useState("");
   async function report(kind: Report["kind"]) {
     if (!selected) return;
     setReportBusy(true);
+    setReportError("");
     try {
+      const payload =
+        pendingReport?.location_id === selected && pendingReport.kind === kind
+          ? pendingReport
+          : {
+              location_id: selected,
+              kind,
+              observed_at: new Date().toISOString(),
+              idempotency_key: crypto.randomUUID(),
+              note: reportNote,
+            };
+      setPendingReport(payload);
       await api("/api/reports", {
         method: "POST",
-        body: JSON.stringify({
-          location_id: selected,
-          kind,
-          observed_at: new Date().toISOString(),
-          idempotency_key: crypto.randomUUID(),
-        }),
+        body: JSON.stringify(payload),
       });
+      setPendingReport(null);
       toast.success("আপনার সংযোগের রিপোর্ট জমা হয়েছে");
       reports.reload();
     } catch (e) {
+      setReportError((e as Error).message);
       toast.error((e as Error).message);
     } finally {
       setReportBusy(false);
@@ -412,6 +443,21 @@ export function Dashboard() {
                 এটি আপনার সংযোগের অবস্থা; পুরো এলাকার সিদ্ধান্ত নয়। একই ধরনের
                 রিপোর্ট ১০ মিনিটের মধ্যে আবার দেওয়া যাবে না।
               </p>
+              <label className="field">
+                ব্যক্তিগত মন্তব্য (ঐচ্ছিক)
+                <input
+                  className="input input-bordered"
+                  maxLength={500}
+                  value={reportNote}
+                  onChange={(e) => setReportNote(e.target.value)}
+                />
+              </label>
+              <ErrorBox message={reportError} />
+              {pendingReport && (
+                <p className="hint">
+                  একই বোতাম আবার চাপলে আগের অনুরোধ নিরাপদে পুনরায় পাঠানো হবে।
+                </p>
+              )}
               <div className="inline-actions">
                 <button
                   className="btn btn-primary"
@@ -505,6 +551,7 @@ export function Dashboard() {
           </div>
         </>
       )}
+      <ObservationPanel areaId={selected} />
       <Card title="সংরক্ষিত এলাকা" className="section-gap">
         {saved.data?.items.length ? (
           saved.data.items.map((x) => (
@@ -615,6 +662,7 @@ export function NoticeBoard() {
     <>
       <p className="eyebrow">মূল উৎস ও প্রকাশনার সময়</p>
       <h1>নোটিশ ও ঘোষণা</h1>
+      <PublishedSchedules />
       <p className="hint">
         প্রতিটি নোটিশের যাচাইয়ের অবস্থা ও মূল লিংক দেখুন। কোনো নোটিশ বাস্তব
         বিভ্রাট নিশ্চিত করে না।
@@ -697,6 +745,7 @@ export function Admin() {
     <>
       <p className="eyebrow">সীমিত প্রশাসনিক প্রবেশাধিকার</p>
       <h1>অ্যাডমিন ড্যাশবোর্ড</h1>
+      <ReportReview />
       <p className="hint">
         প্রকাশের আগে মূল উৎস ও এলাকার সীমানা হাতে যাচাই করুন। প্রশাসনিক যাচাই
         নিজে সরকারি অনুমোদন নয়।
@@ -918,7 +967,7 @@ function AdminNotices({
     [search, setSearch] = useState(""),
     [query, setQuery] = useState("");
   const list = useData<Page<Notice>>(
-    `/api/notices?page=${page}&page_size=10&search=${encodeURIComponent(query)}&v=${version}`,
+    `/api/admin/notices?page=${page}&page_size=10&search=${encodeURIComponent(query)}&v=${version}`,
   );
   const action = useAsyncAction(reload),
     [edit, setEdit] = useState<Notice | null>(null);
@@ -926,11 +975,14 @@ function AdminNotices({
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const body = {
+      version: edit?.version || 1,
       title: f.get("title"),
       body: f.get("body"),
       source_url: f.get("source_url"),
       publisher: f.get("publisher"),
-      published_at: bdToIso(String(f.get("published_at"))),
+      published_at: f.get("published_at")
+        ? bdToIso(String(f.get("published_at")))
+        : null,
     };
     if (
       await action.run(() =>
@@ -987,11 +1039,10 @@ function AdminNotices({
               type="datetime-local"
               className="input input-bordered"
               defaultValue={
-                edit
+                edit && edit.published_at
                   ? localInputTime(new Date(edit.published_at))
                   : localInputTime(new Date())
               }
-              required
             />
           </Field>
           <ErrorBox message={action.error} />
@@ -1027,6 +1078,7 @@ function AdminNotices({
             <span>
               {x.verification_status} · {shortTime(x.published_at)}
             </span>
+            <PublicationActions kind="notices" item={x} reload={reload} />
             <a href={x.source_url} target="_blank" rel="noreferrer">
               মূল উৎস ↗
             </a>
@@ -1041,6 +1093,7 @@ function AdminNotices({
                     action.run(() =>
                       api(`/api/admin/notices/${x.id}/verify`, {
                         method: "POST",
+                        body: JSON.stringify({ version: x.version }),
                       }),
                     )
                   }
@@ -1053,7 +1106,9 @@ function AdminNotices({
                 onClick={() => {
                   if (window.confirm("নোটিশ মুছবেন?"))
                     action.run(() =>
-                      api(`/api/admin/notices/${x.id}`, { method: "DELETE" }),
+                      api(`/api/admin/notices/${x.id}?version=${x.version}`, {
+                        method: "DELETE",
+                      }),
                     );
                 }}
               >
@@ -1085,14 +1140,26 @@ function AdminSchedules({
   const areas = useData<Page<Location>>(
       `/api/locations?page_size=100&v=${version}`,
     ),
-    notices = useData<Page<Notice>>(`/api/notices?page_size=100&v=${version}`),
-    list = useData<Page<Schedule>>(`/api/schedules?page_size=100&v=${version}`);
+    notices = useData<Page<Notice>>(
+      `/api/admin/notices?page_size=100&v=${version}`,
+    ),
+    list = useData<Page<Schedule>>(
+      `/api/admin/schedules?page_size=100&v=${version}`,
+    );
   const action = useAsyncAction(reload),
     [edit, setEdit] = useState<Schedule | null>(null);
+  const [coverage, setCoverage] = useState<{ id: string; name_bn: string }[]>(
+    [],
+  );
+  const [picked, setPicked] = useState("");
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const body = {
+      version: edit?.version || 1,
+      category: f.get("category"),
+      location_ids: coverage.map((x) => x.id),
+      coverage_scope: f.get("coverage_scope"),
       notice_id: f.get("notice_id"),
       location_id: f.get("location_id"),
       starts_at: bdToIso(String(f.get("starts_at"))),
@@ -1129,21 +1196,51 @@ function AdminSchedules({
                 ))}
             </select>
           </Field>
-          <Field label="যাচাইকৃত এলাকা">
-            <select
-              name="location_id"
-              className="select select-bordered"
-              required
-              defaultValue={edit?.location_id || ""}
+          <LocationPicker
+            value={picked}
+            onChange={(id) => {
+              setPicked(id);
+              if (id)
+                api<Location>(`/api/locations/${id}`).then((loc) =>
+                  setCoverage((old) =>
+                    old.some((x) => x.id === id) ? old : [...old, loc],
+                  ),
+                );
+            }}
+          />
+          <input
+            type="hidden"
+            name="location_id"
+            value={coverage[0]?.id || edit?.location_id || ""}
+          />
+          {coverage.map((x) => (
+            <button
+              key={x.id}
+              type="button"
+              className="btn btn-sm"
+              onClick={() => setCoverage(coverage.filter((y) => y.id !== x.id))}
             >
-              <option value="">বাছুন</option>
-              {areas.data?.items
-                .filter((x) => x.verification_status === "verified")
-                .map((x) => (
-                  <option key={x.id} value={x.id}>
-                    {x.name_bn}
-                  </option>
-                ))}
+              {x.name_bn} ×
+            </button>
+          ))}
+          <Field label="কারণ / বিভাগ">
+            <input
+              name="category"
+              className="input"
+              defaultValue={edit?.category || "maintenance"}
+              required
+            />
+          </Field>
+          <Field label="ঘোষিত আওতা">
+            <select
+              name="coverage_scope"
+              className="select"
+              defaultValue={edit?.coverage_scope || "named_locations"}
+            >
+              <option value="named_locations">শুধু নামযুক্ত এলাকাসমূহ</option>
+              <option value="entire_administrative_area">
+                সমগ্র নির্বাচিত প্রশাসনিক এলাকা (মূল উৎস অনুসারে)
+              </option>
             </select>
           </Field>
           <Field label="শুরু · বাংলাদেশ">
@@ -1182,12 +1279,20 @@ function AdminSchedules({
               {shortTime(x.starts_at)} → {shortTime(x.ends_at)}
             </strong>
             <span>
-              {x.status} ·{" "}
+              {x.status} · {x.lifecycle} ·{" "}
               {areas.data?.items.find((a) => a.id === x.location_id)?.name_bn ||
                 x.location_id}
             </span>
+            <PublicationActions kind="schedules" item={x} reload={reload} />
             <div className="inline-actions">
-              <button className="btn btn-sm" onClick={() => setEdit(x)}>
+              <button
+                className="btn btn-sm"
+                onClick={() => {
+                  setEdit(x);
+                  setCoverage(x.coverage || []);
+                  setPicked("");
+                }}
+              >
                 সম্পাদনা
               </button>
               {x.status === "announced" && (
@@ -1197,6 +1302,7 @@ function AdminSchedules({
                     action.run(() =>
                       api(`/api/admin/schedules/${x.id}/cancel`, {
                         method: "POST",
+                        body: JSON.stringify({ version: x.version }),
                       }),
                     )
                   }
@@ -1209,7 +1315,9 @@ function AdminSchedules({
                 onClick={() => {
                   if (window.confirm("সময়সূচি মুছবেন?"))
                     action.run(() =>
-                      api(`/api/admin/schedules/${x.id}`, { method: "DELETE" }),
+                      api(`/api/admin/schedules/${x.id}?version=${x.version}`, {
+                        method: "DELETE",
+                      }),
                     );
                 }}
               >

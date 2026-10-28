@@ -170,7 +170,17 @@ def test_complete_workflow(monkeypatch):
     )
     assert (
         client.post(
-            "/api/admin/notices/" + nid + "/verify", headers=headers(admin_token)
+            "/api/admin/notices/" + nid + "/verify",
+            headers=headers(admin_token),
+            json={"version": 1},
+        ).status_code
+        == 200
+    )
+    assert (
+        client.post(
+            "/api/admin/notices/" + nid + "/publish",
+            headers=headers(admin_token),
+            json={"version": 2},
         ).status_code
         == 200
     )
@@ -179,6 +189,14 @@ def test_complete_workflow(monkeypatch):
     )
     assert planned.status_code == 201, planned.text
     sid = planned.json()["id"]
+    assert (
+        client.post(
+            "/api/admin/schedules/" + sid + "/publish",
+            headers=headers(admin_token),
+            json={"version": 1},
+        ).status_code
+        == 200
+    )
     activity = {
         "location_id": district_id,
         "starts_at": (start + timedelta(minutes=30)).isoformat(),
@@ -254,7 +272,9 @@ def test_complete_workflow(monkeypatch):
     assert client.get("/api/locations?page_size=101").status_code == 422
     assert (
         client.post(
-            "/api/admin/schedules/" + sid + "/cancel", headers=headers(admin_token)
+            "/api/admin/schedules/" + sid + "/cancel",
+            headers=headers(admin_token),
+            json={"version": 2},
         ).json()["status"]
         == "cancelled"
     )
@@ -265,12 +285,20 @@ def test_complete_workflow(monkeypatch):
     assert second.status_code == 201, second.text
     assert (
         client.put(
-            "/api/admin/notices/" + nid, headers=headers(admin_token), json=notice_body
+            "/api/admin/notices/" + nid,
+            headers=headers(admin_token),
+            json={**notice_body, "version": 3},
         ).status_code
         == 200
     )
     assert client.post("/api/activities/check", json=activity).json()["conflicts"] == []
-    assert client.get("/api/schedules?status=superseded").json()["total"] >= 1
+    assert any(
+        x["status"] == "superseded"
+        for x in client.get(
+            "/api/admin/schedules", headers=headers(admin_token)
+        ).json()["items"]
+    )
+    assert client.get("/api/schedules?status=superseded").json()["total"] == 0
     assert (
         client.delete(
             "/api/admin/locations/" + district_id, headers=headers(admin_token)

@@ -388,6 +388,12 @@ def delete_location(
 ):
     db.execute(text("SELECT pg_advisory_xact_lock(34001)"))
     item = find(db, Location, location_id)
+    if db.scalar(
+        select(Schedule.id)
+        .where(Schedule.coverage.contains([{"id": str(location_id)}]))
+        .limit(1)
+    ):
+        raise HTTPException(409, "Location is referenced by schedule coverage")
     if any(
         db.scalar(
             select(model.id if hasattr(model, "id") else model.user_id).where(
@@ -403,182 +409,6 @@ def delete_location(
         ]
     ):
         raise HTTPException(409, "Location is in use")
-    db.delete(item)
-    db.commit()
-
-
-@router.get("/notices")
-def notices(
-    db: Session = Depends(get_db),
-    search: str | None = Query(None, max_length=100),
-    status: Literal["unverified", "verified", "rejected"] | None = None,
-    sort: Literal["newest", "oldest"] = "newest",
-    page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
-):
-    stmt = select(Notice)
-    if search:
-        stmt = stmt.where(Notice.title.ilike("%" + search + "%"))
-    if status:
-        stmt = stmt.where(Notice.verification_status == status)
-    order = (
-        Notice.published_at.desc() if sort == "newest" else Notice.published_at.asc()
-    )
-    return list_page(db, stmt.order_by(order, Notice.id), page, page_size, notice_json)
-
-
-@router.post("/admin/notices", status_code=201)
-def create_notice(
-    body: NoticeInput, db: Session = Depends(get_db), admin: User = Depends(admin_user)
-):
-    item = Notice(
-        **{**body.model_dump(), "source_url": str(body.source_url)},
-        verification_status="unverified",
-    )
-    db.add(item)
-    db.commit()
-    db.refresh(item)
-    return notice_json(item)
-
-
-@router.put("/admin/notices/{notice_id}")
-def edit_notice(
-    notice_id: uuid.UUID,
-    body: NoticeInput,
-    db: Session = Depends(get_db),
-    admin: User = Depends(admin_user),
-):
-    item = find(db, Notice, notice_id)
-    for k, v in body.model_dump().items():
-        setattr(item, k, str(v) if k == "source_url" else v)
-    item.verification_status = "unverified"
-    item.verified_by = None
-    item.verified_at = None
-    db.execute(
-        update(Schedule)
-        .where(Schedule.notice_id == item.id, Schedule.status == "announced")
-        .values(status="superseded")
-    )
-    db.commit()
-    db.refresh(item)
-    return notice_json(item)
-
-
-@router.post("/admin/notices/{notice_id}/verify")
-def verify_notice(
-    notice_id: uuid.UUID,
-    db: Session = Depends(get_db),
-    admin: User = Depends(admin_user),
-):
-    item = find(db, Notice, notice_id)
-    if not item.source_url:
-        raise HTTPException(422, "Original source required")
-    item.verification_status = "verified"
-    item.verified_by = admin.id
-    item.verified_at = now()
-    db.commit()
-    db.refresh(item)
-    return notice_json(item)
-
-
-@router.delete("/admin/notices/{notice_id}", status_code=204)
-def delete_notice(
-    notice_id: uuid.UUID,
-    db: Session = Depends(get_db),
-    admin: User = Depends(admin_user),
-):
-    item = find(db, Notice, notice_id)
-    if db.scalar(select(Schedule.id).where(Schedule.notice_id == item.id)):
-        raise HTTPException(409, "Notice has schedules")
-    db.delete(item)
-    db.commit()
-
-
-@router.get("/schedules")
-def schedules(
-    db: Session = Depends(get_db),
-    location_id: uuid.UUID | None = None,
-    status: Literal["announced", "cancelled", "superseded"] | None = None,
-    sort: Literal["newest", "oldest"] = "newest",
-    page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
-):
-    stmt = select(Schedule)
-    if location_id:
-        stmt = stmt.where(Schedule.location_id == location_id)
-    if status:
-        stmt = stmt.where(Schedule.status == status)
-    order = Schedule.starts_at.desc() if sort == "newest" else Schedule.starts_at.asc()
-    return list_page(
-        db, stmt.order_by(order, Schedule.id), page, page_size, schedule_json
-    )
-
-
-@router.post("/admin/schedules", status_code=201)
-def create_schedule(
-    body: ScheduleInput,
-    db: Session = Depends(get_db),
-    admin: User = Depends(admin_user),
-):
-    notice = find(db, Notice, body.notice_id)
-    loc = find(db, Location, body.location_id)
-    if (
-        notice.verification_status != "verified"
-        or loc.verification_status != "verified"
-    ):
-        raise HTTPException(422, "Verified notice and area required")
-    if body.ends_at <= body.starts_at:
-        raise HTTPException(422, "End must follow start")
-    item = Schedule(**body.model_dump(), status="announced")
-    db.add(item)
-    db.commit()
-    db.refresh(item)
-    return schedule_json(item)
-
-
-@router.put("/admin/schedules/{schedule_id}")
-def edit_schedule(
-    schedule_id: uuid.UUID,
-    body: ScheduleInput,
-    db: Session = Depends(get_db),
-    admin: User = Depends(admin_user),
-):
-    item = find(db, Schedule, schedule_id)
-    notice = find(db, Notice, body.notice_id)
-    loc = find(db, Location, body.location_id)
-    if (
-        notice.verification_status != "verified"
-        or loc.verification_status != "verified"
-        or body.ends_at <= body.starts_at
-    ):
-        raise HTTPException(422, "Verified evidence and valid interval required")
-    for k, v in body.model_dump().items():
-        setattr(item, k, v)
-    db.commit()
-    db.refresh(item)
-    return schedule_json(item)
-
-
-@router.post("/admin/schedules/{schedule_id}/cancel")
-def cancel_schedule(
-    schedule_id: uuid.UUID,
-    db: Session = Depends(get_db),
-    admin: User = Depends(admin_user),
-):
-    item = find(db, Schedule, schedule_id)
-    item.status = "cancelled"
-    db.commit()
-    db.refresh(item)
-    return schedule_json(item)
-
-
-@router.delete("/admin/schedules/{schedule_id}", status_code=204)
-def delete_schedule(
-    schedule_id: uuid.UUID,
-    db: Session = Depends(get_db),
-    admin: User = Depends(admin_user),
-):
-    item = find(db, Schedule, schedule_id)
     db.delete(item)
     db.commit()
 
@@ -621,68 +451,6 @@ def unsave_area(
     if entry:
         db.delete(entry)
         db.commit()
-
-
-@router.get("/reports")
-def reports(
-    location_id: uuid.UUID,
-    db: Session = Depends(get_db),
-    page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
-):
-    find(db, Location, location_id)
-    return list_page(
-        db,
-        select(Report)
-        .where(Report.location_id == location_id)
-        .order_by(Report.observed_at.desc(), Report.id.desc()),
-        page,
-        page_size,
-        report_json,
-    )
-
-
-@router.post("/reports", status_code=201)
-def create_report(
-    body: ReportInput, db: Session = Depends(get_db), user: User = Depends(current_user)
-):
-    loc = find(db, Location, body.location_id)
-    if loc.verification_status != "verified":
-        raise HTTPException(422, "Area is not verified")
-    existing = db.scalar(
-        select(Report).where(
-            Report.user_id == user.id, Report.idempotency_key == body.idempotency_key
-        )
-    )
-    if existing:
-        if existing.location_id != body.location_id or existing.kind != body.kind:
-            raise HTTPException(409, "Request key reused for different report")
-        return report_json(existing)
-    instant = now()
-    if (
-        not instant - timedelta(hours=24)
-        <= body.observed_at
-        <= instant + timedelta(minutes=5)
-    ):
-        raise HTTPException(422, "Observation time outside allowed window")
-    recent = db.scalar(
-        select(Report)
-        .where(
-            Report.user_id == user.id,
-            Report.location_id == loc.id,
-            Report.kind == body.kind,
-            Report.observed_at >= instant - timedelta(minutes=10),
-        )
-        .order_by(Report.observed_at.desc())
-        .limit(1)
-    )
-    if recent:
-        raise HTTPException(429, "Similar report submitted recently")
-    item = Report(user_id=user.id, **body.model_dump())
-    db.add(item)
-    db.commit()
-    db.refresh(item)
-    return report_json(item)
 
 
 @router.get("/events")
@@ -756,6 +524,10 @@ def activity_conflicts(body: ActivityInput, db: Session = Depends(get_db)):
             Schedule.location_id == body.location_id,
             Schedule.status == "announced",
             Notice.verification_status == "verified",
+            Notice.lifecycle == "published",
+            Schedule.lifecycle == "published",
+            Notice.is_demo.is_(False),
+            Schedule.is_demo.is_(False),
             Location.verification_status == "verified",
             Schedule.starts_at < body.ends_at,
             Schedule.ends_at > body.starts_at,

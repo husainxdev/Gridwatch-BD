@@ -14,6 +14,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -138,7 +139,12 @@ class Notice(Record, Base):
     body: Mapped[str] = mapped_column(Text)
     source_url: Mapped[str] = mapped_column(Text)
     publisher: Mapped[str] = mapped_column(String(160))
-    published_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    lifecycle: Mapped[str] = mapped_column(String(20), server_default="draft")
+    is_demo: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    version: Mapped[int] = mapped_column(Integer, server_default="1")
+    created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    updated_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     verification_status: Mapped[str] = mapped_column(String(20), default="unverified")
     verified_by: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="RESTRICT")
@@ -158,6 +164,16 @@ class Notice(Record, Base):
 
 class Schedule(Record, Base):
     __tablename__ = "schedules"
+    lifecycle: Mapped[str] = mapped_column(String(20), server_default="draft")
+    version: Mapped[int] = mapped_column(Integer, server_default="1")
+    category: Mapped[str] = mapped_column(String(100), server_default="maintenance")
+    coverage: Mapped[list] = mapped_column(JSONB, server_default="[]")
+    coverage_scope: Mapped[str] = mapped_column(
+        String(30), server_default="named_locations"
+    )
+    is_demo: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    updated_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     notice_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("notices.id", ondelete="RESTRICT"), index=True
     )
@@ -177,6 +193,15 @@ class Schedule(Record, Base):
 
 class Report(Record, Base):
     __tablename__ = "reports"
+    note: Mapped[str] = mapped_column(String(500), server_default="")
+    moderation: Mapped[str] = mapped_column(String(20), server_default="accepted")
+    is_demo: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    episode_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("personal_episodes.id")
+    )
+    candidate_event_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("outage_events.id")
+    )
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="RESTRICT"), index=True
     )
@@ -225,3 +250,35 @@ class DemoArea(Record, Base):
     name_bn: Mapped[str] = mapped_column(String(160))
     description: Mapped[str] = mapped_column(Text)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class PersonalEpisode(Record, Base):
+    __tablename__ = "personal_episodes"
+    __table_args__ = (
+        Index(
+            "uq_open_personal_episode",
+            "user_id",
+            "location_id",
+            unique=True,
+            postgresql_where=text("is_open"),
+        ),
+        CheckConstraint(
+            "ended_at IS NULL OR started_at IS NULL OR ended_at >= started_at",
+            name="personal_episode_interval",
+        ),
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
+    location_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("locations.id"))
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    is_open: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class EvidenceAudit(Record, Base):
+    __tablename__ = "evidence_audit"
+    actor_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"))
+    entity_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), index=True)
+    entity_type: Mapped[str] = mapped_column(String(30))
+    action: Mapped[str] = mapped_column(String(40))
+    snapshot: Mapped[dict] = mapped_column(JSONB)

@@ -26,10 +26,10 @@ try:
         raise SystemExit("Unexpected development database URL; test setup stopped.")
     env = dict(os.environ, DATABASE_URL=original.rsplit("/", 1)[0] + "/" + name)
     run([".venv/bin/alembic", "upgrade", "head"], cwd=backend, env=env)
-    run([".venv/bin/pytest", "-q"], cwd=backend, env=env)
-    run([".venv/bin/alembic", "check"], cwd=backend, env=env)
     run([".venv/bin/alembic", "downgrade", "0001"], cwd=backend, env=env)
     run([".venv/bin/alembic", "upgrade", "head"], cwd=backend, env=env)
+    run([".venv/bin/pytest", "-q"], cwd=backend, env=env)
+    run([".venv/bin/alembic", "check"], cwd=backend, env=env)
 finally:
     run(
         [

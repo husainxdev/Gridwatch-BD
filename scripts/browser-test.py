@@ -1,5 +1,6 @@
 """Browser journey against its own disposable database and servers (ports 18000/15173)."""
 
+import secrets
 import os
 import subprocess
 import time
@@ -38,8 +39,10 @@ try:
     urls = [line.split("=", 1)[1] for line in lines if line.startswith("DATABASE_URL=")]
     if len(urls) != 1 or not urls[0].endswith("/gridwatch"):
         raise RuntimeError("Unexpected development database URL; stopping")
+    browser_password = secrets.token_urlsafe(24)
     env = dict(
         os.environ,
+        BROWSER_TEST_PASSWORD=browser_password,
         DATABASE_URL=urls[0].rsplit("/", 1)[0] + "/" + name,
         FRONTEND_URL="http://localhost:15173",
         APP_ENV="test",
@@ -55,8 +58,11 @@ try:
             """
 from datetime import datetime, UTC
 from app.db import SessionLocal
-from app.models import Location
+from app.models import Location, User
+from app.security import hash_password
+import os
 with SessionLocal.begin() as db:
+    db.add(User(email="phase-admin@example.com",display_name="Phase test admin",password_hash=hash_password(os.environ["BROWSER_TEST_PASSWORD"]),role="admin"))
     root = Location(name_bn="পরীক্ষামূলক বিভাগ", name_en="Browser test division", slug="browser-division", kind="division")
     db.add(root)
     db.flush()

@@ -7,6 +7,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    report_backdate_hours: int = Field(default=24, ge=1, le=168)
+    report_future_seconds: int = Field(default=300, ge=0, le=600)
+    report_rate_limit: int = Field(default=20, ge=1, le=1000)
+    report_cooldown_seconds: int = Field(default=600, ge=0, le=3600)
     auth_rate_limit: int = Field(default=60, ge=1, le=10000)
     auth_rate_window_seconds: int = Field(default=60, ge=1, le=86400)
     database_url: str

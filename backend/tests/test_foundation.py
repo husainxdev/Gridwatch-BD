@@ -49,7 +49,7 @@ def test_live_and_ready(client):
     assert client.get("/api/health/ready").json() == {
         "status": "ready",
         "database": "connected",
-        "schema": "0002",
+        "schema": "0003",
     }
 
 

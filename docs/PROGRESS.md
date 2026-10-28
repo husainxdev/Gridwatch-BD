@@ -44,3 +44,13 @@ Outstanding risk: actual pilot location/provider data and published notice sourc
 - [ ] Production SMTP delivery and hosted-domain cookie verification (credentials/domain unavailable).
 
 See [the phase guide](AUTH-LOCATIONS.md) for commands, manual checks and known deployment limitations. Earlier checked sections describe existing local capabilities, not production certification.
+
+## Sections 5–6 current phase
+
+- [x] Draft/published/withdrawn/archive notice lifecycle and public privacy gates.
+- [x] Schedule publication, cancellation, explicit coverage snapshots, optimistic versions and audit revisions.
+- [x] Personal episodes, exact retry validation, concurrent duplicate safety and per-user database limits.
+- [x] Latest-observation evidence, moderation and personal history integration.
+- [x] Isolated PostgreSQL phase tests and frontend integration.
+
+See [phase scope, API contracts and limitations](SECTIONS-5-6.md). Earlier checklist entries for later sections are historical; this phase does not certify Sections 7–14 as complete.
