@@ -32,7 +32,7 @@ export type Notice = {
   body: string;
   source_url: string;
   publisher: string;
-  published_at: string;
+  published_at: string | null;
   verification_status: string;
   updated_at: string;
 };
