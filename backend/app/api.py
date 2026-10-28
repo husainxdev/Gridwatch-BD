@@ -6,14 +6,14 @@ from datetime import datetime, timedelta
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field, HttpUrl, field_validator
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
 from sqlalchemy import String, cast, func, or_, select, text, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from .db import get_db
 from .models import Location, Notice, OutageEvent, Report, SavedArea, Schedule, User
-from .security import admin_user, current_user, now, owned_saved_area
+from .security import admin_user, current_user, now
 
 router = APIRouter(prefix="/api", tags=["operational data"])
 KINDS = {
@@ -413,15 +413,31 @@ def delete_location(
     db.commit()
 
 
+class SavedAreaInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    label: str = Field(default="", max_length=60)
+    is_default: bool = False
+
+
 @router.get("/saved-areas")
 def saved_areas(db: Session = Depends(get_db), user: User = Depends(current_user)):
-    rows = db.scalars(
-        select(Location)
+    rows = db.execute(
+        select(Location, SavedArea)
         .join(SavedArea, SavedArea.location_id == Location.id)
         .where(SavedArea.user_id == user.id)
-        .order_by(Location.name_bn)
+        .order_by(SavedArea.is_default.desc(), Location.name_bn, Location.id)
     ).all()
-    return {"items": [loc_json(r) for r in rows]}
+    return {
+        "items": [
+            loc_json(loc)
+            | {
+                "label": saved.label,
+                "is_default": saved.is_default,
+                "available": loc.verification_status == "verified",
+            }
+            for loc, saved in rows
+        ]
+    }
 
 
 @router.post("/saved-areas/{location_id}", status_code=201)
@@ -430,27 +446,57 @@ def save_area(
     db: Session = Depends(get_db),
     user: User = Depends(current_user),
 ):
+    db.scalar(select(User).where(User.id == user.id).with_for_update())
     loc = find(db, Location, location_id)
     if loc.verification_status != "verified":
         raise HTTPException(422, "Area is not verified")
-    db.execute(
+    inserted = db.execute(
         insert(SavedArea)
         .values(user_id=user.id, location_id=location_id)
         .on_conflict_do_nothing()
-    )
+        .returning(SavedArea.location_id)
+    ).scalar_one_or_none()
     db.commit()
-    return {"saved": True}
+    return {"saved": True, "already_saved": inserted is None}
+
+
+@router.put("/saved-areas/{location_id}")
+def update_saved_area(
+    location_id: uuid.UUID,
+    body: SavedAreaInput,
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+):
+    db.scalar(select(User).where(User.id == user.id).with_for_update())
+    entry = db.get(SavedArea, {"user_id": user.id, "location_id": location_id})
+    if entry is None:
+        raise HTTPException(404, "Saved area not found")
+    loc = find(db, Location, location_id)
+    if body.is_default and loc.verification_status != "verified":
+        raise HTTPException(422, "Default area is unavailable")
+    if body.is_default:
+        db.execute(
+            update(SavedArea)
+            .where(SavedArea.user_id == user.id, SavedArea.location_id != location_id)
+            .values(is_default=False)
+        )
+    entry.is_default = body.is_default
+    entry.label = body.label.strip()
+    db.commit()
+    return {"saved": True, "label": entry.label, "is_default": entry.is_default}
 
 
 @router.delete("/saved-areas/{location_id}", status_code=204)
 def unsave_area(
     location_id: uuid.UUID,
     db: Session = Depends(get_db),
-    entry: SavedArea | None = Depends(owned_saved_area),
+    user: User = Depends(current_user),
 ):
+    db.scalar(select(User).where(User.id == user.id).with_for_update())
+    entry = db.get(SavedArea, {"user_id": user.id, "location_id": location_id})
     if entry:
         db.delete(entry)
-        db.commit()
+    db.commit()
 
 
 @router.get("/events")

@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    community_window_minutes: int = Field(default=60, ge=5, le=1440)
     report_backdate_hours: int = Field(default=24, ge=1, le=168)
     report_future_seconds: int = Field(default=300, ge=0, le=600)
     report_rate_limit: int = Field(default=20, ge=1, le=1000)

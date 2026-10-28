@@ -97,6 +97,16 @@ class User(Record, Base):
 
 class SavedArea(Base):
     __tablename__ = "saved_areas"
+    label: Mapped[str] = mapped_column(String(60), server_default="")
+    is_default: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    __table_args__ = (
+        Index(
+            "uq_default_saved_area",
+            "user_id",
+            unique=True,
+            postgresql_where=text("is_default"),
+        ),
+    )
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
@@ -184,6 +194,7 @@ class Schedule(Record, Base):
     ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     status: Mapped[str] = mapped_column(String(20), default="announced")
     __table_args__ = (
+        Index("ix_schedule_coverage", "coverage", postgresql_using="gin"),
         CheckConstraint("ends_at > starts_at", name="schedule_interval"),
         CheckConstraint(
             "status IN ('announced','cancelled','superseded')", name="schedule_status"
@@ -212,6 +223,13 @@ class Report(Record, Base):
     observed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     idempotency_key: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
     __table_args__ = (
+        Index(
+            "ix_report_area_latest",
+            "location_id",
+            "user_id",
+            "observed_at",
+            "created_at",
+        ),
         CheckConstraint(
             "kind IN ('power_off','power_back','still_off')", name="report_kind"
         ),

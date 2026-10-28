@@ -103,6 +103,14 @@ export function csrf() {
       ?.split("=")[1] || ""
   );
 }
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
+    super(message);
+  }
+}
 export async function api<T>(
   path: string,
   options: RequestInit = {},
@@ -148,7 +156,7 @@ export async function api<T>(
           ? data.detail
           : detail;
     } catch {}
-    throw new Error(detail);
+    throw new ApiError(detail, response.status);
   }
   return response.status === 204 ? (undefined as T) : response.json();
 }

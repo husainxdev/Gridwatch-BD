@@ -1,6 +1,6 @@
+import { DashboardView } from "./Dashboard";
 import {
   PublicationActions,
-  ObservationPanel,
   PublishedSchedules,
   ReportReview,
 } from "./evidence-ui";
@@ -18,7 +18,6 @@ import {
   type Location,
   type Notice,
   type Page,
-  type Report,
   type Schedule,
 } from "./client";
 import { useSession } from "./session";
@@ -293,24 +292,6 @@ export function RequireUser({
   return <>{children}</>;
 }
 
-let rememberedArea = "";
-function useAreaSelection() {
-  const areas = useData<Page<Location>>("/api/locations?page_size=100");
-  const [selected, updateSelected] = useState(rememberedArea);
-  const setSelected = (value: string) => {
-    rememberedArea = value;
-    updateSelected(value);
-  };
-  const detail = useData<Location>(
-    selected ? `/api/locations/${selected}` : "/api/health/live",
-  );
-  return {
-    areas,
-    selected,
-    setSelected,
-    area: selected && detail.data?.id === selected ? detail.data : undefined,
-  };
-}
 function AreaChooser({
   value,
   onChange,
@@ -323,259 +304,11 @@ function AreaChooser({
 }
 export function Dashboard() {
   const { user } = useSession();
-  const { areas, selected, setSelected, area } = useAreaSelection();
-  const reports = useData<Page<Report>>(
-    selected
-      ? `/api/reports?location_id=${selected}&page_size=5`
-      : "/api/health/live",
-  );
-  const schedules = useData<Page<Schedule>>(
-    selected
-      ? `/api/schedules?location_id=${selected}&status=announced&page_size=5`
-      : "/api/health/live",
-  );
-  const events = useData<Page<Event>>(
-    selected
-      ? `/api/events?location_id=${selected}&page_size=5`
-      : "/api/health/live",
-  );
-  const saved = useData<{ items: Location[] }>("/api/saved-areas");
-  const action = useAsyncAction(() => {
-    reports.reload();
-    saved.reload();
-  });
-  const [reportBusy, setReportBusy] = useState(false);
-  const [pendingReport, setPendingReport] = useState<{
-    location_id: string;
-    kind: string;
-    observed_at: string;
-    idempotency_key: string;
-  } | null>(null);
-  const [reportNote, setReportNote] = useState("");
-  const [reportError, setReportError] = useState("");
-  async function report(kind: Report["kind"]) {
-    if (!selected) return;
-    setReportBusy(true);
-    setReportError("");
-    try {
-      const payload =
-        pendingReport?.location_id === selected && pendingReport.kind === kind
-          ? pendingReport
-          : {
-              location_id: selected,
-              kind,
-              observed_at: new Date().toISOString(),
-              idempotency_key: crypto.randomUUID(),
-              note: reportNote,
-            };
-      setPendingReport(payload);
-      await api("/api/reports", {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
-      setPendingReport(null);
-      toast.success("আপনার সংযোগের রিপোর্ট জমা হয়েছে");
-      reports.reload();
-    } catch (e) {
-      setReportError((e as Error).message);
-      toast.error((e as Error).message);
-    } finally {
-      setReportBusy(false);
-    }
-  }
-  const listed =
-    selected && Array.isArray(reports.data?.items) ? reports.data!.items : [];
-  const planned =
-    selected && Array.isArray(schedules.data?.items)
-      ? schedules.data!.items
-      : [];
-  const historical =
-    selected && Array.isArray(events.data?.items) ? events.data!.items : [];
   return (
-    <>
-      <p className="eyebrow">ব্যক্তিগত ড্যাশবোর্ড</p>
-      <h1>স্বাগতম, {user?.display_name}</h1>
-      <p className="hint">
-        এই পাতা যাচাইকৃত এলাকা ও তার রেকর্ড দেখায়। নীরবতা বিদ্যুৎ থাকার প্রমাণ
-        নয়।
-      </p>
-      <ErrorBox message={areas.error} />
-      <Card title="এলাকা নির্বাচন">
-        <AreaChooser
-          items={areas.data?.items || []}
-          value={selected}
-          onChange={setSelected}
-        />
-        {area && (
-          <div className="inline-actions">
-            <EvidenceBadge>
-              {area.verification_status === "verified"
-                ? "এলাকা যাচাইকৃত"
-                : "যাচাই বাকি"}
-            </EvidenceBadge>
-            <a href={area.source_url || "#"} target="_blank" rel="noreferrer">
-              এলাকার উৎস
-            </a>
-            <button
-              className="btn btn-sm"
-              onClick={() =>
-                action.run(() =>
-                  api(`/api/saved-areas/${area.id}`, { method: "POST" }),
-                )
-              }
-            >
-              এলাকা সংরক্ষণ
-            </button>
-          </div>
-        )}
-        {!selected && !areas.loading && (
-          <EmptyState title="একটি যাচাইকৃত এলাকা বাছুন">
-            তালিকা বা অনুসন্ধান থেকে এলাকা বাছুন। এলাকা না থাকলে অ্যাডমিনকে
-            প্রথমে পাইলট এলাকা ও উৎস যাচাই করতে হবে। নমুনা এলাকা এখানে আসে না।
-          </EmptyState>
-        )}
-      </Card>
-      {selected && (
-        <>
-          <div className="detail-grid section-gap">
-            <Card title="আপনার সংযোগের রিপোর্ট">
-              <p className="hint">
-                এটি আপনার সংযোগের অবস্থা; পুরো এলাকার সিদ্ধান্ত নয়। একই ধরনের
-                রিপোর্ট ১০ মিনিটের মধ্যে আবার দেওয়া যাবে না।
-              </p>
-              <label className="field">
-                ব্যক্তিগত মন্তব্য (ঐচ্ছিক)
-                <input
-                  className="input input-bordered"
-                  maxLength={500}
-                  value={reportNote}
-                  onChange={(e) => setReportNote(e.target.value)}
-                />
-              </label>
-              <ErrorBox message={reportError} />
-              {pendingReport && (
-                <p className="hint">
-                  একই বোতাম আবার চাপলে আগের অনুরোধ নিরাপদে পুনরায় পাঠানো হবে।
-                </p>
-              )}
-              <div className="inline-actions">
-                <button
-                  className="btn btn-primary"
-                  disabled={reportBusy}
-                  onClick={() => report("power_off")}
-                >
-                  বিদ্যুৎ নেই
-                </button>
-                <button
-                  className="btn"
-                  disabled={reportBusy}
-                  onClick={() => report("power_back")}
-                >
-                  বিদ্যুৎ ফিরেছে
-                </button>
-                <button
-                  className="btn"
-                  disabled={reportBusy}
-                  onClick={() => report("still_off")}
-                >
-                  এখনো নেই
-                </button>
-              </div>
-              {listed.length ? (
-                listed.map((x) => (
-                  <div className="record" key={x.id}>
-                    <strong>
-                      {
-                        (
-                          {
-                            power_off: "বিদ্যুৎ নেই",
-                            power_back: "বিদ্যুৎ ফিরেছে",
-                            still_off: "এখনো নেই",
-                          } as Record<string, string>
-                        )[x.kind]
-                      }
-                    </strong>
-                    <span>{shortTime(x.observed_at)} · ব্যক্তিগত রিপোর্ট</span>
-                  </div>
-                ))
-              ) : (
-                <EmptyState title="কোনো রিপোর্ট নেই">
-                  রিপোর্ট না থাকলে বিদ্যুৎ আছে বলা যায় না।
-                </EmptyState>
-              )}
-            </Card>
-            <Card title="ঘোষিত সময়সূচি">
-              <p className="hint">এগুলো পরিকল্পনা, ঘটেছে এমন প্রমাণ নয়।</p>
-              {planned.length ? (
-                planned.map((x) => (
-                  <div className="record" key={x.id}>
-                    <strong>
-                      {shortTime(x.starts_at)} → {shortTime(x.ends_at)}
-                    </strong>
-                    <span>
-                      ঘোষিত · সর্বশেষ পরিবর্তন {shortTime(x.updated_at)}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <EmptyState title="কোনো ঘোষিত সময়সূচি নেই">
-                  এতে বিদ্যুৎ থাকার নিশ্চয়তা নেই।
-                </EmptyState>
-              )}
-            </Card>
-          </div>
-          <div className="detail-grid section-gap">
-            <Activity areaId={selected} />
-            <Card title="যাচাইকৃত বিভ্রাটের ইতিহাস">
-              {historical.length ? (
-                historical.map((x) => (
-                  <div className="record" key={x.id}>
-                    <strong>
-                      {shortTime(x.started_at)} →{" "}
-                      {x.restored_at
-                        ? shortTime(x.restored_at)
-                        : "ফেরার তথ্য নেই"}
-                    </strong>
-                    <span>শুরুর প্রমাণ: {x.start_evidence}</span>
-                    {x.restoration_evidence && (
-                      <span>ফেরার প্রমাণ: {x.restoration_evidence}</span>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <EmptyState title="রেকর্ড করা ঘটনা নেই">
-                  সময়সূচি থেকে ইতিহাস তৈরি করা হয় না।
-                </EmptyState>
-              )}
-            </Card>
-          </div>
-        </>
-      )}
-      <ObservationPanel areaId={selected} />
-      <Card title="সংরক্ষিত এলাকা" className="section-gap">
-        {saved.data?.items.length ? (
-          saved.data.items.map((x) => (
-            <div className="record" key={x.id}>
-              <strong>{x.name_bn}</strong>
-              <button
-                className="btn btn-sm"
-                onClick={() =>
-                  action.run(() =>
-                    api(`/api/saved-areas/${x.id}`, { method: "DELETE" }),
-                  )
-                }
-              >
-                সরান
-              </button>
-            </div>
-          ))
-        ) : (
-          <EmptyState title="এখনো সংরক্ষিত এলাকা নেই">
-            যাচাইকৃত এলাকা বেছে সংরক্ষণ করুন।
-          </EmptyState>
-        )}
-      </Card>
-    </>
+    <DashboardView
+      key={user!.id}
+      renderExtra={(id) => <Activity areaId={id} />}
+    />
   );
 }
 function Activity({ areaId }: { areaId: string }) {

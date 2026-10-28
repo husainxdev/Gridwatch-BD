@@ -7,7 +7,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from sqlalchemy import String, func, or_, select
+from sqlalchemy import String, func, or_, select, text
 from sqlalchemy.orm import Session
 
 from .api import NoticeInput, ReportInput, ScheduleInput, aware, find, list_page
@@ -347,12 +347,33 @@ def schedule_values(db, body):
     if notice.verification_status != "verified":
         raise HTTPException(422, "Verified notice required")
     ids = list(dict.fromkeys([body.location_id] + body.location_ids))
+    ancestor_rows = db.execute(
+        text("""
+        WITH RECURSIVE chain AS (
+          SELECT id AS root,id,parent_id,ARRAY[id] AS path FROM locations WHERE id=ANY(:keys)
+          UNION ALL
+          SELECT c.root,p.id,p.parent_id,c.path || p.id FROM chain c
+          JOIN locations p ON p.id=c.parent_id WHERE NOT p.id=ANY(c.path)
+        ) SELECT root,id FROM chain WHERE root!=id
+    """),
+        {"keys": ids},
+    ).all()
+    ancestors = {key: [] for key in ids}
+    for root, ancestor in ancestor_rows:
+        ancestors[root].append(str(ancestor))
     coverage = []
     for key in ids:
         loc = find(db, Location, key)
         if loc.verification_status != "verified":
             raise HTTPException(422, "Verified locations required")
-        coverage.append({"id": str(loc.id), "name_bn": loc.name_bn, "kind": loc.kind})
+        coverage.append(
+            {
+                "id": str(loc.id),
+                "name_bn": loc.name_bn,
+                "kind": loc.kind,
+                "ancestor_ids": ancestors[key],
+            }
+        )
     data = body.model_dump(exclude={"version", "location_ids", "feeder_id"})
     return data | {"coverage": coverage, "is_demo": notice.is_demo}
 
@@ -637,9 +658,22 @@ def own_episodes(db: Session = Depends(get_db), user: User = Depends(current_use
 @router.get("/reports/summary")
 def summary(location_id: uuid.UUID, db: Session = Depends(get_db)):
     instant = now()
-    start = instant - timedelta(hours=1)
-    rows = db.scalars(
-        select(Report)
+    start = instant - timedelta(minutes=get_settings().community_window_minutes)
+    latest = (
+        select(
+            Report.kind,
+            Report.observed_at,
+            func.row_number()
+            .over(
+                partition_by=Report.user_id,
+                order_by=(
+                    Report.observed_at.desc(),
+                    Report.created_at.desc(),
+                    Report.id.desc(),
+                ),
+            )
+            .label("rank"),
+        )
         .where(
             Report.location_id == location_id,
             Report.observed_at >= start,
@@ -647,26 +681,35 @@ def summary(location_id: uuid.UUID, db: Session = Depends(get_db)):
             Report.moderation == "accepted",
             Report.is_demo.is_(False),
         )
-        .order_by(
-            Report.user_id,
-            Report.observed_at.desc(),
-            Report.created_at.desc(),
-            Report.id,
-        )
-    ).all()
-    latest = {}
-    for r in rows:
-        latest.setdefault(r.user_id, r)
+        .subquery()
+    )
+    counts = dict.fromkeys(["power_off", "power_back", "still_off"], 0)
+    latest_time = None
+    for kind, count, observed in db.execute(
+        select(latest.c.kind, func.count(), func.max(latest.c.observed_at))
+        .where(latest.c.rank == 1)
+        .group_by(latest.c.kind)
+    ):
+        counts[kind] = count
+        latest_time = max(latest_time, observed) if latest_time else observed
+    off = counts["power_off"] + counts["still_off"]
+    label = (
+        "mixed"
+        if off and counts["power_back"]
+        else "interruptions_reported"
+        if off
+        else "restoration_reports"
+        if counts["power_back"]
+        else "no_recent_reports"
+    )
     return {
-        "counts": {
-            kind: sum(r.kind == kind for r in latest.values())
-            for kind in ["power_off", "power_back", "still_off"]
-        },
+        "counts": counts,
+        "unique_reporters": sum(counts.values()),
+        "evidence_label": label,
         "window_start": start,
         "window_end": instant,
-        "latest_observed_at": max(
-            (r.observed_at for r in latest.values()), default=None
-        ),
+        "retrieved_at": instant,
+        "latest_observed_at": latest_time,
         "scope": "individual_connections_only",
         "area_status": "unknown",
     }

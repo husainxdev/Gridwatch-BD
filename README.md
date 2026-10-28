@@ -5,6 +5,7 @@ A Bengali-first load shedding and power outage management university project. Th
 - [Scope, sources, user flows and data rules](docs/SCOPE.md)
 - [Progress and seven-day work sequence](docs/PROGRESS.md)
 - [Sections 5–6 implementation and API guide](docs/SECTIONS-5-6.md)
+- [Sections 7–8 dashboard, saved preferences and freshness guide](docs/SECTIONS-7-8.md)
 - [Database design](docs/DATABASE.md)
 - [Sections 3–4 API, security, email and testing guide](docs/AUTH-LOCATIONS.md)
 - [Deployment recipe and live verification checklist](docs/DEPLOYMENT.md)

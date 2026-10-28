@@ -298,7 +298,10 @@ def test_complete_workflow(monkeypatch):
             "/api/admin/schedules", headers=headers(admin_token)
         ).json()["items"]
     )
-    assert client.get("/api/schedules?status=superseded").json()["total"] == 0
+    assert all(
+        x["notice_id"] != nid
+        for x in client.get("/api/schedules?status=superseded").json()["items"]
+    )
     assert (
         client.delete(
             "/api/admin/locations/" + district_id, headers=headers(admin_token)

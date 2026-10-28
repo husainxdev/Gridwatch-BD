@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from .api import router as api_router
 from .auth import router as auth_router
 from .config import get_settings
+from .dashboard import router as dashboard_router
 from .db import get_db
 from .evidence import router as evidence_router
 from .models import DemoArea
@@ -42,7 +43,7 @@ def ready(db: Session = Depends(get_db)):
         revision = db.execute(
             text("SELECT version_num FROM alembic_version")
         ).scalar_one()
-        if revision != "0003":
+        if revision != "0004":
             raise HTTPException(503, "Database migration required")
     except SQLAlchemyError:
         raise HTTPException(503, "Database unavailable or migration required") from None
@@ -73,6 +74,7 @@ def demo_areas(db: Session = Depends(get_db)):
 
 
 app.include_router(auth_router)
+app.include_router(dashboard_router)
 app.include_router(evidence_router)
 app.include_router(api_router)
 
@@ -110,3 +112,11 @@ async def integrity_error(request, exc):
         status_code=409,
         content={"detail": "Record conflicts with an existing or referenced record"},
     )
+
+
+@app.middleware("http")
+async def private_api_cache(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "private, no-store"
+    return response

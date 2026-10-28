@@ -54,3 +54,14 @@ See [the phase guide](AUTH-LOCATIONS.md) for commands, manual checks and known d
 - [x] Isolated PostgreSQL phase tests and frontend integration.
 
 See [phase scope, API contracts and limitations](SECTIONS-5-6.md). Earlier checklist entries for later sections are historical; this phase does not certify Sections 7–14 as complete.
+
+## Sections 7–8 current phase
+
+- [x] Real dashboard snapshot and explicit selected-area context.
+- [x] Saved-area quick switching, optional labels and one persisted default with concurrency/ownership enforcement.
+- [x] Today/upcoming/cancelled/revised windows, joined source metadata and snapshot-based partial coverage.
+- [x] Latest-per-reporter backend aggregation and independent personal episode/timer.
+- [x] Shared polling with cancellation, hidden/offline pause, backoff and stale-data labels.
+- [x] Migration 0004, populated-upgrade checks and focused backend/browser validation.
+
+See [phase API and freshness rules](SECTIONS-7-8.md). This phase covers Sections 7–8 and necessary prerequisites; it does not certify Sections 9–14.

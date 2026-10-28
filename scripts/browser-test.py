@@ -66,6 +66,7 @@ with SessionLocal.begin() as db:
     root = Location(name_bn="পরীক্ষামূলক বিভাগ", name_en="Browser test division", slug="browser-division", kind="division")
     db.add(root)
     db.flush()
+    db.add(Location(name_bn="দ্বিতীয় পরীক্ষামূলক জেলা", name_en="Browser alternate district", slug="browser-alternate", kind="district", parent_id=root.id, aliases=["Alternate area alias"], verification_status="verified", source_url="https://example.com/fictional-alternate", verified_at=datetime.now(UTC)))
     db.add(Location(name_bn="পরীক্ষামূলক জেলা", name_en="Browser test district", slug="browser-district", kind="district", parent_id=root.id, aliases=["Browser district alias"], verification_status="verified", source_url="https://example.com/fictional-test-only", verified_at=datetime.now(UTC)))
 """,
         ],

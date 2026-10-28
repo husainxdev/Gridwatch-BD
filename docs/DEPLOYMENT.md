@@ -47,4 +47,4 @@ A real area must be verified by a person before entering official notices. No of
 
 ## Authentication configuration
 
-Use the same HTTPS origin for frontend and API; separate-site deployments are unsupported. See [Sections 3–4](AUTH-LOCATIONS.md) for exact cookie paths, CSRF and token lifetimes. `AUTH_RATE_LIMIT=60` / `AUTH_RATE_WINDOW_SECONDS=60` provide per-process limits only. Apply shared ingress limits before public exposure. Never log request bodies, Authorization headers, cookies or reset links. Current readiness requires schema `0003`. See [Sections 5–6](SECTIONS-5-6.md) for publication, reporting and migration rules.
+Use the same HTTPS origin for frontend and API; separate-site deployments are unsupported. See [Sections 3–4](AUTH-LOCATIONS.md) for exact cookie paths, CSRF and token lifetimes. `AUTH_RATE_LIMIT=60` / `AUTH_RATE_WINDOW_SECONDS=60` provide per-process limits only. Apply shared ingress limits before public exposure. Never log request bodies, Authorization headers, cookies or reset links. Current readiness requires schema `0004`. See [Sections 5–6](SECTIONS-5-6.md) for publication, reporting and migration rules.
