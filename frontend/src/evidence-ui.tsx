@@ -168,23 +168,43 @@ export function ObservationPanel({ areaId }: { areaId: string }) {
 
 export function PublishedSchedules() {
   const [items, setItems] = useState<
-      (import("./client").Schedule & { window_state: string })[]
+      (import("./client").Schedule & {
+        window_state: string;
+        notice: Pick<
+          import("./client").Notice,
+          "source_url" | "publisher" | "published_at" | "updated_at"
+        >;
+      })[]
     >([]),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [loading, setLoading] = useState(true),
+    [attempt, setAttempt] = useState(0);
   useEffect(() => {
     const c = new AbortController();
-    api<Page<import("./client").Schedule & { window_state: string }>>(
-      "/api/schedules?page_size=20",
-      { signal: c.signal },
-    )
+    setLoading(true);
+    setError("");
+    api<
+      Page<
+        import("./client").Schedule & {
+          window_state: string;
+          notice: Pick<
+            import("./client").Notice,
+            "source_url" | "publisher" | "published_at" | "updated_at"
+          >;
+        }
+      >
+    >("/api/schedules?page_size=20", { signal: c.signal })
       .then((r) => {
         if (!c.signal.aborted) setItems(r.items);
       })
       .catch((e) => {
         if (!c.signal.aborted) setError(e.message);
+      })
+      .finally(() => {
+        if (!c.signal.aborted) setLoading(false);
       });
     return () => c.abort();
-  }, []);
+  }, [attempt]);
   return (
     <section className="section-gap">
       <h2>ঘোষিত সময়সূচি</h2>
@@ -193,6 +213,17 @@ export function PublishedSchedules() {
         (UTC+6)।
       </p>
       {error && <p role="alert">{error}</p>}
+      {loading && <p role="status">সময়সূচি লোড হচ্ছে…</p>}
+      {!loading && !error && !items.length && (
+        <p>
+          কোনো প্রকাশিত সময়সূচি পাওয়া যায়নি; বিদ্যুৎ থাকার নিশ্চয়তা নয়।
+        </p>
+      )}
+      {error && (
+        <button className="btn" onClick={() => setAttempt((x) => x + 1)}>
+          সময়সূচি আবার লোড করুন
+        </button>
+      )}
       {items.map((s) => (
         <details key={s.id} className="record">
           <summary>
@@ -215,25 +246,25 @@ export function PublishedSchedules() {
               : "সমগ্র নির্বাচিত প্রশাসনিক এলাকা"}{" "}
             · {s.coverage.map((x) => x.name_bn).join(" / ")}
           </p>
-          <button
-            type="button"
-            className="btn btn-sm"
-            onClick={async () => {
-              try {
-                const n = await api<import("./client").Notice>(
-                  `/api/notices/${s.notice_id}`,
-                );
-                window.open(n.source_url, "_blank", "noopener,noreferrer");
-              } catch (e) {
-                setError((e as Error).message);
-              }
-            }}
-          >
-            মূল নোটিশের উৎস
-          </button>
+          {s.notice && (
+            <>
+              <a
+                className="btn btn-sm"
+                href={s.notice.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                মূল নোটিশের উৎস ↗
+              </a>
+              <p>
+                {s.notice.publisher} · প্রকাশ:{" "}
+                {shortTime(s.notice.published_at)} · সর্বশেষ পরিবর্তন:{" "}
+                {shortTime(s.updated_at)}
+              </p>
+            </>
+          )}
         </details>
       ))}
-      {!items.length && !error && <p>তথ্য অনুপস্থিত।</p>}
     </section>
   );
 }

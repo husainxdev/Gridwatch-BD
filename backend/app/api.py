@@ -99,8 +99,8 @@ class NoticeInput(BaseModel):
     @field_validator("source_url")
     @classmethod
     def https_source(cls, v):
-        if v.scheme != "https":
-            raise ValueError("HTTPS source required")
+        if v.scheme != "https" or v.username or v.password:
+            raise ValueError("HTTPS source without credentials required")
         return v
 
     @field_validator("published_at")
@@ -399,8 +399,8 @@ class VerifyInput(BaseModel):
     @field_validator("source_url")
     @classmethod
     def https_source(cls, v):
-        if v.scheme != "https":
-            raise ValueError("HTTPS source required")
+        if v.scheme != "https" or v.username or v.password:
+            raise ValueError("HTTPS source without credentials required")
         return v
 
 
@@ -481,12 +481,22 @@ class SavedAreaInput(BaseModel):
 
 
 @router.get("/saved-areas")
-def saved_areas(db: Session = Depends(get_db), user: User = Depends(current_user)):
+def saved_areas(
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(100, ge=1, le=100),
+):
+    total = db.scalar(
+        select(func.count()).select_from(SavedArea).where(SavedArea.user_id == user.id)
+    )
     rows = db.execute(
         select(Location, SavedArea)
         .join(SavedArea, SavedArea.location_id == Location.id)
         .where(SavedArea.user_id == user.id)
         .order_by(SavedArea.is_default.desc(), Location.name_bn, Location.id)
+        .offset((page - 1) * page_size)
+        .limit(page_size)
     ).all()
     return {
         "items": [
@@ -497,7 +507,10 @@ def saved_areas(db: Session = Depends(get_db), user: User = Depends(current_user
                 "available": loc.verification_status == "verified",
             }
             for loc, saved in rows
-        ]
+        ],
+        "total": total,
+        "page": page,
+        "page_size": page_size,
     }
 
 

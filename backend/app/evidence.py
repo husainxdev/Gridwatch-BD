@@ -326,7 +326,7 @@ def schedule_list(
         stmt = stmt.where(Schedule.starts_at < aware(starts_before))
     if ends_after:
         stmt = stmt.where(Schedule.ends_at > aware(ends_after))
-    return list_page(
+    result = list_page(
         db,
         stmt.order_by(
             Schedule.starts_at.desc() if sort == "newest" else Schedule.starts_at,
@@ -336,6 +336,23 @@ def schedule_list(
         page_size,
         schedule_json,
     )
+
+    # Bounded batch of public source metadata: never a lazy lookup per schedule.
+    ids = {item["notice_id"] for item in result["items"]}
+    sources = (
+        {
+            n.id: {
+                k: getattr(n, k)
+                for k in ("source_url", "publisher", "published_at", "updated_at")
+            }
+            for n in db.scalars(select(Notice).where(Notice.id.in_(ids)))
+        }
+        if ids
+        else {}
+    )
+    for item in result["items"]:
+        item["notice"] = sources.get(item["notice_id"])
+    return result
 
 
 @router.get("/schedules/{key}")
@@ -671,23 +688,28 @@ def own_reports(
 
 
 @router.get("/me/episodes")
-def own_episodes(db: Session = Depends(get_db), user: User = Depends(current_user)):
-    items = db.scalars(
+def own_episodes(
+    db: Session = Depends(get_db),
+    user: User = Depends(current_user),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+):
+    return list_page(
+        db,
         select(PersonalEpisode)
         .where(PersonalEpisode.user_id == user.id)
-        .order_by(PersonalEpisode.last_observed_at.desc())
-    ).all()
-    return {
-        "items": [
+        .order_by(PersonalEpisode.last_observed_at.desc(), PersonalEpisode.id),
+        page,
+        page_size,
+        lambda e: (
             serialize(e)
             | {
                 "duration_seconds": (e.ended_at - e.started_at).total_seconds()
                 if e.started_at and e.ended_at
                 else None
             }
-            for e in items
-        ]
-    }
+        ),
+    )
 
 
 @router.get("/reports/summary")

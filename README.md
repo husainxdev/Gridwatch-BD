@@ -82,3 +82,5 @@ Sections 9–10: [Admin workspace, saved activities and personal history](docs/S
 [Next.js migration and Windows update guide](docs/NEXTJS.md).
 
 [Implementation review and remaining limits (2026-10-29)](docs/REVIEW-2026-10-29.md).
+
+[Sections 11–12 verification matrix, QA findings and remaining prerequisites](docs/QA-SECTIONS-11-12.md).

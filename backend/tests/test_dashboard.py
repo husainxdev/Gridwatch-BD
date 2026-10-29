@@ -273,6 +273,15 @@ def test_dashboard_still_off_preserves_episode_and_personal_times(accounts):
     first = send(0, "power_off")
     send(1, "power_back")
     before = c.get("/api/dashboard?location_id=" + areas[0], headers=headers[0]).json()
+    polled = c.get("/api/dashboard?location_id=" + areas[0], headers=headers[0]).json()
+    assert (
+        polled["personal"]["latest_report"]["observed_at"]
+        == before["personal"]["latest_report"]["observed_at"]
+    )
+    assert (
+        polled["personal"]["episode"]["started_at"]
+        == before["personal"]["episode"]["started_at"]
+    )
     send(0, "still_off")
     after = c.get("/api/dashboard?location_id=" + areas[0], headers=headers[0]).json()
     assert after["personal"]["episode"]["id"] == first["episode_id"]

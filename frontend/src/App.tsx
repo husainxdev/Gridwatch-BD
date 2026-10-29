@@ -373,7 +373,9 @@ export default function App({ children }: { children: ReactNode }) {
             বাংলা <span>BN</span>
           </span>
         </header>
-        <main id="main">{children}</main>
+        <main id="main" tabIndex={-1}>
+          {children}
+        </main>
         <footer>
           <span>© GridWatch BD · বিশ্ববিদ্যালয় প্রকল্প</span>
           <span>প্রদর্শনী সংস্করণ • জরুরি সেবা নয়</span>

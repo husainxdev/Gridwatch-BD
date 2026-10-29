@@ -13,8 +13,8 @@ Checked items are implemented locally. Days are a priority guide, not a deadline
 - [x] 8. Community report list and evidence/uncertainty display.
 - [x] 9. Integrated Admin workspace, URL-backed server listings, version checks and transactional audit.
 - [x] 10. Saved private activities, fresh announcement conflict checks and recorded personal history.
-- [ ] 11. Dedicated full-phase functional, permission and data-correctness review (phase-specific integration tests already exist).
-- [ ] 12. Dedicated full usability/responsive review (initial polish and phase-specific desktop/mobile checks already exist).
+- [x] 11. Core journeys, permissions, calculations and migration verification against isolated PostgreSQL; see QA report for scope and external exceptions.
+- [x] 12. Reproduced fixes, four viewport sizes, automated accessibility/keyboard and failure-state checks; physical devices/screen readers remain unverified.
 - [ ] 13. Hosted deployment and live verification; no deployment target or credentials supplied.
 - [x] 14a. Setup, architecture and submission-oriented documentation; local account creation instructions.
 - [ ] 14b. Verified pilot evidence, real demo content, screenshots and final presentation.
@@ -85,3 +85,14 @@ See [API contracts, counting rules, limits and startup instructions](SECTIONS-9-
 - [x] Cross-tab session coordination, exact expiry checks, repeated-restoration fixes and reference-safe concurrent location deletion.
 - [x] Review findings and limitations recorded in [the review](REVIEW-2026-10-29.md).
 - [ ] Hosted Next.js/API deployment and external SMTP delivery verification.
+
+## Sections 11–12 verification
+
+- [x] 54 backend tests, 22 production browser journeys and four focused development-mode journeys.
+- [x] Independent interval/history constants, bounded query benchmark, saved/history collection pagination.
+- [x] Axe checks at 360/390/768/1440px, keyboard area selection, skip focus and reduced-height forms.
+- [x] Real SMTP adapter to a dedicated loopback sink: reset, single use, old-session invalidation; no external mail.
+- [x] Contrast, false empty states, retry controls, duplicate actions, credential-bearing sources and source-link usability fixed.
+- [ ] Native Windows/browser-extension reproduction, physical mobile keyboards and screen-reader session (not locally available).
+
+See [verification matrix and QA handoff](QA-SECTIONS-11-12.md). Sections 13–14 deployment/submission remain separate; no public deployment was performed.

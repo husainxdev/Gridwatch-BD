@@ -68,6 +68,16 @@ test("admin publication and personal outage restoration use real backend", async
   await expect(
     page.getByRole("heading", { name: "ঘোষিত সময়সূচি" }),
   ).toBeVisible();
+  const sourceRecord = page
+    .locator("details")
+    .filter({ has: page.locator('a[href="https://example.com/browser.pdf"]') });
+  await sourceRecord.locator("summary").click();
+  await expect(
+    sourceRecord.getByRole("link", { name: "মূল নোটিশের উৎস ↗" }),
+  ).toHaveAttribute("target", "_blank");
+  await expect(
+    sourceRecord.getByRole("link", { name: "মূল নোটিশের উৎস ↗" }),
+  ).toHaveAttribute("rel", /noopener/);
   await page.goto("/dashboard");
   await page
     .getByLabel("এলাকার নাম বা ID খুঁজুন")

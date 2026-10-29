@@ -1,3 +1,4 @@
+import { SavedPager } from "./components/SavedPager";
 import { useEffect, useState, type FormEvent } from "react";
 import { useSearchParams } from "./navigation";
 import toast from "react-hot-toast";
@@ -87,9 +88,13 @@ export function ActivitiesPage() {
   const area = params.get("location_id") || "";
   const [version, setVersion] = useState(0);
   const list = useList<Activity>("/api/activities", version);
+  const [savedPage, setSavedPage] = useState(1);
   const saved = useRequest<{
+    total: number;
     items: { id: string; name_bn: string; label: string; available: boolean }[];
-  }>("/api/saved-areas");
+  }>(
+    savedPage === 1 ? "/api/saved-areas" : `/api/saved-areas?page=${savedPage}`,
+  );
   const [title, setTitle] = useState(""),
     [start, setStart] = useState(""),
     [end, setEnd] = useState("");
@@ -191,6 +196,7 @@ export function ActivitiesPage() {
               <label>
                 সংরক্ষিত এলাকা
                 <select
+                  aria-label="সংরক্ষিত এলাকা"
                   className="select"
                   value={area}
                   onChange={(e) => {
@@ -208,6 +214,12 @@ export function ActivitiesPage() {
                     ))}
                 </select>
               </label>
+              <SavedPager
+                page={savedPage}
+                total={saved.data?.total ?? -1}
+                loading={saved.loading}
+                onChange={setSavedPage}
+              />
               <LocationPicker
                 value={area}
                 onChange={(id) => {

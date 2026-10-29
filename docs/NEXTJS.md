@@ -62,7 +62,7 @@ npm audit --prefix frontend --audit-level=high
 
 Omit `CHROMIUM_EXECUTABLE` when using Playwright's installed Chromium on Windows. The existing runner chooses Windows or Linux venv paths. Linux cloud execution does not establish a tested Windows runtime.
 
-Validated in this cloud workspace: **50 backend tests**, **13 browser tests against `next build` / `next start`**, migration/model checks, strict TypeScript, formatting, production build and npm audit (zero reported vulnerabilities). The default build was also smoke-checked separately from the test build. See the review for exact commands and limitations.
+Initial migration validation (before Sections 11–12): **50 backend tests**, **13 browser tests against `next build` / `next start`**, migration/model checks, strict TypeScript, formatting, production build and npm audit (zero reported vulnerabilities). The default build was also smoke-checked separately from the test build. See the review for exact commands and limitations.
 
 ## Manual checks
 
@@ -89,3 +89,5 @@ GRIDWATCH_BROWSER_MODE=development CHROMIUM_EXECUTABLE=/usr/bin/chromium python3
 The development check passed (1 test). The runner also accepts optional Playwright file/filter arguments in production mode. On Windows PowerShell set `$env:GRIDWATCH_BROWSER_MODE="development"`, run `py scripts/browser-test.py cancellation.spec.ts`, then remove it with `Remove-Item Env:GRIDWATCH_BROWSER_MODE`. The production mode remains the default. Do not run two browser runners concurrently: their test server ports and Next build directory are shared.
 
 Follow-up validation: production browser suite **14 passed**, development cancellation regression **1 passed**, strict TypeScript, Prettier, runner Ruff/format, production build and Git whitespace checks passed. An initial production run exposed a timing issue in the routing test: it counted refreshes before startup refresh began. The assertion now waits for the startup refresh response before measuring whether client navigation triggers another refresh; the complete rerun passed.
+
+Current phase validation and API pagination changes: [Sections 11–12 QA report](QA-SECTIONS-11-12.md).

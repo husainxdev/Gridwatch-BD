@@ -9,6 +9,8 @@ import uuid
 from pathlib import Path
 from urllib.request import urlopen
 
+from qa_mailbox import Mailbox
+
 root = Path(__file__).resolve().parents[1]
 backend = root / "backend"
 python = str(
@@ -16,6 +18,7 @@ python = str(
 )
 name = "gridwatch_browser_" + uuid.uuid4().hex[:12]
 processes = []
+mailbox = Mailbox()
 development = os.environ.get("GRIDWATCH_BROWSER_MODE") == "development"
 
 
@@ -51,11 +54,19 @@ try:
         DATABASE_URL=urls[0].rsplit("/", 1)[0] + "/" + name,
         FRONTEND_URL="http://localhost:15173",
         APP_ENV="test",
+        AUTH_RATE_LIMIT="500",
         CORS_ORIGINS='["http://localhost:15173"]',
         GRIDWATCH_API_TARGET="http://127.0.0.1:18000",
         GRIDWATCH_TEST_BUILD="1",
         NEXT_PUBLIC_E2E_TEST="1",
         NEXT_TELEMETRY_DISABLED="1",
+        MAIL_FROM="no-reply@qa.example.test",
+        SMTP_HOST="127.0.0.1",
+        SMTP_PORT=str(mailbox.smtp.server_address[1]),
+        SMTP_STARTTLS="false",
+        SMTP_USERNAME="",
+        SMTP_PASSWORD="",
+        QA_MAILBOX_URL=f"http://127.0.0.1:{mailbox.http.server_address[1]}",
     )
     run([python, "-m", "alembic", "upgrade", "head"], cwd=backend, env=env)
     # Fictional fixtures exist ONLY inside this disposable browser database.
@@ -76,6 +87,16 @@ with SessionLocal.begin() as db:
     db.flush()
     db.add(Location(name_bn="দ্বিতীয় পরীক্ষামূলক জেলা", name_en="Browser alternate district", slug="browser-alternate", kind="district", parent_id=root.id, aliases=["Alternate area alias"], verification_status="verified", source_url="https://example.com/fictional-alternate", verified_at=datetime.now(UTC)))
     db.add(Location(name_bn="পরীক্ষামূলক জেলা", name_en="Browser test district", slug="browser-district", kind="district", parent_id=root.id, aliases=["Browser district alias"], verification_status="verified", source_url="https://example.com/fictional-test-only", verified_at=datetime.now(UTC)))
+    from app.models import SavedArea
+    paging = User(email="qa-many@example.com",display_name="Fictional QA paging user",password_hash=hash_password(os.environ["BROWSER_TEST_PASSWORD"]),role="user")
+    db.add(paging)
+    db.flush()
+    for number in range(105):
+        loc = Location(name_bn=f"কাল্পনিক QA এলাকা {number:03}",name_en=f"Fictional QA paging {number:03}",slug=f"qa-paging-{number}",kind="district",parent_id=root.id,verification_status="verified",source_url="https://example.com/fictional-qa-paging",verified_at=datetime.now(UTC))
+        db.add(loc)
+        db.flush()
+        db.add(SavedArea(user_id=paging.id,location_id=loc.id,is_default=number==0))
+
 """,
         ],
         cwd=backend,
@@ -115,6 +136,7 @@ with SessionLocal.begin() as db:
         env=env,
     )
 finally:
+    mailbox.close()
     for process in reversed(processes):
         process.terminate()
         try:

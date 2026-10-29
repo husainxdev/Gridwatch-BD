@@ -1,3 +1,4 @@
+import { SavedPager } from "./components/SavedPager";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "./navigation";
 import { FiRefreshCw, FiMapPin } from "react-icons/fi";
@@ -93,7 +94,9 @@ function SavedItem({
   select,
   run,
   busy,
+  onRemoved,
 }: {
+  onRemoved: () => void;
   area: Saved;
   select: () => void;
   run: (fn: () => Promise<unknown>, message: string) => Promise<void>;
@@ -172,10 +175,10 @@ function SavedItem({
             className="btn btn-sm"
             disabled={busy}
             onClick={() =>
-              void run(
-                () => api(`/api/saved-areas/${area.id}`, { method: "DELETE" }),
-                "সংরক্ষিত এলাকা সরানো হয়েছে",
-              )
+              void run(async () => {
+                await api(`/api/saved-areas/${area.id}`, { method: "DELETE" });
+                onRemoved();
+              }, "সংরক্ষিত এলাকা সরানো হয়েছে")
             }
           >
             সরান
@@ -208,7 +211,11 @@ export function DashboardView({
       mounted.current = false;
     };
   }, []);
-  const saved = usePolling<{ items: Saved[] }>("/api/saved-areas", uid);
+  const [savedPage, setSavedPage] = useState(1);
+  const saved = usePolling<{ items: Saved[]; total: number }>(
+    savedPage === 1 ? "/api/saved-areas" : `/api/saved-areas?page=${savedPage}`,
+    uid,
+  );
   const dashboard = usePolling<Snapshot>(
     selected ? `/api/dashboard?location_id=${selected}&page=${page}` : null,
     uid,
@@ -245,12 +252,17 @@ export function DashboardView({
         );
     }
   }, [saved.data]); // Initialize once: temporary viewing never changes the saved default.
-  const savedBefore = useRef<Saved[]>([]);
+  const savedBefore = useRef<{ page: number; items: Saved[] }>({
+    page: 1,
+    items: [],
+  });
   useEffect(() => {
     if (!saved.data) return;
     const before = savedBefore.current;
     const removed =
-      before.some((x) => x.id === selected) &&
+      before.page === savedPage &&
+      (saved.data.total ?? 0) <= 100 &&
+      before.items.some((x) => x.id === selected) &&
       !saved.data.items.some((x) => x.id === selected);
     const unavailable =
       saved.data.items.find((x) => x.id === selected)?.available === false;
@@ -262,7 +274,7 @@ export function DashboardView({
           : "নির্বাচিত এলাকাটি এখন যাচাইকৃত নয়। অন্য এলাকা নিজে বাছুন।",
       );
     }
-    savedBefore.current = saved.data.items;
+    savedBefore.current = { page: savedPage, items: saved.data.items };
   }, [saved.data, selected]);
   const data = dashboard.data;
   useEffect(() => {
@@ -282,7 +294,10 @@ export function DashboardView({
     note: string;
   };
   const [pending, setPending] = useState<Payload | null>(null);
+  const actionBusy = useRef(false);
   async function run(fn: () => Promise<unknown>, message: string) {
+    if (actionBusy.current) return;
+    actionBusy.current = true;
     setBusy(true);
     setActionError("");
     try {
@@ -295,11 +310,13 @@ export function DashboardView({
     } catch (e) {
       if (mounted.current) setActionError((e as Error).message);
     } finally {
+      actionBusy.current = false;
       if (mounted.current) setBusy(false);
     }
   }
   async function report(kind: string) {
-    if (!available || busy) return;
+    if (!available || actionBusy.current) return;
+    actionBusy.current = true;
     const target = selected;
     const body =
       pending?.location_id === target && pending.kind === kind
@@ -325,6 +342,7 @@ export function DashboardView({
       if (mounted.current && currentArea.current === target)
         setActionError((e as Error).message);
     } finally {
+      actionBusy.current = false;
       if (mounted.current) setBusy(false);
     }
   }
@@ -490,6 +508,8 @@ export function DashboardView({
                 <input
                   className="input input-bordered"
                   maxLength={500}
+                  disabled={busy}
+                  readOnly={pending?.location_id === selected}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                 />
@@ -515,7 +535,8 @@ export function DashboardView({
               )}
               {pending?.location_id === selected && (
                 <p className="hint">
-                  একই বোতাম আবার চাপলে আগের অনুরোধ একই key দিয়ে পাঠানো হবে।
+                  একই বোতাম আবার চাপলে আগের সময় ও মন্তব্যসহ একই অনুরোধ পাঠানো
+                  হবে। ফল নিশ্চিত না হওয়া পর্যন্ত মন্তব্য অপরিবর্তিত থাকবে।
                 </p>
               )}
             </EvidenceCard>
@@ -713,6 +734,14 @@ export function DashboardView({
             <SavedItem
               key={x.id}
               area={x}
+              onRemoved={() => {
+                if (currentArea.current === x.id) {
+                  choose("");
+                  setFallback(
+                    "নির্বাচিত সংরক্ষিত এলাকাটি সরানো হয়েছে। নতুন এলাকা নিজে বাছুন।",
+                  );
+                }
+              }}
               select={() => choose(x.id)}
               run={run}
               busy={busy}
@@ -726,6 +755,12 @@ export function DashboardView({
             থাকবে।
           </EmptyState>
         )}
+        <SavedPager
+          page={savedPage}
+          total={saved.data?.total ?? -1}
+          loading={saved.loading}
+          onChange={setSavedPage}
+        />
         {saved.stale && saved.data && (
           <p role="status">সংরক্ষিত তালিকাটি পুরোনো হতে পারে।</p>
         )}

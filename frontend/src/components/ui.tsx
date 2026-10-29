@@ -4,14 +4,17 @@ export function Card({
   title,
   children,
   className = "",
+  headingLevel = 2,
 }: {
   title: string;
   children: ReactNode;
   className?: string;
+  headingLevel?: 1 | 2;
 }) {
+  const Heading = headingLevel === 1 ? "h1" : "h2";
   return (
     <section className={`panel ${className}`}>
-      <h2>{title}</h2>
+      <Heading>{title}</Heading>
       {children}
     </section>
   );

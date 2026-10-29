@@ -26,7 +26,7 @@ class SourceBody(BaseModel):
     @field_validator("source_url")
     @classmethod
     def https(cls, value):
-        if value.scheme != "https":
+        if value.scheme != "https" or value.username or value.password:
             raise ValueError("Original HTTPS evidence required")
         return value
 

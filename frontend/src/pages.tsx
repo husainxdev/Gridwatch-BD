@@ -172,11 +172,14 @@ export function AuthPage({
     if (mode === "reset")
       window.history.replaceState(null, "", window.location.pathname);
   }, [mode]);
+  const submitting = useRef(false);
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [success, setSuccess] = useState("");
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     setError("");
     setBusy(true);
     const fd = new FormData(e.currentTarget);
@@ -215,6 +218,7 @@ export function AuthPage({
     } catch (err) {
       setError((err as Error).message);
     } finally {
+      submitting.current = false;
       setBusy(false);
     }
   }
@@ -225,6 +229,7 @@ export function AuthPage({
   return (
     <div className="auth-wrap">
       <Card
+        headingLevel={1}
         title={
           {
             login: "অ্যাকাউন্টে প্রবেশ",
@@ -275,7 +280,11 @@ export function AuthPage({
             </Field>
           )}
           <ErrorBox message={error} />
-          {success && <div className="alert alert-success">{success}</div>}
+          {success && (
+            <div role="status" className="alert alert-success">
+              {success}
+            </div>
+          )}
           <Submit busy={busy}>
             {mode === "login"
               ? "প্রবেশ করুন"
@@ -397,6 +406,12 @@ export function NoticeBoard() {
         </select>
       </div>
       <ErrorBox message={notices.error} />
+      {notices.loading && <p role="status">নোটিশ লোড হচ্ছে…</p>}
+      {notices.error && (
+        <button className="btn" onClick={notices.reload}>
+          নোটিশ আবার লোড করুন
+        </button>
+      )}
       {notices.data?.items.length
         ? notices.data.items.map((x) => (
             <Card key={x.id} title={x.title} className="section-gap">
@@ -419,7 +434,8 @@ export function NoticeBoard() {
               </p>
             </Card>
           ))
-        : !notices.loading && (
+        : !notices.loading &&
+          !notices.error && (
             <Card title="নোটিশ নেই">
               <EmptyState title="এখনো কোনো নোটিশ নেই">
                 অ্যাডমিন যাচাইযোগ্য মূল উৎস যুক্ত করলে এখানে দেখা যাবে।
