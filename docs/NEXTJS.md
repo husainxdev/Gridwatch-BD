@@ -73,3 +73,19 @@ Validated in this cloud workspace: **50 backend tests**, **13 browser tests agai
 5. Logout and confirm both tabs lose protected access. Check an unknown URL displays the 404 page.
 
 Real Sylhet sources, hosting/domain verification and external SMTP delivery remain prerequisites. No official/live integration is inferred from this framework migration. See [the implementation review](REVIEW-2026-10-29.md) for remaining boundaries and actual check results.
+
+## Request cancellation investigation
+
+A reported Windows development log showed `unhandledRejection: AbortError` at effect cleanup on home/notices. Cleanup intentionally cancels obsolete requests, and catches must remain attached. Added a browser regression which holds home, notice and schedule requests pending, navigates away, verifies all three requests are cancelled, and asserts no page errors or unhandled rejections. Strict Mode remains enabled and no global error suppression was added. Home results now check the signal before updating state; error handlers also check cancellation.
+
+The exact reported unhandled-rejection log was not reproduced in Linux Chromium, either before or after these guards. Passing local checks alone does not establish that the user's Windows/browser issue is resolved.
+
+Run the focused check against the real Next development server with an isolated database:
+
+```bash
+GRIDWATCH_BROWSER_MODE=development CHROMIUM_EXECUTABLE=/usr/bin/chromium python3 scripts/browser-test.py cancellation.spec.ts
+```
+
+The development check passed (1 test). The runner also accepts optional Playwright file/filter arguments in production mode. On Windows PowerShell set `$env:GRIDWATCH_BROWSER_MODE="development"`, run `py scripts/browser-test.py cancellation.spec.ts`, then remove it with `Remove-Item Env:GRIDWATCH_BROWSER_MODE`. The production mode remains the default. Do not run two browser runners concurrently: their test server ports and Next build directory are shared.
+
+Follow-up validation: production browser suite **14 passed**, development cancellation regression **1 passed**, strict TypeScript, Prettier, runner Ruff/format, production build and Git whitespace checks passed. An initial production run exposed a timing issue in the routing test: it counted refreshes before startup refresh began. The assertion now waits for the startup refresh response before measuring whether client navigation triggers another refresh; the complete rerun passed.

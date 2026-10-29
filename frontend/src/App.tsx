@@ -28,13 +28,14 @@ export function Overview() {
     setError("");
     fetchAreas(controller.signal)
       .then((items) => {
+        if (controller.signal.aborted) return;
         setAreas(items);
         setSelected((current) =>
           items.some((a) => a.id === current) ? current : items[0]?.id || "",
         );
       })
       .catch((e) => {
-        if (e.name !== "AbortError") setError(e.message);
+        if (!controller.signal.aborted) setError(e.message);
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);

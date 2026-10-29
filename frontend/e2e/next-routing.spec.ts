@@ -7,7 +7,12 @@ test("Next routes support direct loads, client navigation and real 404 status", 
   page.on("request", (r) => {
     if (r.url().endsWith("/api/auth/refresh")) refreshes++;
   });
+  const sessionRestore = page.waitForResponse(
+    (r) =>
+      r.url().endsWith("/api/auth/refresh") && r.request().method() === "POST",
+  );
   const response = await page.goto("/sources");
+  await sessionRestore;
   expect(response?.status()).toBe(200);
   await expect(page.locator("main h1")).toBeVisible();
   const initialRefreshes = refreshes;

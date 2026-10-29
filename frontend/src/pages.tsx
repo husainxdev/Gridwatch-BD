@@ -67,7 +67,7 @@ function useData<T>(path: string) {
         if (active) setData(x);
       })
       .catch((e) => {
-        if (active) setError(e.message);
+        if (active && !controller.signal.aborted) setError(e.message);
       })
       .finally(() => {
         if (active) setLoading(false);

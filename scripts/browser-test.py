@@ -3,6 +3,7 @@
 import os
 import secrets
 import subprocess
+import sys
 import time
 import uuid
 from pathlib import Path
@@ -15,6 +16,7 @@ python = str(
 )
 name = "gridwatch_browser_" + uuid.uuid4().hex[:12]
 processes = []
+development = os.environ.get("GRIDWATCH_BROWSER_MODE") == "development"
 
 
 def run(args, **kwargs):
@@ -86,16 +88,17 @@ with SessionLocal.begin() as db:
     )
     processes.append(api)
     wait_ready("http://127.0.0.1:18000/api/health/ready", api)
-    run(
-        ["node", "node_modules/next/dist/bin/next", "build"],
-        cwd=root / "frontend",
-        env=env,
-    )
+    if not development:
+        run(
+            ["node", "node_modules/next/dist/bin/next", "build"],
+            cwd=root / "frontend",
+            env=env,
+        )
     web = subprocess.Popen(
         [
             "node",
             "node_modules/next/dist/bin/next",
-            "start",
+            "dev" if development else "start",
             "--hostname",
             "127.0.0.1",
             "--port",
@@ -107,7 +110,7 @@ with SessionLocal.begin() as db:
     processes.append(web)
     wait_ready("http://127.0.0.1:15173", web)
     run(
-        ["node", "node_modules/@playwright/test/cli.js", "test"],
+        ["node", "node_modules/@playwright/test/cli.js", "test", *sys.argv[1:]],
         cwd=root / "frontend",
         env=env,
     )
