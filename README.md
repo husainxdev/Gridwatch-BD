@@ -1,5 +1,7 @@
 # GridWatch BD
 
+Built with **Next.js App Router, React, TypeScript/JavaScript, Tailwind CSS/DaisyUI, FastAPI and PostgreSQL**.
+
 A Bengali-first load shedding and power outage management university project. The application is functional for a **small, manually verified pilot**, with no official feed or real Sylhet area connected yet. The home page clearly labels its fictional demonstration areas; operational accounts, reports, schedules and history use separate tables. No real coverage or production readiness is claimed.
 
 - [Scope, sources, user flows and data rules](docs/SCOPE.md)
@@ -33,7 +35,7 @@ cd backend
 npm run dev --prefix frontend
 ```
 
-Visit the local Vite server on port 5173. Vite proxies `/api` to the API on port 8000. Mailpit's local development mailbox is on port 8025. It catches password-reset email locally; no external email is sent in this configuration. Do not expose Mailpit publicly.
+Visit the local Next.js server at `http://localhost:5173`. Next.js proxies `/api` to the API on port 8000. Mailpit's local development mailbox is on port 8025. It catches password-reset email locally; no external email is sent in this configuration. Do not expose Mailpit publicly.
 
 Create your own local administrator through a password prompt (no default admin credentials are committed):
 
@@ -71,6 +73,12 @@ curl --fail http://127.0.0.1:8000/api/health/ready
 
 ## Deployment boundary
 
-The source can be built and run with a hosted PostgreSQL database and a static Vite build, but no hosted deployment has been configured or live-verified. Set a strong `JWT_SECRET`, real `DATABASE_URL`, `APP_ENV=production`, `DEMO_ENABLED=false`, explicit `CORS_ORIGINS` and `FRONTEND_URL`, a trusted SMTP service, HTTPS, migrations and a static host with SPA fallback and `/api` routing. The frontend build reads `VITE_API_BASE_URL`; never put secrets in a Vite variable. Production refresh cookies are `Secure`, HttpOnly, and SameSite Strict; host frontend and API under the same site. Add backups, monitoring, rate limiting at the ingress, and security review before public exposure. No official API access is required for a manual pilot.
+The source can be built and run with a hosted PostgreSQL database and a Next.js Node server, but no hosted deployment has been configured or live-verified. Set a strong `JWT_SECRET`, real `DATABASE_URL`, `APP_ENV=production`, `DEMO_ENABLED=false`, explicit `CORS_ORIGINS` and `FRONTEND_URL`, a trusted SMTP service, HTTPS, migrations and a running Next.js server and same-origin `/api` routing. Browser requests always use same-origin `/api`. Set `GRIDWATCH_API_TARGET` at build time for the Next.js rewrite when changing the upstream; never put secrets in `NEXT_PUBLIC_*` variables. Production refresh cookies are `Secure`, HttpOnly, and SameSite Strict; host frontend and API under the same site. Add backups, monitoring, rate limiting at the ingress, and security review before public exposure. No official API access is required for a manual pilot.
 
 Stop local services with `docker compose stop db mail`; volumes persist. The cloud checkout is already isolated; no extra Git worktree is needed.
+
+Sections 9–10: [Admin workspace, saved activities and personal history](docs/SECTIONS-9-10.md), including Windows PowerShell startup and migrations 0005–0006.
+
+[Next.js migration and Windows update guide](docs/NEXTJS.md).
+
+[Implementation review and remaining limits (2026-10-29)](docs/REVIEW-2026-10-29.md).

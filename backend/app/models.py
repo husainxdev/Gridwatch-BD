@@ -1,4 +1,4 @@
-"""Domain storage; authorization and cross-record validation belong in upcoming services."""
+"""Domain storage; API services enforce authorization, evidence and cross-record rules."""
 
 import uuid
 from datetime import datetime
@@ -35,6 +35,7 @@ class Record:
 
 
 class Location(Record, Base):
+    version: Mapped[int] = mapped_column(Integer, server_default="1")
     __tablename__ = "locations"
     aliases: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]")
     name_bn: Mapped[str] = mapped_column(String(160))
@@ -203,6 +204,7 @@ class Schedule(Record, Base):
 
 
 class Report(Record, Base):
+    version: Mapped[int] = mapped_column(Integer, server_default="1")
     __tablename__ = "reports"
     note: Mapped[str] = mapped_column(String(500), server_default="")
     moderation: Mapped[str] = mapped_column(String(20), server_default="accepted")
@@ -238,6 +240,7 @@ class Report(Record, Base):
 
 
 class OutageEvent(Record, Base):
+    version: Mapped[int] = mapped_column(Integer, server_default="1")
     __tablename__ = "outage_events"
     location_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("locations.id", ondelete="RESTRICT"), index=True
@@ -274,6 +277,9 @@ class PersonalEpisode(Record, Base):
     __tablename__ = "personal_episodes"
     __table_args__ = (
         Index(
+            "ix_episode_owner_area_time", "user_id", "location_id", "last_observed_at"
+        ),
+        Index(
             "uq_open_personal_episode",
             "user_id",
             "location_id",
@@ -300,3 +306,84 @@ class EvidenceAudit(Record, Base):
     entity_type: Mapped[str] = mapped_column(String(30))
     action: Mapped[str] = mapped_column(String(40))
     snapshot: Mapped[dict] = mapped_column(JSONB)
+
+
+class Activity(Record, Base):
+    __tablename__ = "activities"
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE")
+    )
+    location_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("locations.id", ondelete="RESTRICT")
+    )
+    title: Mapped[str] = mapped_column(String(160))
+    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    version: Mapped[int] = mapped_column(Integer, server_default="1")
+    __table_args__ = (
+        CheckConstraint("ends_at > starts_at", name="activity_interval"),
+        Index("ix_activity_owner_start", "user_id", "starts_at"),
+    )
+
+
+class ElectricityOffice(Record, Base):
+    __tablename__ = "electricity_offices"
+    name_bn: Mapped[str] = mapped_column(String(160))
+    name_en: Mapped[str] = mapped_column(String(160))
+    source_url: Mapped[str] = mapped_column(Text)
+    verification_status: Mapped[str] = mapped_column(
+        String(20), server_default="unverified"
+    )
+    verified_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    is_active: Mapped[bool] = mapped_column(Boolean, server_default="true")
+    version: Mapped[int] = mapped_column(Integer, server_default="1")
+    __table_args__ = (
+        Index("uq_office_name", func.lower(func.btrim(name_en)), unique=True),
+        CheckConstraint(
+            "verification_status IN ('unverified','verified')", name="office_status"
+        ),
+        CheckConstraint(
+            "verification_status != 'verified' OR (verified_by IS NOT NULL AND verified_at IS NOT NULL)",
+            name="office_evidence",
+        ),
+    )
+
+
+class FeederMapping(Record, Base):
+    """One explicitly sourced feeder-to-administrative-location claim, not an inferred boundary."""
+
+    __tablename__ = "feeder_mappings"
+    office_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("electricity_offices.id", ondelete="RESTRICT"), index=True
+    )
+    location_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("locations.id", ondelete="RESTRICT"), index=True
+    )
+    feeder_name: Mapped[str] = mapped_column(String(160))
+    coverage_description: Mapped[str] = mapped_column(String(1000))
+    source_url: Mapped[str] = mapped_column(Text)
+    verification_status: Mapped[str] = mapped_column(
+        String(20), server_default="unverified"
+    )
+    verified_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    is_active: Mapped[bool] = mapped_column(Boolean, server_default="true")
+    version: Mapped[int] = mapped_column(Integer, server_default="1")
+    __table_args__ = (
+        Index(
+            "uq_feeder_mapping",
+            office_id,
+            location_id,
+            func.lower(func.btrim(feeder_name)),
+            unique=True,
+        ),
+        CheckConstraint(
+            "verification_status IN ('unverified','verified')",
+            name="feeder_mapping_status",
+        ),
+        CheckConstraint(
+            "verification_status != 'verified' OR (verified_by IS NOT NULL AND verified_at IS NOT NULL)",
+            name="feeder_mapping_evidence",
+        ),
+    )

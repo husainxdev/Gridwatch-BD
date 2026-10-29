@@ -85,6 +85,7 @@ class ScheduleBody(ScheduleInput):
 
 
 class VersionBody(BaseModel):
+    reason: str = Field(default="", max_length=500)
     version: int = Field(ge=1)
 
 
@@ -210,6 +211,9 @@ def notice_action(
     actor: User = Depends(admin_user),
 ):
     item = locked(db, Notice, key, body.version)
+    db.info["audit_reason"] = body.reason
+    if action in {"cancel", "withdraw", "archive"} and len(body.reason.strip()) < 5:
+        raise HTTPException(422, "Reason of at least five characters required")
     audit(db, actor, item, action)
     if action == "verify":
         item.verification_status = "verified"
@@ -235,8 +239,14 @@ def delete_notice(
     actor: User = Depends(admin_user),
 ):
     item = locked(db, Notice, key, version)
-    if item.lifecycle != "draft" or db.scalar(
-        select(Schedule.id).where(Schedule.notice_id == key).limit(1)
+    if (
+        item.lifecycle != "draft"
+        or db.scalar(
+            select(EvidenceAudit.id)
+            .where(EvidenceAudit.entity_id == key, EvidenceAudit.action == "publish")
+            .limit(1)
+        )
+        or db.scalar(select(Schedule.id).where(Schedule.notice_id == key).limit(1))
     ):
         raise HTTPException(
             409, "Preserve published/referenced evidence; withdraw or archive instead"
@@ -303,7 +313,7 @@ def schedule_list(
     if feeder:
         stmt = stmt.where(
             False
-        )  # No verified feeder registry exists; never infer mappings.
+        )  # Registry claims are not implicit schedule coverage; never infer mappings.
     if category:
         stmt = stmt.where(Schedule.category == category)
     if status:
@@ -339,7 +349,8 @@ def schedule_detail(key: uuid.UUID, db: Session = Depends(get_db)):
 def schedule_values(db, body):
     if body.feeder_id:
         raise HTTPException(
-            422, "Verified feeder registry unavailable; use explicit locations"
+            422,
+            "Schedule feeder integration is unavailable; use explicit source-named locations",
         )
     if body.ends_at <= body.starts_at:
         raise HTTPException(422, "End must follow start")
@@ -436,6 +447,9 @@ def schedule_action(
     actor: User = Depends(admin_user),
 ):
     item = locked(db, Schedule, key, body.version)
+    db.info["audit_reason"] = body.reason
+    if action in {"cancel", "withdraw", "archive"} and len(body.reason.strip()) < 5:
+        raise HTTPException(422, "Reason of at least five characters required")
     audit(db, actor, item, action)
     if action == "publish":
         n = find(db, Notice, item.notice_id)
@@ -461,8 +475,14 @@ def delete_schedule(
     actor: User = Depends(admin_user),
 ):
     item = locked(db, Schedule, key, version)
-    if item.lifecycle != "draft":
-        raise HTTPException(409, "Cancel published evidence instead")
+    if item.lifecycle != "draft" or db.scalar(
+        select(EvidenceAudit.id)
+        .where(EvidenceAudit.entity_id == key, EvidenceAudit.action == "publish")
+        .limit(1)
+    ):
+        raise HTTPException(
+            409, "Cancel or archive previously published evidence instead"
+        )
     audit(db, actor, item, "delete")
     db.delete(item)
     db.commit()
@@ -474,6 +494,8 @@ def revisions(
     key: uuid.UUID,
     db: Session = Depends(get_db),
     actor: User = Depends(admin_user),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(100, ge=1, le=100),
 ):
     return {
         "items": [
@@ -484,6 +506,8 @@ def revisions(
                     EvidenceAudit.entity_type == entity, EvidenceAudit.entity_id == key
                 )
                 .order_by(EvidenceAudit.created_at, EvidenceAudit.id)
+                .offset((page - 1) * page_size)
+                .limit(page_size)
             )
         ]
     }
@@ -568,11 +592,22 @@ def submit_report(
         and body.observed_at < ep.started_at
     ):
         raise HTTPException(422, "Restoration precedes personal outage start")
-    if previous and body.observed_at < previous.observed_at:
-        item.moderation = (
-            "pending"  # preserve observation; do not silently rewrite current state
-        )
+    if body.observed_at > instant or (
+        previous and body.observed_at < previous.observed_at
+    ):
+        # A clock-skew-tolerated submission is retained, not treated as a future fact.
+        item.moderation = "pending"
     else:
+        # Consecutive restoration confirmations belong to the previous episode;
+        # they do not invent a new interruption or move its first reported end.
+        if (
+            not ep
+            and body.kind == "power_back"
+            and previous
+            and previous.kind == "power_back"
+            and previous.episode_id
+        ):
+            ep = db.get(PersonalEpisode, previous.episode_id)
         if not ep:
             ep = PersonalEpisode(
                 user_id=user.id,
@@ -586,7 +621,7 @@ def submit_report(
             db.flush()
         else:
             ep.last_observed_at = body.observed_at
-            if body.kind == "power_back":
+            if body.kind == "power_back" and ep.is_open:
                 ep.ended_at = body.observed_at
                 ep.is_open = False
         item.episode_id = ep.id
@@ -716,6 +751,8 @@ def summary(location_id: uuid.UUID, db: Session = Depends(get_db)):
 
 
 class ModerationBody(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    version: int = Field(default=1, ge=1)
     state: Literal["accepted", "rejected", "pending"]
     reason: str = Field(min_length=5, max_length=500)
     candidate_event_id: uuid.UUID | None = None
@@ -730,6 +767,15 @@ def moderate(
 ):
     item = find(db, Report, key)
     db.scalar(select(User).where(User.id == item.user_id).with_for_update())
+    db.refresh(item)
+    if item.version != body.version:
+        raise HTTPException(409, "Report changed; reload before reviewing")
+    if body.state == "accepted" and item.observed_at > now():
+        raise HTTPException(
+            422, "Future observations require review after their observation time"
+        )
+    item.version += 1
+    db.info["audit_reason"] = body.reason
     if body.candidate_event_id:
         event = find(db, OutageEvent, body.candidate_event_id)
         if event.location_id != item.location_id:
@@ -806,8 +852,13 @@ def rebuild_episodes(db, user_id, location_id):
         db.delete(ep)
     db.flush()
     ep = None
+    last_closed = None
     for r in rows:
-        if r.moderation != "accepted":
+        if r.moderation != "accepted" or r.is_demo or r.observed_at > now():
+            continue
+        if ep is None and r.kind == "power_back" and last_closed is not None:
+            r.episode_id = last_closed.id
+            last_closed.last_observed_at = r.observed_at
             continue
         if ep is None:
             ep = PersonalEpisode(
@@ -824,6 +875,7 @@ def rebuild_episodes(db, user_id, location_id):
         if r.kind == "power_back":
             ep.ended_at = r.observed_at
             ep.is_open = False
+            last_closed = ep
             ep = None
 
 

@@ -39,7 +39,7 @@ To mark a pilot verified, record: the precise ward/neighborhood label; its paren
 - Demo fixtures must never enter operational tables or aggregate counts. Production disables demo endpoint and seeding.
 
 ## Architecture
-React + TypeScript + Vite; React Router; Tailwind CSS v4 + DaisyUI v5; React Icons; React Hot Toast. Self-hosted Bengali font avoids a runtime font CDN dependency. FastAPI + SQLAlchemy + Alembic with PostgreSQL 17. Public endpoints include health, development-only demo areas, notices, schedules, locations, reports and recorded events. Authenticated endpoints provide reports and saved areas; admin endpoints manage reviewed operational records.
+Next.js App Router + React + TypeScript (JavaScript output); Tailwind CSS v4 + DaisyUI v5; React Icons; React Hot Toast. Self-hosted Bengali font avoids a runtime font CDN dependency. FastAPI + SQLAlchemy + Alembic with PostgreSQL 17. Public endpoints include health, development-only demo areas, notices, schedules, locations, reports and recorded events. Authenticated endpoints provide reports and saved areas; admin endpoints manage reviewed operational records.
 
 Operational routers use typed request schemas and bounded pagination with whitelisted sort keys. A future official-source adapter should normalize incoming material to reviewable drafts and never publish it directly. Service-layer separation and an independent security review remain deployment work.
 

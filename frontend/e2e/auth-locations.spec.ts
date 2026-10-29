@@ -78,8 +78,7 @@ for (const width of [1440, 390]) {
       } else await route.continue();
     });
     const users = await page.evaluate(async () => {
-      const modulePath = "/src/client.ts";
-      const { api } = await import(modulePath);
+      const { api } = window.__gridwatchTest!;
       return Promise.all([api("/api/auth/me"), api("/api/auth/me")]);
     });
     expect(users[0].email).toBe(email);

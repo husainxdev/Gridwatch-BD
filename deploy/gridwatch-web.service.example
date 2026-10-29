@@ -1,0 +1,21 @@
+[Unit]
+Description=GridWatch BD Next.js frontend
+After=network-online.target gridwatch-api.service
+Wants=network-online.target
+[Service]
+Type=simple
+User=gridwatch
+Group=gridwatch
+WorkingDirectory=/srv/gridwatch/frontend
+Environment=NODE_ENV=production
+Environment=NEXT_TELEMETRY_DISABLED=1
+ExecStart=/usr/bin/npm run start
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+# Adjust npm path to the actual Node installation. Build before starting.
+[Install]
+WantedBy=multi-user.target

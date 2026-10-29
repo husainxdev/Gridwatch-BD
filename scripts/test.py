@@ -8,6 +8,9 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 name = "gridwatch_test_" + uuid.uuid4().hex[:12]
 backend = root / "backend"
+python = str(
+    backend / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+)
 
 
 def run(args, **kwargs):
@@ -25,14 +28,14 @@ try:
     if not original or not original.endswith("/gridwatch"):
         raise SystemExit("Unexpected development database URL; test setup stopped.")
     env = dict(os.environ, DATABASE_URL=original.rsplit("/", 1)[0] + "/" + name)
-    run([".venv/bin/alembic", "upgrade", "head"], cwd=backend, env=env)
-    run([".venv/bin/alembic", "downgrade", "0001"], cwd=backend, env=env)
-    run([".venv/bin/alembic", "upgrade", "head"], cwd=backend, env=env)
-    # Prove an existing 0003 saved-area row survives the new preferences migration.
-    run([".venv/bin/alembic", "downgrade", "0003"], cwd=backend, env=env)
+    run([python, "-m", "alembic", "upgrade", "head"], cwd=backend, env=env)
+    run([python, "-m", "alembic", "downgrade", "0001"], cwd=backend, env=env)
+    run([python, "-m", "alembic", "upgrade", "head"], cwd=backend, env=env)
+    # Prove populated 0003 -> 0004 -> 0005 -> 0006 upgrades preserve existing records.
+    run([python, "-m", "alembic", "downgrade", "0003"], cwd=backend, env=env)
     run(
         [
-            ".venv/bin/python",
+            python,
             "-c",
             """
 from sqlalchemy import text
@@ -46,10 +49,11 @@ with engine.begin() as db:
         cwd=backend,
         env=env,
     )
-    run([".venv/bin/alembic", "upgrade", "head"], cwd=backend, env=env)
+    run([python, "-m", "alembic", "upgrade", "0004"], cwd=backend, env=env)
+    run([python, "-m", "alembic", "upgrade", "head"], cwd=backend, env=env)
     run(
         [
-            ".venv/bin/python",
+            python,
             "-c",
             """
 from sqlalchemy import text
@@ -57,17 +61,18 @@ from app.db import engine
 with engine.begin() as db:
     row=db.execute(text("SELECT label,is_default FROM saved_areas WHERE user_id='00000000-0000-0000-0000-000000000071'")).one()
     assert row.label == '' and row.is_default is False
+    assert db.execute(text("SELECT version FROM locations WHERE id='00000000-0000-0000-0000-000000000072'")).scalar_one() == 1
     db.execute(text("DELETE FROM saved_areas WHERE user_id='00000000-0000-0000-0000-000000000071'"))
     db.execute(text("DELETE FROM locations WHERE id='00000000-0000-0000-0000-000000000072'"))
     db.execute(text("DELETE FROM users WHERE id='00000000-0000-0000-0000-000000000071'"))
-print('Populated 0003 saved-area upgrade preserved its record')
+print('Populated 0003 -> 0004 -> 0005 -> 0006 upgrade preserved saved area and location')
 """,
         ],
         cwd=backend,
         env=env,
     )
-    run([".venv/bin/pytest", "-q"], cwd=backend, env=env)
-    run([".venv/bin/alembic", "check"], cwd=backend, env=env)
+    run([python, "-m", "pytest", "-q"], cwd=backend, env=env)
+    run([python, "-m", "alembic", "check"], cwd=backend, env=env)
 finally:
     run(
         [

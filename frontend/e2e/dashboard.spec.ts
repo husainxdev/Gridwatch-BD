@@ -51,8 +51,7 @@ for (const width of [1440, 390]) {
       .click();
     await expect(page.getByText("এলাকাটি আগে থেকেই সংরক্ষিত")).toBeVisible();
     const area = await page.evaluate(async () => {
-      const path = "/src/client.ts";
-      const { api } = await import(path);
+      const { api } = window.__gridwatchTest!;
       const a = (await api("/api/saved-areas")).items[0];
       await api("/api/reports", {
         method: "POST",
@@ -105,8 +104,7 @@ for (const width of [1440, 390]) {
       page.getByText("আপনার সংযোগের রিপোর্ট জমা হয়েছে"),
     ).toBeVisible();
     const identity = await page.evaluate(async () => {
-      const path = "/src/client.ts";
-      const { api } = await import(path);
+      const { api } = window.__gridwatchTest!;
       return (await api("/api/me/episodes")).items[0];
     });
     await page.reload();
@@ -123,8 +121,7 @@ for (const width of [1440, 390]) {
       page.getByText("আপনার ব্যক্তিগত পুনঃসংযোগ রেকর্ড হয়েছে"),
     ).toBeVisible();
     const closed = await page.evaluate(async () => {
-      const path = "/src/client.ts";
-      const { api } = await import(path);
+      const { api } = window.__gridwatchTest!;
       return (await api("/api/me/episodes")).items[0];
     });
     expect(closed.id).toBe(identity.id);
@@ -175,8 +172,7 @@ test("rapid area switch, stale failure, refresh expiry and logout isolate privat
   await signup(page, "network");
   await select(page);
   const original = await page.evaluate(async () => {
-    const path = "/src/client.ts";
-    const { api } = await import(path);
+    const { api } = window.__gridwatchTest!;
     return (await api("/api/locations?search=Browser%20test%20district"))
       .items[0].id;
   });
@@ -220,7 +216,7 @@ test("rapid area switch, stale failure, refresh expiry and logout isolate privat
     }),
   );
   await page.getByRole("button", { name: "রিপোর্ট ও ইতিহাস রিফ্রেশ" }).click();
-  await expect(page.getByRole("alert")).toContainText(
+  await expect(page.locator("main").getByRole("alert")).toContainText(
     "Test network unavailable",
   );
   await expect(
@@ -234,7 +230,7 @@ test("rapid area switch, stale failure, refresh expiry and logout isolate privat
   ).toBeDisabled();
   await page.unroute("**/api/dashboard?**");
   await page.getByRole("button", { name: "রিপোর্ট ও ইতিহাস রিফ্রেশ" }).click();
-  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.locator("main").getByRole("alert")).toHaveCount(0);
   // A failed startup refresh must clear all private query entries.
   await page.route("**/api/auth/refresh", (route) =>
     route.fulfill({
@@ -262,8 +258,7 @@ test("rapid area switch, stale failure, refresh expiry and logout isolate privat
   // The mocked 401 did not revoke the server cookie; finish that real session
   // before creating a new account, so a startup refresh cannot restore it.
   await page.evaluate(async () => {
-    const path = "/src/client.ts";
-    const { api } = await import(path);
+    const { api } = window.__gridwatchTest!;
     await api("/api/auth/logout", { method: "POST" }, false);
   });
   await signup(page, "fresh-user");
@@ -292,8 +287,7 @@ test("shared polling deduplicates, backs off, and pauses while hidden or offline
   await page.clock.install();
   await page.clock.pauseAt(new Date());
   const interval = await page.evaluate(async () => {
-    const path = "/src/polling.ts";
-    return (await import(path)).pollInterval;
+    return window.__gridwatchTest!.pollInterval;
   });
   let calls = 0;
   let fail = false;
@@ -326,7 +320,7 @@ test("shared polling deduplicates, backs off, and pauses while hidden or offline
   await first;
   fail = true;
   await page.getByRole("button", { name: "রিপোর্ট ও ইতিহাস রিফ্রেশ" }).click();
-  await expect(page.getByRole("alert")).toContainText(
+  await expect(page.locator("main").getByRole("alert")).toContainText(
     "Controlled polling failure",
   );
   expect(calls).toBe(2);
@@ -352,7 +346,7 @@ test("shared polling deduplicates, backs off, and pauses while hidden or offline
     document.dispatchEvent(new Event("visibilitychange"));
   });
   await expect.poll(() => calls).toBe(4);
-  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.locator("main").getByRole("alert")).toHaveCount(0);
   await page.evaluate(() => {
     Object.defineProperty(navigator, "onLine", {
       configurable: true,
@@ -360,7 +354,9 @@ test("shared polling deduplicates, backs off, and pauses while hidden or offline
     });
     window.dispatchEvent(new Event("offline"));
   });
-  await expect(page.getByRole("alert")).toContainText("ইন্টারনেট সংযোগ নেই");
+  await expect(page.locator("main").getByRole("alert")).toContainText(
+    "ইন্টারনেট সংযোগ নেই",
+  );
   await page.clock.fastForward(interval * 5);
   expect(calls).toBe(4);
   await page.evaluate(() => {
@@ -371,7 +367,7 @@ test("shared polling deduplicates, backs off, and pauses while hidden or offline
     window.dispatchEvent(new Event("online"));
   });
   await expect.poll(() => calls).toBe(5);
-  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.locator("main").getByRole("alert")).toHaveCount(0);
   await expect(
     page.getByText("দেখছেন: পরীক্ষামূলক জেলা", { exact: true }),
   ).toBeVisible();
@@ -409,6 +405,7 @@ test("unavailable saved default has an explicit fallback without choosing anothe
     ).json()
   ).items[0];
   const body = {
+    version: area.version,
     name_bn: area.name_bn,
     name_en: area.name_en,
     slug: area.slug,
@@ -447,7 +444,10 @@ test("unavailable saved default has an explicit fallback without choosing anothe
       (
         await other.post("/api/admin/locations/" + area.id + "/verify", {
           headers: { Authorization: `Bearer ${token}` },
-          data: { source_url: "https://example.com/fictional-test-only" },
+          data: {
+            source_url: "https://example.com/fictional-test-only",
+            version: area.version + 1,
+          },
         })
       ).status(),
     ).toBe(200);

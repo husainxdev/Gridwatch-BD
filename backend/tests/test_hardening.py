@@ -62,7 +62,20 @@ def test_location_hierarchy_aliases_and_duplicates():
     from app.security import admin_user
 
     client = TestClient(app)
-    app.dependency_overrides[admin_user] = lambda: SimpleNamespace(id=uuid.uuid4())
+    from app.db import SessionLocal
+    from app.models import User
+
+    with SessionLocal.begin() as db:
+        actor = User(
+            email=uuid.uuid4().hex + "@example.com",
+            display_name="Audit fixture",
+            password_hash="not-a-login",
+            role="admin",
+        )
+        db.add(actor)
+        db.flush()
+        actor_id = actor.id
+    app.dependency_overrides[admin_user] = lambda: SimpleNamespace(id=actor_id)
     try:
         suffix = uuid.uuid4().hex
 

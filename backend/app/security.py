@@ -43,7 +43,10 @@ def hash_password(value: str):
 def check_password(value: str, hashed: str):
     if len(value.encode()) > 72:
         return False
-    return bcrypt.checkpw(value.encode(), hashed.encode())
+    try:
+        return bcrypt.checkpw(value.encode(), hashed.encode())
+    except ValueError:
+        return False
 
 
 def access_token(user: User, session_id: uuid.UUID):
@@ -109,7 +112,7 @@ def current_user(
         not session
         or session.user_id != uid
         or session.revoked_at
-        or session.expires_at < now()
+        or session.expires_at <= now()
     ):
         raise HTTPException(401, "Session expired")
     user = db.get(User, uid)
@@ -131,9 +134,10 @@ def owned_saved_area(
     return db.get(SavedArea, {"user_id": user.id, "location_id": location_id})
 
 
-def admin_user(user: User = Depends(current_user)):
+def admin_user(user: User = Depends(current_user), db: Session = Depends(get_db)):
     if user.role != "admin":
         raise HTTPException(403, "Admin access required")
+    db.info["audit_actor"] = user.id
     return user
 
 

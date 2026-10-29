@@ -5,7 +5,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { api, csrf, renewToken, setAccessToken, type User } from "./client";
+import {
+  api,
+  csrf,
+  renewToken,
+  acceptSession,
+  announceSignOut,
+  withSessionLock,
+  type User,
+} from "./client";
 type Session = {
   user: User | null;
   checking: boolean;
@@ -24,6 +32,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
     const clear = () => setUser(null);
+    const updated = (e: Event) => setUser((e as CustomEvent<User>).detail);
+    window.addEventListener("gridwatch-session-updated", updated);
     window.addEventListener("gridwatch-session-ended", clear);
     renewToken()
       .then((result) => {
@@ -38,37 +48,44 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
       window.removeEventListener("gridwatch-session-ended", clear);
+      window.removeEventListener("gridwatch-session-updated", updated);
     };
   }, []);
   async function signIn(email: string, password: string) {
-    const result = await api<{ access_token: string; user: User }>(
-      "/api/auth/login",
-      { method: "POST", body: JSON.stringify({ email, password }) },
-      false,
-    );
-    setAccessToken(result.access_token);
-    setUser(result.user);
+    return withSessionLock(async () => {
+      const result = await api<{ access_token: string; user: User }>(
+        "/api/auth/login",
+        { method: "POST", body: JSON.stringify({ email, password }) },
+        false,
+      );
+      acceptSession(result);
+      setUser(result.user);
+    });
   }
   async function signUp(email: string, password: string, display_name: string) {
-    const result = await api<{ access_token: string; user: User }>(
-      "/api/auth/register",
-      {
-        method: "POST",
-        body: JSON.stringify({ email, password, display_name }),
-      },
-      false,
-    );
-    setAccessToken(result.access_token);
-    setUser(result.user);
+    return withSessionLock(async () => {
+      const result = await api<{ access_token: string; user: User }>(
+        "/api/auth/register",
+        {
+          method: "POST",
+          body: JSON.stringify({ email, password, display_name }),
+        },
+        false,
+      );
+      acceptSession(result);
+      setUser(result.user);
+    });
   }
   async function signOut() {
     if (!csrf())
       throw new Error(
         "Session cookie missing. Reload to verify session status.",
       );
-    await api("/api/auth/logout", { method: "POST" }, false);
-    setAccessToken(null);
-    setUser(null);
+    await withSessionLock(async () => {
+      await api("/api/auth/logout", { method: "POST" }, false);
+      announceSignOut();
+      setUser(null);
+    });
   }
   return (
     <Context.Provider value={{ user, checking, signIn, signUp, signOut }}>

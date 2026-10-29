@@ -8,11 +8,11 @@ from pathlib import Path
 backend = Path(__file__).resolve().parents[1] / "backend"
 os.chdir(backend)
 sys.path.insert(0, str(backend))
-from sqlalchemy import select
-from email_validator import validate_email, EmailNotValidError
 from app.db import SessionLocal
 from app.models import User
 from app.security import hash_password
+from email_validator import EmailNotValidError, validate_email
+from sqlalchemy import select
 
 
 def main():

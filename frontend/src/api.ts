@@ -6,10 +6,7 @@ export type DemoArea = {
   power_status: "unknown";
 };
 export async function fetchAreas(signal: AbortSignal): Promise<DemoArea[]> {
-  const response = await fetch(
-    `${import.meta.env.VITE_API_BASE_URL || ""}/api/demo/areas`,
-    { signal },
-  );
+  const response = await fetch("/api/demo/areas", { signal });
   if (!response.ok)
     throw new Error(
       "এলাকার তথ্য লোড করা যায়নি। ব্যাকএন্ড চালু আছে কি না দেখুন।",

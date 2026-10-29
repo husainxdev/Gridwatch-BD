@@ -1,7 +1,7 @@
 """Browser journey against its own disposable database and servers (ports 18000/15173)."""
 
-import secrets
 import os
+import secrets
 import subprocess
 import time
 import uuid
@@ -10,6 +10,9 @@ from urllib.request import urlopen
 
 root = Path(__file__).resolve().parents[1]
 backend = root / "backend"
+python = str(
+    backend / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+)
 name = "gridwatch_browser_" + uuid.uuid4().hex[:12]
 processes = []
 
@@ -48,12 +51,15 @@ try:
         APP_ENV="test",
         CORS_ORIGINS='["http://localhost:15173"]',
         GRIDWATCH_API_TARGET="http://127.0.0.1:18000",
+        GRIDWATCH_TEST_BUILD="1",
+        NEXT_PUBLIC_E2E_TEST="1",
+        NEXT_TELEMETRY_DISABLED="1",
     )
-    run([".venv/bin/alembic", "upgrade", "head"], cwd=backend, env=env)
+    run([python, "-m", "alembic", "upgrade", "head"], cwd=backend, env=env)
     # Fictional fixtures exist ONLY inside this disposable browser database.
     run(
         [
-            ".venv/bin/python",
+            python,
             "-c",
             """
 from datetime import datetime, UTC
@@ -74,21 +80,26 @@ with SessionLocal.begin() as db:
         env=env,
     )
     api = subprocess.Popen(
-        [".venv/bin/uvicorn", "app.main:app", "--port", "18000", "--no-access-log"],
+        [python, "-m", "uvicorn", "app.main:app", "--port", "18000", "--no-access-log"],
         cwd=backend,
         env=env,
     )
     processes.append(api)
     wait_ready("http://127.0.0.1:18000/api/health/ready", api)
+    run(
+        ["node", "node_modules/next/dist/bin/next", "build"],
+        cwd=root / "frontend",
+        env=env,
+    )
     web = subprocess.Popen(
         [
             "node",
-            "node_modules/vite/bin/vite.js",
-            "--host",
+            "node_modules/next/dist/bin/next",
+            "start",
+            "--hostname",
             "127.0.0.1",
             "--port",
             "15173",
-            "--strictPort",
         ],
         cwd=root / "frontend",
         env=env,

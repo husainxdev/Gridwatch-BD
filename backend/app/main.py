@@ -6,6 +6,8 @@ from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from . import auditing  # noqa: F401
+from .admin_workspace import router as admin_workspace_router
 from .api import router as api_router
 from .auth import router as auth_router
 from .config import get_settings
@@ -13,14 +15,16 @@ from .dashboard import router as dashboard_router
 from .db import get_db
 from .evidence import router as evidence_router
 from .models import DemoArea
+from .planning import router as planning_router
+from .registry import router as registry_router
 from .security import secret_key
 
 settings = get_settings()
 secret_key()  # fail startup instead of serving auth with a missing/weak signing secret
 app = FastAPI(
     title="GridWatch BD",
-    version="0.1.0",
-    description="Foundation API. Demo records are not official outage data.",
+    version="0.3.0",
+    description="Source-reviewed plans and recorded personal observations. No live official feed.",
 )
 app.add_middleware(
     CORSMiddleware,
@@ -43,7 +47,7 @@ def ready(db: Session = Depends(get_db)):
         revision = db.execute(
             text("SELECT version_num FROM alembic_version")
         ).scalar_one()
-        if revision != "0004":
+        if revision != "0006":
             raise HTTPException(503, "Database migration required")
     except SQLAlchemyError:
         raise HTTPException(503, "Database unavailable or migration required") from None
@@ -77,6 +81,9 @@ app.include_router(auth_router)
 app.include_router(dashboard_router)
 app.include_router(evidence_router)
 app.include_router(api_router)
+app.include_router(admin_workspace_router)
+app.include_router(planning_router)
+app.include_router(registry_router)
 
 # Do not reflect Pydantic's raw input (passwords/reset tokens) in API responses.
 

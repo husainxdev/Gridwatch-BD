@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "./navigation";
 import { FiRefreshCw, FiMapPin } from "react-icons/fi";
 import toast from "react-hot-toast";
 import {
@@ -62,7 +62,8 @@ type Snapshot = {
   };
 };
 const viewing = new Map<string, string>();
-window.addEventListener("gridwatch-session-ended", () => viewing.clear());
+if (typeof window !== "undefined")
+  window.addEventListener("gridwatch-session-ended", () => viewing.clear());
 const kinds: Record<string, string> = {
   power_off: "বিদ্যুৎ নেই",
   power_back: "বিদ্যুৎ ফিরেছে",

@@ -1,7 +1,7 @@
 """Create development-only credentials without displaying them; preserve existing files."""
 
-from pathlib import Path
 import secrets
+from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 paths = [root / ".env", root / "backend/.env"]

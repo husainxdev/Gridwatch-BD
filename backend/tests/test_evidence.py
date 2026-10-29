@@ -149,7 +149,7 @@ def test_lifecycle_visibility_versions_and_revision(setup):
                 "/api/admin/evidence/schedules/" + sid + "/revisions", headers=a
             ).json()["items"]
         )
-        == 3
+        == 5
     )
     assert (
         c.post(
@@ -159,7 +159,9 @@ def test_lifecycle_visibility_versions_and_revision(setup):
     )
     assert (
         c.post(
-            "/api/admin/schedules/" + sid + "/cancel", headers=a, json={"version": 4}
+            "/api/admin/schedules/" + sid + "/cancel",
+            headers=a,
+            json={"version": 4, "reason": "Source cancelled"},
         ).json()["status"]
         == "cancelled"
     )
@@ -169,7 +171,9 @@ def test_lifecycle_visibility_versions_and_revision(setup):
     )
     assert (
         c.post(
-            "/api/admin/notices/" + key + "/withdraw", headers=a, json={"version": 3}
+            "/api/admin/notices/" + key + "/withdraw",
+            headers=a,
+            json={"version": 3, "reason": "Source withdrawn"},
         ).status_code
         == 200
     )

@@ -40,7 +40,7 @@ router = APIRouter(
 class Credentials(BaseModel):
     model_config = ConfigDict(extra="forbid")
     email: EmailStr
-    password: str
+    password: str = Field(max_length=72)
 
 
 class Register(Credentials):
@@ -54,8 +54,8 @@ class ResetRequest(BaseModel):
 
 class ResetConfirm(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    token: str
-    password: str
+    token: str = Field(min_length=1, max_length=128)
+    password: str = Field(max_length=72)
 
 
 def user_dict(user):
@@ -149,7 +149,7 @@ def refresh(request: Request, response: Response, db: Session = Depends(get_db))
         revoke_family(db, session.family_id)
         db.commit()
         raise HTTPException(401, "Session revoked")
-    if session.expires_at < now():
+    if session.expires_at <= now():
         raise HTTPException(401, "Session expired")
     if not user or not user.is_active:
         raise HTTPException(401, "Account inactive")
@@ -255,7 +255,7 @@ def confirm_reset(body: ResetConfirm, db: Session = Depends(get_db)):
         .where(PasswordReset.token_hash == digest(body.token))
         .with_for_update()
     )
-    if not record or record.used_at or record.expires_at < now():
+    if not record or record.used_at or record.expires_at <= now():
         raise HTTPException(400, "Invalid or expired reset link")
     try:
         hashed = hash_password(body.password)

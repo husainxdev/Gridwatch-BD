@@ -4,7 +4,7 @@ This is a deployment recipe, not a claim of a live service. Obtain a host/domain
 
 ## Same-origin layout
 
-Serve the built React app and `/api/*` on the same HTTPS origin. [The example Caddyfile](../deploy/Caddyfile.example) proxies API requests to a loopback Uvicorn process and serves Vite's `dist` with SPA fallback. DNS must point to the host for Caddy's automatic HTTPS. Do not expose PostgreSQL, SMTP or Mailpit ports publicly. Do not copy local `.env` files or development database volumes to the server.
+Serve the built React app and `/api/*` on the same HTTPS origin. [The example Caddyfile](../deploy/Caddyfile.example) proxies API requests to a loopback Uvicorn process and proxies all other routes to the Next.js Node process on loopback port 5173. DNS must point to the host for Caddy's automatic HTTPS. Do not expose PostgreSQL, SMTP or Mailpit ports publicly. Do not copy local `.env` files or development database volumes to the server.
 
 ## Build and configuration
 
@@ -37,7 +37,7 @@ MAIL_FROM=no-reply@gridwatch.example.org
 
 The adapter requires authenticated STARTTLS in production. Store SMTP credentials in deployment secrets, never source control. Local Mailpit is for development only.
 
-With the production environment loaded, run `backend/.venv/bin/alembic upgrade head` as an explicit deployment step before restarting the API. Re-run only after a reviewed schema change and a backup. Configure the example systemd unit for the API and Caddy for static hosting. Build the frontend with an empty `VITE_API_BASE_URL` so browser requests stay on the HTTPS origin.
+With the production environment loaded, run `backend/.venv/bin/alembic upgrade head` as an explicit deployment step before restarting the API. Re-run only after a reviewed schema change and a backup. Configure the example systemd units for the API and Next.js frontend; Caddy terminates HTTPS and routes requests. Run `npm run start` from the built frontend directory (the service example uses this command). Set `GRIDWATCH_API_TARGET` at build time if changing the Next.js rewrite upstream; Caddy routes public `/api` directly to Uvicorn. Browser requests always stay same-origin. `NEXT_PUBLIC_*` values are public build-time configuration, never secrets. Do not enable `NEXT_PUBLIC_E2E_TEST` in deployed builds. The default `.next` build and isolated `.next-test` browser-test build are distinct.
 
 ## Live verification checklist
 
@@ -47,4 +47,4 @@ A real area must be verified by a person before entering official notices. No of
 
 ## Authentication configuration
 
-Use the same HTTPS origin for frontend and API; separate-site deployments are unsupported. See [Sections 3–4](AUTH-LOCATIONS.md) for exact cookie paths, CSRF and token lifetimes. `AUTH_RATE_LIMIT=60` / `AUTH_RATE_WINDOW_SECONDS=60` provide per-process limits only. Apply shared ingress limits before public exposure. Never log request bodies, Authorization headers, cookies or reset links. Current readiness requires schema `0004`. See [Sections 5–6](SECTIONS-5-6.md) for publication, reporting and migration rules.
+Use the same HTTPS origin for frontend and API; separate-site deployments are unsupported. See [Sections 3–4](AUTH-LOCATIONS.md) for exact cookie paths, CSRF and token lifetimes. `AUTH_RATE_LIMIT=60` / `AUTH_RATE_WINDOW_SECONDS=60` provide per-process limits only. Apply shared ingress limits before public exposure. Never log request bodies, Authorization headers, cookies or reset links. Current readiness requires schema `0006`. See [Sections 5–6](SECTIONS-5-6.md) for publication, reporting and migration rules.

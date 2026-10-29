@@ -20,7 +20,7 @@ export function PublicationActions({
       <div className="inline-actions">
         {(kind === "notices"
           ? ["publish", "withdraw", "archive"]
-          : ["publish", "archive"]
+          : ["publish", "cancel", "archive"]
         ).map((action) => (
           <button
             type="button"
@@ -28,13 +28,32 @@ export function PublicationActions({
             disabled={busy}
             key={action}
             onClick={async () => {
-              if (!confirm("এই পরিবর্তন নিশ্চিত করবেন?")) return;
+              if (busy) return;
+              const reason =
+                action === "publish"
+                  ? ""
+                  : prompt(
+                      "কারণ লিখুন (কমপক্ষে ৫ অক্ষর)। ঘোষণা ইতিহাসে থাকবে; ব্যক্তিগত episode বদলাবে না।",
+                    );
+              if (
+                reason === null ||
+                (action !== "publish" && reason.trim().length < 5)
+              )
+                return;
+              if (
+                !confirm(
+                  action === "publish"
+                    ? "এই ঘোষণা ব্যবহারকারীদের জন্য প্রকাশ করবেন?"
+                    : "ঘোষণার অবস্থা বদলাবে এবং পরের activity check নতুন অবস্থা দেখাবে। নিশ্চিত করবেন?",
+                )
+              )
+                return;
               setBusy(true);
               setError("");
               try {
                 await api(`/api/admin/${kind}/${item.id}/${action}`, {
                   method: "POST",
-                  body: JSON.stringify({ version: item.version }),
+                  body: JSON.stringify({ version: item.version, reason }),
                 });
                 toast.success("পরিবর্তন সংরক্ষিত");
                 reload();
@@ -46,9 +65,12 @@ export function PublicationActions({
             }}
           >
             {
-              { publish: "প্রকাশ", withdraw: "প্রত্যাহার", archive: "আর্কাইভ" }[
-                action
-              ]
+              {
+                publish: "প্রকাশ",
+                cancel: "বাতিল চিহ্নিত",
+                withdraw: "প্রত্যাহার",
+                archive: "আর্কাইভ",
+              }[action]
             }
           </button>
         ))}

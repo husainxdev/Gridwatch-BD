@@ -2,7 +2,7 @@
 
 import unicodedata
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -12,7 +12,17 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from .db import get_db
-from .models import Location, Notice, OutageEvent, Report, SavedArea, Schedule, User
+from .models import (
+    Activity,
+    FeederMapping,
+    Location,
+    OutageEvent,
+    PersonalEpisode,
+    Report,
+    SavedArea,
+    Schedule,
+    User,
+)
 from .security import admin_user, current_user, now
 
 router = APIRouter(prefix="/api", tags=["operational data"])
@@ -40,6 +50,7 @@ class Page(BaseModel):
 
 
 class LocationInput(BaseModel):
+    version: int = Field(default=1, ge=1)
     aliases: list[str] = Field(default_factory=list, max_length=20)
 
     @field_validator("aliases")
@@ -58,8 +69,8 @@ class LocationInput(BaseModel):
     @classmethod
     def normalize_name(cls, value):
         result = " ".join(unicodedata.normalize("NFKC", value).split())
-        if len(result) < 2:
-            raise ValueError("Name too short")
+        if not 2 <= len(result) <= 160:
+            raise ValueError("Normalized name must contain 2–160 characters")
         return result
 
     name_bn: str = Field(min_length=2, max_length=160)
@@ -134,6 +145,7 @@ class EventInput(BaseModel):
 
 
 class RestorationInput(BaseModel):
+    version: int = Field(default=1, ge=1)
     restored_at: datetime
     evidence: str = Field(min_length=12, max_length=2000)
 
@@ -174,6 +186,7 @@ def list_page(db, stmt, page: int, size: int, render):
 
 def loc_json(r):
     return {
+        "version": r.version,
         "id": r.id,
         "parent_id": r.parent_id,
         "aliases": r.aliases,
@@ -227,6 +240,7 @@ def report_json(r):
 
 def event_json(r):
     return {
+        "version": r.version,
         "id": r.id,
         "location_id": r.location_id,
         "started_at": r.started_at,
@@ -272,26 +286,30 @@ def locations(
             pass
         stmt = stmt.where(or_(*predicates))
 
-    def render_location(node):
-        item = loc_json(node)
-        names = []
-        seen = {node.id}
-        while node.parent_id:
-            node = db.get(Location, node.parent_id)
-            if node is None or node.id in seen:
-                break
-            seen.add(node.id)
-            names.append(node.name_bn)
-        item["ancestor_names"] = list(reversed(names))
-        return item
-
-    return list_page(
-        db,
-        stmt.order_by(Location.name_en, Location.id),
-        page,
-        page_size,
-        render_location,
+    result = list_page(
+        db, stmt.order_by(Location.name_en, Location.id), page, page_size, loc_json
     )
+    ids = [r["id"] for r in result["items"]]
+    paths = {key: [] for key in ids}
+    if ids:
+        rows = db.execute(
+            text("""
+            WITH RECURSIVE ancestors AS (
+                SELECT id AS origin, id, parent_id, name_bn, 0 AS depth, ARRAY[id] AS visited
+                FROM locations WHERE id = ANY(:ids)
+                UNION ALL
+                SELECT a.origin,p.id,p.parent_id,p.name_bn,a.depth+1,a.visited || p.id
+                FROM locations p JOIN ancestors a ON p.id=a.parent_id
+                WHERE NOT p.id = ANY(a.visited)
+            ) SELECT origin,name_bn FROM ancestors WHERE depth > 0 ORDER BY depth DESC
+        """),
+            {"ids": ids},
+        )
+        for origin, name in rows:
+            paths[origin].append(name)
+    for item in result["items"]:
+        item["ancestor_names"] = paths[item["id"]]
+    return result
 
 
 @router.post("/admin/locations", status_code=201)
@@ -301,13 +319,20 @@ def create_location(
     admin: User = Depends(admin_user),
 ):
     db.execute(text("SELECT pg_advisory_xact_lock(34001)"))
+    db.execute(text("SELECT pg_advisory_xact_lock(34002)"))
     parent = find(db, Location, body.parent_id) if body.parent_id else None
     if (parent.kind if parent else None) not in KINDS[body.kind]:
         raise HTTPException(422, "Invalid location parent")
     if db.scalar(select(Location.id).where(Location.slug == body.slug)):
         raise HTTPException(409, "Slug already exists")
-    item = Location(**body.model_dump(), verification_status="unverified")
+    item = Location(
+        **body.model_dump(exclude={"version"}), verification_status="unverified"
+    )
     db.add(item)
+    db.flush()
+    from .evidence import audit
+
+    audit(db, admin, item, "create")
     db.commit()
     db.refresh(item)
     return loc_json(item)
@@ -321,7 +346,10 @@ def edit_location(
     admin: User = Depends(admin_user),
 ):
     db.execute(text("SELECT pg_advisory_xact_lock(34001)"))
+    db.execute(text("SELECT pg_advisory_xact_lock(34002)"))
     item = find(db, Location, location_id)
+    if item.version != body.version:
+        raise HTTPException(409, "Location changed; reload before editing")
     parent = find(db, Location, body.parent_id) if body.parent_id else None
     if (parent.kind if parent else None) not in KINDS[body.kind]:
         raise HTTPException(422, "Invalid location parent")
@@ -337,22 +365,35 @@ def edit_location(
         select(Location.id).where(Location.slug == body.slug, Location.id != item.id)
     ):
         raise HTTPException(409, "Slug already exists")
-    for k, v in body.model_dump().items():
+    for k, v in body.model_dump(exclude={"version"}).items():
         setattr(item, k, v)
+    item.version += 1
     item.verification_status = "unverified"
+    from .registry import invalidate_location_mappings
+
+    invalidate_location_mappings(db, item.id)
     item.source_url = None
     item.verified_at = None
-    db.execute(
-        update(Schedule)
-        .where(Schedule.location_id == item.id, Schedule.status == "announced")
-        .values(status="superseded")
-    )
+    for schedule in db.scalars(
+        select(Schedule)
+        .where(
+            or_(
+                Schedule.location_id == item.id,
+                Schedule.coverage.contains([{"id": str(item.id)}]),
+            ),
+            Schedule.status == "announced",
+        )
+        .with_for_update()
+    ):
+        schedule.status = "superseded"
+        schedule.version += 1
     db.commit()
     db.refresh(item)
     return loc_json(item)
 
 
 class VerifyInput(BaseModel):
+    version: int = Field(default=1, ge=1)
     source_url: HttpUrl
 
     @field_validator("source_url")
@@ -371,7 +412,11 @@ def verify_location(
     admin: User = Depends(admin_user),
 ):
     db.execute(text("SELECT pg_advisory_xact_lock(34001)"))
+    db.execute(text("SELECT pg_advisory_xact_lock(34002)"))
     item = find(db, Location, location_id)
+    if item.version != body.version:
+        raise HTTPException(409, "Location changed; reload before verification")
+    item.version += 1
     item.source_url = str(body.source_url)
     item.verified_at = now()
     item.verification_status = "verified"
@@ -383,14 +428,27 @@ def verify_location(
 @router.delete("/admin/locations/{location_id}", status_code=204)
 def delete_location(
     location_id: uuid.UUID,
+    version: int = Query(..., ge=1),
     db: Session = Depends(get_db),
     admin: User = Depends(admin_user),
 ):
     db.execute(text("SELECT pg_advisory_xact_lock(34001)"))
-    item = find(db, Location, location_id)
+    db.execute(text("SELECT pg_advisory_xact_lock(34002)"))
+    item = db.scalar(
+        select(Location).where(Location.id == location_id).with_for_update()
+    )
+    if not item:
+        raise HTTPException(404, "Record not found")
+    if item.version != version:
+        raise HTTPException(409, "Location changed; reload before deleting")
     if db.scalar(
         select(Schedule.id)
-        .where(Schedule.coverage.contains([{"id": str(location_id)}]))
+        .where(
+            or_(
+                Schedule.coverage.contains([{"id": str(location_id)}]),
+                Schedule.coverage.contains([{"ancestor_ids": [str(location_id)]}]),
+            )
+        )
         .limit(1)
     ):
         raise HTTPException(409, "Location is referenced by schedule coverage")
@@ -406,6 +464,9 @@ def delete_location(
             (Report, Report.location_id),
             (OutageEvent, OutageEvent.location_id),
             (SavedArea, SavedArea.location_id),
+            (Activity, Activity.location_id),
+            (FeederMapping, FeederMapping.location_id),
+            (PersonalEpisode, PersonalEpisode.location_id),
         ]
     ):
         raise HTTPException(409, "Location is in use")
@@ -527,6 +588,10 @@ def create_event(
         raise HTTPException(422, "Verified area and past start required")
     item = OutageEvent(**body.model_dump(), verified_by=admin.id, verified_at=now())
     db.add(item)
+    db.flush()
+    from .evidence import audit
+
+    audit(db, admin, item, "create")
     db.commit()
     db.refresh(item)
     return event_json(item)
@@ -539,7 +604,14 @@ def restore(
     db: Session = Depends(get_db),
     admin: User = Depends(admin_user),
 ):
-    item = find(db, OutageEvent, event_id)
+    item = db.scalar(
+        select(OutageEvent).where(OutageEvent.id == event_id).with_for_update()
+    )
+    if not item:
+        raise HTTPException(404, "Event not found")
+    if item.version != body.version:
+        raise HTTPException(409, "Event changed; reload before editing")
+    item.version += 1
     if item.restored_at:
         raise HTTPException(409, "Event already restored")
     if not item.started_at <= body.restored_at <= now():
@@ -551,41 +623,6 @@ def restore(
     db.commit()
     db.refresh(item)
     return event_json(item)
-
-
-@router.post("/activities/check")
-def activity_conflicts(body: ActivityInput, db: Session = Depends(get_db)):
-    find(db, Location, body.location_id)
-    if body.ends_at <= body.starts_at or body.ends_at - body.starts_at > timedelta(
-        days=7
-    ):
-        raise HTTPException(
-            422, "Activity interval must be positive and at most seven days"
-        )
-    rows = db.scalars(
-        select(Schedule)
-        .join(Notice, Notice.id == Schedule.notice_id)
-        .join(Location, Location.id == Schedule.location_id)
-        .where(
-            Schedule.location_id == body.location_id,
-            Schedule.status == "announced",
-            Notice.verification_status == "verified",
-            Notice.lifecycle == "published",
-            Schedule.lifecycle == "published",
-            Notice.is_demo.is_(False),
-            Schedule.is_demo.is_(False),
-            Location.verification_status == "verified",
-            Schedule.starts_at < body.ends_at,
-            Schedule.ends_at > body.starts_at,
-        )
-        .order_by(Schedule.starts_at)
-    ).all()
-    return {
-        "conflicts": [schedule_json(s) for s in rows],
-        "message": "No announced conflict found; power availability is not guaranteed."
-        if not rows
-        else "Activity overlaps an announced outage; actual interruption may differ.",
-    }
 
 
 @router.get("/locations/{location_id}")
@@ -624,3 +661,45 @@ def location_children(
         page_size,
         loc_json,
     )
+
+
+class DeactivateLocation(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    version: int = Field(ge=1)
+    reason: str = Field(min_length=5, max_length=500)
+
+
+@router.post("/admin/locations/{location_id}/deactivate")
+def deactivate_location(
+    location_id: uuid.UUID,
+    body: DeactivateLocation,
+    db: Session = Depends(get_db),
+    admin: User = Depends(admin_user),
+):
+    """Suspend verification; keep evidence/references and historical observations."""
+    db.execute(text("SELECT pg_advisory_xact_lock(34001)"))
+    db.execute(text("SELECT pg_advisory_xact_lock(34002)"))
+    item = find(db, Location, location_id)
+    if item.version != body.version:
+        raise HTTPException(409, "Location changed; reload before deactivating")
+    db.info["audit_reason"] = body.reason
+    item.version += 1
+    item.verification_status = "unverified"
+    from .registry import invalidate_location_mappings
+
+    invalidate_location_mappings(db, item.id)
+    for schedule in db.scalars(
+        select(Schedule)
+        .where(
+            or_(
+                Schedule.location_id == item.id,
+                Schedule.coverage.contains([{"id": str(item.id)}]),
+            ),
+            Schedule.status == "announced",
+        )
+        .with_for_update()
+    ):
+        schedule.status = "superseded"
+        schedule.version += 1
+    db.commit()
+    return loc_json(item)

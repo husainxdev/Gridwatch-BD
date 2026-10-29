@@ -1,7 +1,7 @@
 import { useMemo, useSyncExternalStore } from "react";
 import { api, ApiError } from "./client";
 
-const configured = Number(import.meta.env.VITE_POLL_INTERVAL_MS || 30000);
+const configured = Number(process.env.NEXT_PUBLIC_POLL_INTERVAL_MS || 30000);
 export const pollInterval = Number.isFinite(configured)
   ? Math.max(5000, Math.min(configured, 300000))
   : 30000;
@@ -130,13 +130,14 @@ class Entry<T> {
     window.removeEventListener("offline", this.activity);
   }
 }
-window.addEventListener("gridwatch-session-ended", () => {
-  entries.forEach((e) => {
-    e.stop();
-    e.emit({ ...empty });
+if (typeof window !== "undefined")
+  window.addEventListener("gridwatch-session-ended", () => {
+    entries.forEach((e) => {
+      e.stop();
+      e.emit({ ...empty });
+    });
+    entries.clear();
   });
-  entries.clear();
-});
 export function usePolling<T>(path: string | null, userId: string) {
   const entry = useMemo(() => {
     if (!path) return null;

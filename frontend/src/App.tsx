@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, NavLink, Route, Routes } from "react-router-dom";
+import { useEffect, useState, type ReactNode } from "react";
+import { Link, NavLink } from "./navigation";
 import {
   FiActivity,
   FiArrowRight,
@@ -14,10 +14,9 @@ import {
 import toast from "react-hot-toast";
 import { fetchAreas, formatTime, type DemoArea } from "./api";
 import { Card, EmptyState, EvidenceBadge } from "./components/ui";
-import { Admin, AuthPage, Dashboard, NoticeBoard, RequireUser } from "./pages";
 import { useSession } from "./session";
 
-function Overview() {
+export function Overview() {
   const [areas, setAreas] = useState<DemoArea[]>([]);
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(true);
@@ -165,8 +164,8 @@ function Overview() {
                 রিপোর্ট একজনের সংযোগের অভিজ্ঞতা জানায়।
               </div>
               <EmptyState title="এখনো কোনো রিপোর্ট নেই">
-                রিপোর্ট জমা দেওয়া ও অ্যাকাউন্ট ব্যবস্থাপনা পরবর্তী ধাপে যোগ
-                হবে।
+                ব্যক্তিগত রিপোর্ট দিতে লগইন করে ড্যাশবোর্ডে যান। এই ডেমোতে
+                বাস্তব রিপোর্ট নেই।
               </EmptyState>
             </Card>
             <Card title="তথ্যের পরিচয়">
@@ -215,7 +214,7 @@ function Overview() {
 function FiInfoIcon() {
   return <FiShield aria-hidden="true" />;
 }
-function Sources() {
+export function Sources() {
   return (
     <>
       <p className="eyebrow">স্বচ্ছতা ও আস্থা</p>
@@ -267,13 +266,13 @@ function Sources() {
     </>
   );
 }
-function Roadmap() {
+export function Roadmap() {
   return (
     <>
       <p className="eyebrow">নির্মাণের অগ্রগতি</p>
       <h1>স্বচ্ছভাবে, ধাপে ধাপে।</h1>
       <div className="reading">
-        <Card title="বর্তমান ধাপ · ভিত্তি">
+        <Card title="ভিত্তি ও তথ্যের নীতি">
           <p>
             স্কোপ, তথ্যের নীতি, ডেটাবেস, migration, health API এবং এই অ্যাপ শেল
             তৈরি হয়েছে।
@@ -297,7 +296,7 @@ function Roadmap() {
     </>
   );
 }
-export default function App() {
+export default function App({ children }: { children: ReactNode }) {
   const { user, signOut } = useSession();
   return (
     <div className="app">
@@ -328,6 +327,8 @@ export default function App() {
           <NavLink to="/dashboard">
             <FiActivity /> ড্যাশবোর্ড
           </NavLink>
+          <NavLink to="/activities">কাজের সময়</NavLink>
+          <NavLink to="/history">আমার ইতিহাস</NavLink>
           {user?.role === "admin" && (
             <NavLink to="/admin">
               <FiShield /> অ্যাডমিন
@@ -338,7 +339,7 @@ export default function App() {
           </NavLink>
         </nav>
         <div className="sidebar-bottom">
-          <span className="badge">PILOT · v0.2</span>
+          <span className="badge">PILOT · v0.3</span>
           <p>
             বাংলাদেশের জন্য তৈরি
             <br />
@@ -371,44 +372,7 @@ export default function App() {
             বাংলা <span>BN</span>
           </span>
         </header>
-        <main id="main">
-          <Routes>
-            <Route path="/" element={<Overview />} />
-            <Route path="/sources" element={<Sources />} />
-            <Route path="/notices" element={<NoticeBoard />} />
-            <Route path="/login" element={<AuthPage mode="login" />} />
-            <Route path="/register" element={<AuthPage mode="register" />} />
-            <Route path="/forgot" element={<AuthPage mode="forgot" />} />
-            <Route path="/reset" element={<AuthPage mode="reset" />} />
-            <Route
-              path="/dashboard"
-              element={
-                <RequireUser>
-                  <Dashboard />
-                </RequireUser>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <RequireUser admin>
-                  <Admin />
-                </RequireUser>
-              }
-            />
-            <Route path="/progress" element={<Roadmap />} />
-            <Route
-              path="*"
-              element={
-                <Card title="পাতাটি পাওয়া যায়নি">
-                  <Link to="/" className="btn">
-                    মূল পাতায় ফিরুন
-                  </Link>
-                </Card>
-              }
-            />
-          </Routes>
-        </main>
+        <main id="main">{children}</main>
         <footer>
           <span>© GridWatch BD · বিশ্ববিদ্যালয় প্রকল্প</span>
           <span>প্রদর্শনী সংস্করণ • জরুরি সেবা নয়</span>

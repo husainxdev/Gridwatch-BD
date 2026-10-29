@@ -1,12 +1,26 @@
-import { DashboardView } from "./Dashboard";
+import { RegistryWorkspace } from "./Registry";
 import {
-  PublicationActions,
-  PublishedSchedules,
-  ReportReview,
-} from "./evidence-ui";
+  NoticeSelector,
+  AdminOverview,
+  AdminAudit,
+  AuditTrail,
+  ListControls,
+  ModerationWorkspace,
+  OfficeDirectory,
+  useList,
+} from "./management";
+import { DashboardView } from "./Dashboard";
+import { PublicationActions, PublishedSchedules } from "./evidence-ui";
 import { LocationPicker } from "./components/LocationPicker";
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
-import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Fragment,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
+import { Link, Navigate, useNavigate, useSearchParams } from "./navigation";
 import toast from "react-hot-toast";
 import {
   api,
@@ -44,10 +58,11 @@ function useData<T>(path: string) {
     [version, setVersion] = useState(0);
   useEffect(() => {
     let active = true;
+    const controller = new AbortController();
     setLoading(true);
     setData(null);
     setError("");
-    api<T>(path)
+    api<T>(path, { signal: controller.signal })
       .then((x) => {
         if (active) setData(x);
       })
@@ -59,17 +74,21 @@ function useData<T>(path: string) {
       });
     return () => {
       active = false;
+      controller.abort();
     };
   }, [path, version]);
   return { data, error, loading, reload: () => setVersion((x) => x + 1) };
 }
 function useAsyncAction(reload?: () => void) {
+  const inFlight = useRef(false);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   async function run(
     action: () => Promise<unknown>,
     success = "সংরক্ষণ হয়েছে",
   ) {
+    if (inFlight.current) return false;
+    inFlight.current = true;
     setBusy(true);
     setError("");
     try {
@@ -88,6 +107,7 @@ function useAsyncAction(reload?: () => void) {
       setError((e as Error).message);
       return false;
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   }
@@ -140,7 +160,7 @@ export function AuthPage({
 }: {
   mode: "login" | "register" | "forgot" | "reset";
 }) {
-  const { user, signIn, signUp } = useSession();
+  const { user, checking, signIn, signUp } = useSession();
   const nav = useNavigate(),
     [params] = useSearchParams();
   const [resetToken] = useState(
@@ -198,6 +218,8 @@ export function AuthPage({
       setBusy(false);
     }
   }
+  if (checking && (mode === "login" || mode === "register"))
+    return <div className="loading-state">সেশন যাচাই হচ্ছে…</div>;
   if (user && (mode === "login" || mode === "register"))
     return <Navigate to="/dashboard" replace />;
   return (
@@ -289,7 +311,7 @@ export function RequireUser({
         এই পাতায় অ্যাডমিন অনুমতি প্রয়োজন।
       </div>
     );
-  return <>{children}</>;
+  return <Fragment key={user.id}>{children}</Fragment>;
 }
 
 function AreaChooser({
@@ -312,73 +334,20 @@ export function Dashboard() {
   );
 }
 function Activity({ areaId }: { areaId: string }) {
-  const [start, setStart] = useState(localInputTime(new Date())),
-    [end, setEnd] = useState(localInputTime(new Date(Date.now() + 3600000))),
-    [result, setResult] = useState<{
-      conflicts: Schedule[];
-      message: string;
-    } | null>(null);
-  const action = useAsyncAction();
   return (
-    <Card title="কাজের সময় মিলিয়ে দেখুন">
-      <p className="hint">
-        ঘোষিত সময়সূচির সঙ্গে ওভারল্যাপ খোঁজা হয়। ফলাফল বিদ্যুৎ থাকার নিশ্চয়তা
-        নয়।
+    <Card title="কাজের সময় ও ব্যক্তিগত ইতিহাস">
+      <p>
+        সংরক্ষিত কাজের সঙ্গে বর্তমান ঘোষণা মিলিয়ে দেখুন। ব্যক্তিগত ইতিহাসে শুধু
+        আপনার গৃহীত পর্যবেক্ষণ থাকে।
       </p>
-      <form
-        className="form-stack"
-        onSubmit={(e) => {
-          e.preventDefault();
-          action.run(async () => {
-            setResult(
-              await api("/api/activities/check", {
-                method: "POST",
-                body: JSON.stringify({
-                  location_id: areaId,
-                  starts_at: bdToIso(start),
-                  ends_at: bdToIso(end),
-                }),
-              }),
-            );
-          }, "সময় মিলিয়ে দেখা হয়েছে");
-        }}
-      >
-        <Field label="শুরু · বাংলাদেশ সময়">
-          <input
-            className="input input-bordered"
-            type="datetime-local"
-            value={start}
-            onChange={(e) => setStart(e.target.value)}
-            required
-          />
-        </Field>
-        <Field label="শেষ · বাংলাদেশ সময়">
-          <input
-            className="input input-bordered"
-            type="datetime-local"
-            value={end}
-            onChange={(e) => setEnd(e.target.value)}
-            required
-          />
-        </Field>
-        <ErrorBox message={action.error} />
-        <Submit busy={action.busy}>মিলিয়ে দেখুন</Submit>
-      </form>
-      {result && (
-        <div className="record" role="status">
-          <strong>
-            {result.conflicts.length
-              ? `${result.conflicts.length}টি ঘোষিত সংঘর্ষ`
-              : "ঘোষিত সংঘর্ষ নেই"}
-          </strong>
-          <span>{result.message}</span>
-          {result.conflicts.map((x) => (
-            <span key={x.id}>
-              {shortTime(x.starts_at)} → {shortTime(x.ends_at)}
-            </span>
-          ))}
-        </div>
-      )}
+      <div className="inline-actions">
+        <Link className="btn" to={`/activities?location_id=${areaId}`}>
+          কাজের সময় মিলিয়ে দেখুন
+        </Link>
+        <Link className="btn" to={`/history?location_id=${areaId}`}>
+          সম্পূর্ণ ব্যক্তিগত ইতিহাস
+        </Link>
+      </div>
     </Card>
   );
 }
@@ -469,16 +438,16 @@ export function NoticeBoard() {
   );
 }
 export function Admin() {
-  const [tab, setTab] = useState<"areas" | "notices" | "schedules" | "events">(
-    "areas",
-  );
+  const [params, setParams] = useSearchParams();
+  const tab = params.get("tab") || "overview";
+  const setTab = (tab: string) => setParams({ tab });
   const [version, setVersion] = useState(0);
   const reload = () => setVersion((x) => x + 1);
   return (
     <>
       <p className="eyebrow">সীমিত প্রশাসনিক প্রবেশাধিকার</p>
       <h1>অ্যাডমিন ড্যাশবোর্ড</h1>
-      <ReportReview />
+
       <p className="hint">
         প্রকাশের আগে মূল উৎস ও এলাকার সীমানা হাতে যাচাই করুন। প্রশাসনিক যাচাই
         নিজে সরকারি অনুমোদন নয়।
@@ -486,7 +455,13 @@ export function Admin() {
       <div className="toolbar admin-tabs">
         {(
           [
+            ["overview", "সারাংশ"],
             ["areas", "এলাকা"],
+            ["reports", "রিপোর্ট"],
+            ["offices", "বিদ্যুৎ অফিস"],
+            ["mappings", "Feeder mapping"],
+            ["publishers", "নোটিশ প্রকাশক"],
+            ["audit", "পরিবর্তনের ইতিহাস"],
             ["notices", "নোটিশ"],
             ["schedules", "সময়সূচি"],
             ["events", "ঘটনা"],
@@ -501,6 +476,16 @@ export function Admin() {
           </button>
         ))}
       </div>
+      {tab === "overview" && <AdminOverview />}
+      {tab === "reports" && <ModerationWorkspace />}
+      {tab === "offices" && (
+        <RegistryWorkspace key="offices" entity="offices" />
+      )}
+      {tab === "mappings" && (
+        <RegistryWorkspace key="mappings" entity="mappings" />
+      )}
+      {tab === "publishers" && <OfficeDirectory />}
+      {tab === "audit" && <AdminAudit />}
       {tab === "areas" && <AdminAreas version={version} reload={reload} />}
       {tab === "notices" && <AdminNotices version={version} reload={reload} />}
       {tab === "schedules" && (
@@ -517,15 +502,14 @@ function AdminAreas({
   version: number;
   reload: () => void;
 }) {
-  const list = useData<Page<Location>>(
-    `/api/locations?page_size=100&v=${version}`,
-  );
+  const list = useList<Location>("/api/admin/list/locations", version);
   const action = useAsyncAction(reload);
   const [edit, setEdit] = useState<Location | null>(null);
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget),
       body = {
+        version: edit?.version || 1,
         name_bn: f.get("name_bn"),
         name_en: f.get("name_en"),
         slug: f.get("slug"),
@@ -634,6 +618,21 @@ function AdminAreas({
         </form>
       </Card>
       <Card title="এলাকার তালিকা">
+        <ListControls
+          list={list}
+          statuses={["verified", "unverified"]}
+          kinds={[
+            "division",
+            "district",
+            "city_corporation",
+            "upazila",
+            "ward",
+            "union",
+            "village",
+            "neighborhood",
+          ]}
+          location
+        />
         <ErrorBox message={list.error} />
         {list.data?.items.map((x) => (
           <div className="record" key={x.id}>
@@ -643,10 +642,39 @@ function AdminAreas({
             <span>
               {x.verification_status} · {x.slug}
             </span>
+            <AuditTrail entity="locations" id={x.id} />
             <div className="inline-actions">
-              <button className="btn btn-sm" onClick={() => setEdit(x)}>
+              <button
+                className="btn btn-sm"
+                disabled={action.busy}
+                onClick={() => setEdit(x)}
+              >
                 সম্পাদনা
               </button>
+              {x.verification_status === "verified" && (
+                <button
+                  disabled={action.busy}
+                  className="btn btn-sm"
+                  onClick={() => {
+                    const reason = window.prompt(
+                      "এলাকার যাচাই স্থগিতের কারণ (কমপক্ষে ৫ অক্ষর)। ইতিহাস থাকবে, সংশ্লিষ্ট ঘোষণা superseded হবে।",
+                    );
+                    if (
+                      reason &&
+                      reason.trim().length >= 5 &&
+                      confirm("এই এলাকা নতুন selection-এর জন্য অনুপলব্ধ করবেন?")
+                    )
+                      action.run(() =>
+                        api(`/api/admin/locations/${x.id}/deactivate`, {
+                          method: "POST",
+                          body: JSON.stringify({ version: x.version, reason }),
+                        }),
+                      );
+                  }}
+                >
+                  যাচাই স্থগিত
+                </button>
+              )}
               {x.verification_status !== "verified" && (
                 <button
                   className="btn btn-sm"
@@ -658,7 +686,10 @@ function AdminAreas({
                       action.run(() =>
                         api(`/api/admin/locations/${x.id}/verify`, {
                           method: "POST",
-                          body: JSON.stringify({ source_url: url }),
+                          body: JSON.stringify({
+                            source_url: url,
+                            version: x.version,
+                          }),
                         }),
                       );
                   }}
@@ -669,9 +700,15 @@ function AdminAreas({
               <button
                 className="btn btn-sm btn-error btn-outline"
                 onClick={() => {
-                  if (window.confirm("এই এলাকা মুছবেন?"))
+                  if (
+                    window.confirm(
+                      "অব্যবহৃত এলাকা স্থায়ীভাবে মুছবেন? সংযুক্ত রেকর্ড থাকলে মুছতে দেওয়া হবে না।",
+                    )
+                  )
                     action.run(() =>
-                      api(`/api/admin/locations/${x.id}`, { method: "DELETE" }),
+                      api(`/api/admin/locations/${x.id}?version=${x.version}`, {
+                        method: "DELETE",
+                      }),
                     );
                 }}
               >
@@ -696,12 +733,7 @@ function AdminNotices({
   version: number;
   reload: () => void;
 }) {
-  const [page, setPage] = useState(1),
-    [search, setSearch] = useState(""),
-    [query, setQuery] = useState("");
-  const list = useData<Page<Notice>>(
-    `/api/admin/notices?page=${page}&page_size=10&search=${encodeURIComponent(query)}&v=${version}`,
-  );
+  const list = useList<Notice>("/api/admin/list/notices", version);
   const action = useAsyncAction(reload),
     [edit, setEdit] = useState<Notice | null>(null);
   async function submit(e: FormEvent<HTMLFormElement>) {
@@ -788,23 +820,13 @@ function AdminNotices({
         </form>
       </Card>
       <Card title="নোটিশ তালিকা">
-        <div className="toolbar">
-          <input
-            className="input input-bordered"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="খুঁজুন"
-          />
-          <button
-            className="btn"
-            onClick={() => {
-              setPage(1);
-              setQuery(search);
-            }}
-          >
-            খুঁজুন
-          </button>
-        </div>
+        <ListControls
+          list={list}
+          statuses={["draft", "published", "withdrawn", "archived"]}
+          location
+          office
+          category
+        />
         {list.data?.items.map((x) => (
           <div className="record" key={x.id}>
             <strong>{x.title}</strong>
@@ -812,6 +834,7 @@ function AdminNotices({
               {x.verification_status} · {shortTime(x.published_at)}
             </span>
             <PublicationActions kind="notices" item={x} reload={reload} />
+            <AuditTrail entity="notices" id={x.id} />
             <a href={x.source_url} target="_blank" rel="noreferrer">
               মূল উৎস ↗
             </a>
@@ -837,7 +860,11 @@ function AdminNotices({
               <button
                 className="btn btn-sm btn-outline btn-error"
                 onClick={() => {
-                  if (window.confirm("নোটিশ মুছবেন?"))
+                  if (
+                    window.confirm(
+                      "শুধু অব্যবহৃত খসড়া স্থায়ীভাবে মুছবেন? প্রকাশিত নোটিশ archive করুন।",
+                    )
+                  )
                     action.run(() =>
                       api(`/api/admin/notices/${x.id}?version=${x.version}`, {
                         method: "DELETE",
@@ -851,14 +878,6 @@ function AdminNotices({
           </div>
         ))}
         <ErrorBox message={list.error} />
-        {list.data && (
-          <Pager
-            page={page}
-            total={list.data.total}
-            size={10}
-            onChange={setPage}
-          />
-        )}
       </Card>
     </div>
   );
@@ -870,15 +889,8 @@ function AdminSchedules({
   version: number;
   reload: () => void;
 }) {
-  const areas = useData<Page<Location>>(
-      `/api/locations?page_size=100&v=${version}`,
-    ),
-    notices = useData<Page<Notice>>(
-      `/api/admin/notices?page_size=100&v=${version}`,
-    ),
-    list = useData<Page<Schedule>>(
-      `/api/admin/schedules?page_size=100&v=${version}`,
-    );
+  const list = useList<Schedule>("/api/admin/list/schedules", version);
+  const [noticeId, setNoticeId] = useState("");
   const action = useAsyncAction(reload),
     [edit, setEdit] = useState<Schedule | null>(null);
   const [coverage, setCoverage] = useState<{ id: string; name_bn: string }[]>(
@@ -912,33 +924,19 @@ function AdminSchedules({
     <div className="admin-grid">
       <Card title={edit ? "সময়সূচি সম্পাদনা" : "ঘোষিত সময়সূচি"}>
         <form className="form-stack" onSubmit={submit} key={edit?.id || "new"}>
-          <Field label="যাচাইকৃত নোটিশ">
-            <select
-              name="notice_id"
-              className="select select-bordered"
-              required
-              defaultValue={edit?.notice_id || ""}
-            >
-              <option value="">বাছুন</option>
-              {notices.data?.items
-                .filter((x) => x.verification_status === "verified")
-                .map((x) => (
-                  <option key={x.id} value={x.id}>
-                    {x.title}
-                  </option>
-                ))}
-            </select>
-          </Field>
+          <NoticeSelector value={noticeId} onChange={setNoticeId} />
           <LocationPicker
             value={picked}
             onChange={(id) => {
               setPicked(id);
               if (id)
-                api<Location>(`/api/locations/${id}`).then((loc) =>
-                  setCoverage((old) =>
-                    old.some((x) => x.id === id) ? old : [...old, loc],
-                  ),
-                );
+                api<Location>(`/api/locations/${id}`)
+                  .then((loc) =>
+                    setCoverage((old) =>
+                      old.some((x) => x.id === id) ? old : [...old, loc],
+                    ),
+                  )
+                  .catch((e) => toast.error(e.message));
             }}
           />
           <input
@@ -1006,47 +1004,49 @@ function AdminSchedules({
         </form>
       </Card>
       <Card title="সময়সূচির তালিকা">
+        <ListControls
+          list={list}
+          statuses={[
+            "draft",
+            "published",
+            "cancelled",
+            "superseded",
+            "archived",
+          ]}
+          location
+          office
+          category
+        />
         {list.data?.items.map((x) => (
           <div className="record" key={x.id}>
             <strong>
               {shortTime(x.starts_at)} → {shortTime(x.ends_at)}
             </strong>
             <span>
-              {x.status} · {x.lifecycle} ·{" "}
-              {areas.data?.items.find((a) => a.id === x.location_id)?.name_bn ||
-                x.location_id}
+              {x.status} · {x.lifecycle} · {x.location_name || x.location_id}
             </span>
             <PublicationActions kind="schedules" item={x} reload={reload} />
+            <AuditTrail entity="schedules" id={x.id} />
             <div className="inline-actions">
               <button
                 className="btn btn-sm"
                 onClick={() => {
                   setEdit(x);
+                  setNoticeId(x.notice_id);
                   setCoverage(x.coverage || []);
                   setPicked("");
                 }}
               >
                 সম্পাদনা
               </button>
-              {x.status === "announced" && (
-                <button
-                  className="btn btn-sm"
-                  onClick={() =>
-                    action.run(() =>
-                      api(`/api/admin/schedules/${x.id}/cancel`, {
-                        method: "POST",
-                        body: JSON.stringify({ version: x.version }),
-                      }),
-                    )
-                  }
-                >
-                  বাতিল চিহ্নিত
-                </button>
-              )}
               <button
                 className="btn btn-sm btn-outline btn-error"
                 onClick={() => {
-                  if (window.confirm("সময়সূচি মুছবেন?"))
+                  if (
+                    window.confirm(
+                      "শুধু অপ্রকাশিত খসড়া মুছবেন? প্রকাশিত সময়সূচি বাতিল বা archive করুন।",
+                    )
+                  )
                     action.run(() =>
                       api(`/api/admin/schedules/${x.id}?version=${x.version}`, {
                         method: "DELETE",
@@ -1080,11 +1080,7 @@ function AdminEvents({
       `/api/locations?page_size=100&v=${version}`,
     ),
     [area, setArea] = useState("");
-  const list = useData<Page<Event>>(
-    area
-      ? `/api/events?location_id=${area}&page_size=100&v=${version}`
-      : "/api/health/live",
-  );
+  const list = useList<Event>("/api/admin/list/events", version);
   const action = useAsyncAction(reload);
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -1134,6 +1130,7 @@ function AdminEvents({
         </form>
       </Card>
       <Card title="যাচাইকৃত ঘটনার তালিকা">
+        <ListControls list={list} statuses={["open", "completed"]} location />
         {Array.isArray(list.data?.items) &&
           list.data.items.map((x) => (
             <div className="record" key={x.id}>
@@ -1142,6 +1139,7 @@ function AdminEvents({
                 {x.restored_at ? shortTime(x.restored_at) : "ফেরার তথ্য নেই"}
               </strong>
               <span>শুরুর প্রমাণ: {x.start_evidence}</span>
+              <AuditTrail entity="outage_events" id={x.id} />
               {x.restoration_evidence && (
                 <span>ফেরার প্রমাণ: {x.restoration_evidence}</span>
               )}
@@ -1163,6 +1161,7 @@ function AdminEvents({
                           method: "POST",
                           body: JSON.stringify({
                             evidence,
+                            version: x.version,
                             restored_at: bdToIso(time),
                           }),
                         }),
@@ -1174,11 +1173,6 @@ function AdminEvents({
               )}
             </div>
           ))}
-        {!area && (
-          <EmptyState title="এলাকা বাছুন">
-            ঘটনা দেখতে যাচাইকৃত এলাকা নির্বাচন করুন।
-          </EmptyState>
-        )}
       </Card>
     </div>
   );

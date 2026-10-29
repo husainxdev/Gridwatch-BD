@@ -11,6 +11,7 @@ export type Page<T> = {
   page_size: number;
 };
 export type Location = {
+  version: number;
   id: string;
   parent_id: string | null;
   ancestor_names?: string[];
@@ -37,6 +38,7 @@ export type Notice = {
   updated_at: string;
 };
 export type Schedule = {
+  location_name?: string;
   version: number;
   lifecycle: string;
   category: string;
@@ -59,6 +61,7 @@ export type Report = {
   scope: string;
 };
 export type Event = {
+  version: number;
   id: string;
   location_id: string;
   started_at: string;
@@ -67,20 +70,133 @@ export type Event = {
   restoration_evidence: string | null;
   verified_at: string;
 };
-const base = import.meta.env.VITE_API_BASE_URL || "";
+const base = "";
 let accessToken: string | null = null;
-let refreshing: Promise<{ access_token: string; user: User }> | null = null;
+type Credentials = { access_token: string; user: User };
+let credentials: Credentials | null = null;
+let credentialsCsrf = "";
+let refreshing: Promise<Credentials> | null = null;
+const sessionChannel =
+  typeof window === "undefined" || typeof BroadcastChannel === "undefined"
+    ? null
+    : new BroadcastChannel("gridwatch-session");
+export function withSessionLock<T>(run: () => Promise<T>): Promise<T> {
+  return navigator.locks
+    ? navigator.locks.request("gridwatch-session-cookie", run)
+    : run();
+}
+export function acceptSession(result: Credentials, broadcast = true) {
+  if (credentials && credentials.user.id !== result.user.id)
+    setAccessToken(null);
+  credentials = result;
+  credentialsCsrf = csrf();
+  accessToken = result.access_token;
+  window.dispatchEvent(
+    new CustomEvent("gridwatch-session-updated", { detail: result.user }),
+  );
+  if (broadcast)
+    sessionChannel?.postMessage({
+      type: "session",
+      value: result,
+      csrf: credentialsCsrf,
+    });
+}
+export function announceSignOut() {
+  setAccessToken(null);
+  sessionChannel?.postMessage({ type: "logout" });
+}
+function freshAccess(value: Credentials): boolean {
+  try {
+    const part = value.access_token
+      .split(".")[1]
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+    const exp = JSON.parse(atob(part)).exp;
+    return typeof exp === "number" && exp * 1000 > Date.now() + 5000;
+  } catch {
+    return false;
+  }
+}
+sessionChannel?.addEventListener("message", (event) => {
+  if (
+    event.data?.type === "session" &&
+    event.data.csrf === csrf() &&
+    freshAccess(event.data.value) &&
+    typeof event.data.value?.access_token === "string" &&
+    typeof event.data.value?.user?.id === "string"
+  )
+    acceptSession(event.data.value, false);
+  if (event.data?.type === "logout") setAccessToken(null);
+  if (
+    event.data?.type === "request" &&
+    credentials &&
+    freshAccess(credentials) &&
+    credentials.access_token !== event.data.previous &&
+    credentialsCsrf === event.data.csrf
+  ) {
+    sessionChannel.postMessage({
+      type: "reply",
+      id: event.data.id,
+      value: credentials,
+    });
+  }
+});
+async function peerSession(
+  previous: string | null,
+): Promise<Credentials | null> {
+  if (!sessionChannel) return null;
+  return new Promise((resolve) => {
+    const id = crypto.randomUUID();
+    const finish = (value: Credentials | null) => {
+      clearTimeout(timer);
+      sessionChannel.removeEventListener("message", receive);
+      resolve(value);
+    };
+    const receive = (e: MessageEvent) => {
+      if (
+        e.data?.type === "reply" &&
+        e.data.id === id &&
+        e.data.value?.access_token &&
+        e.data.value.access_token !== previous
+      )
+        finish(e.data.value);
+    };
+    const timer = setTimeout(() => finish(null), 150);
+    sessionChannel.addEventListener("message", receive);
+    sessionChannel.postMessage({ type: "request", id, previous, csrf: csrf() });
+  });
+}
 export function renewToken() {
-  if (!refreshing)
-    refreshing = api<{ access_token: string; user: User }>(
-      "/api/auth/refresh",
-      { method: "POST" },
-      false,
-    )
-      .then((result) => {
-        setAccessToken(result.access_token);
-        return result;
-      })
+  if (!refreshing) {
+    const previous = accessToken;
+    refreshing = withSessionLock(async () => {
+      // The lock also covers login/logout. A waiting tab consumes a peer's
+      // rotated access token in memory rather than replaying the old cookie.
+      if (credentials && accessToken !== previous && freshAccess(credentials))
+        return credentials;
+      const peer = await peerSession(previous);
+      if (peer && freshAccess(peer)) {
+        // A peer token is only a transport optimization. Validate the active
+        // account server-side before completing startup or restoring a view.
+        accessToken = peer.access_token;
+        try {
+          const user = await api<User>("/api/auth/me", {}, false);
+          const checked = { access_token: peer.access_token, user };
+          acceptSession(checked, false);
+          return checked;
+        } catch (e) {
+          if (!(e instanceof ApiError) || ![401, 403].includes(e.status))
+            throw e;
+        }
+      }
+      const result = await api<Credentials>(
+        "/api/auth/refresh",
+        { method: "POST" },
+        false,
+      );
+      acceptSession(result);
+      return result;
+    })
       .catch((error) => {
         setAccessToken(null);
         throw error;
@@ -88,12 +204,16 @@ export function renewToken() {
       .finally(() => {
         refreshing = null;
       });
+  }
   return refreshing;
 }
 export function setAccessToken(value: string | null) {
   accessToken = value;
-  if (value === null)
+  if (value === null) {
+    credentials = null;
+    credentialsCsrf = "";
     window.dispatchEvent(new Event("gridwatch-session-ended"));
+  }
 }
 export function csrf() {
   return (
@@ -117,6 +237,7 @@ export async function api<T>(
   retry = true,
 ): Promise<T> {
   const attemptedAccessToken = accessToken;
+  const attemptedUserId = credentials?.user.id;
   const headers = new Headers(options.headers);
   if (options.body) headers.set("Content-Type", "application/json");
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
@@ -133,11 +254,22 @@ export async function api<T>(
     accessToken &&
     path != "/api/auth/refresh"
   ) {
+    if (attemptedUserId && credentials?.user.id !== attemptedUserId)
+      throw new ApiError(
+        "Account changed; submit again from the current account.",
+        409,
+      );
     try {
       // Another request may have already refreshed while this 401 was in flight.
       if (attemptedAccessToken === accessToken) await renewToken();
+      if (attemptedUserId && credentials?.user.id !== attemptedUserId)
+        throw new ApiError(
+          "Account changed; submit again from the current account.",
+          409,
+        );
       return api<T>(path, options, false);
-    } catch {
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 409) throw e;
       setAccessToken(null);
     }
   }

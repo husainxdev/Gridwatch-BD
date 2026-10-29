@@ -13,8 +13,7 @@ test("admin publication and personal outage restoration use real backend", async
     page.getByRole("heading", { name: "স্বাগতম, Phase test admin" }),
   ).toBeVisible();
   const ids = await page.evaluate(async () => {
-    const path = "/src/client.ts";
-    const { api } = await import(path);
+    const { api } = window.__gridwatchTest!;
     const areas = await api("/api/locations?search=Browser%20test%20district");
     const n = await api("/api/admin/notices", {
       method: "POST",
@@ -37,8 +36,7 @@ test("admin publication and personal outage restoration use real backend", async
   await page.getByRole("button", { name: "প্রকাশ", exact: true }).click();
   await expect(page.getByText("published · সংস্করণ 3")).toBeVisible();
   await page.evaluate(async ({ notice, area }) => {
-    const path = "/src/client.ts";
-    const { api } = await import(path);
+    const { api } = window.__gridwatchTest!;
     const start = new Date(Date.now() + 3600000).toISOString(),
       end = new Date(Date.now() + 7200000).toISOString();
     await api("/api/admin/schedules", {
@@ -83,8 +81,7 @@ test("admin publication and personal outage restoration use real backend", async
   ).toBeVisible();
   // Replaying exactly the same request returns the existing report.
   await page.evaluate(async () => {
-    const path = "/src/client.ts";
-    const { api } = await import(path);
+    const { api } = window.__gridwatchTest!;
     const r = (await api("/api/me/reports")).items[0];
     const replay = await api("/api/reports", {
       method: "POST",
@@ -108,8 +105,7 @@ test("admin publication and personal outage restoration use real backend", async
   await expect
     .poll(() =>
       page.evaluate(async () => {
-        const path = "/src/client.ts";
-        const { api } = await import(path);
+        const { api } = window.__gridwatchTest!;
         const r = await api("/api/me/episodes");
         return r.items.length === 1 && !r.items[0].is_open;
       }),

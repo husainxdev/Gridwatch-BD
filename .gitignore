@@ -11,3 +11,7 @@ __pycache__/
 
 frontend/test-results/
 frontend/playwright-report/
+
+frontend/.next/
+frontend/.next-test/
+frontend/next-env.d.ts

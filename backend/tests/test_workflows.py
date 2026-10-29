@@ -202,11 +202,14 @@ def test_complete_workflow(monkeypatch):
         "starts_at": (start + timedelta(minutes=30)).isoformat(),
         "ends_at": (end + timedelta(minutes=30)).isoformat(),
     }
-    conflict = client.post("/api/activities/check", json=activity)
+    conflict = client.post(
+        "/api/activities/check", headers=headers(user_token), json=activity
+    )
     assert len(conflict.json()["conflicts"]) == 1
     assert (
         client.post(
             "/api/activities/check",
+            headers=headers(user_token),
             json={
                 **activity,
                 "starts_at": end.isoformat(),
@@ -274,11 +277,16 @@ def test_complete_workflow(monkeypatch):
         client.post(
             "/api/admin/schedules/" + sid + "/cancel",
             headers=headers(admin_token),
-            json={"version": 2},
+            json={"version": 2, "reason": "Cancellation test"},
         ).json()["status"]
         == "cancelled"
     )
-    assert client.post("/api/activities/check", json=activity).json()["conflicts"] == []
+    assert (
+        client.post(
+            "/api/activities/check", headers=headers(user_token), json=activity
+        ).json()["conflicts"]
+        == []
+    )
     second = client.post(
         "/api/admin/schedules", headers=headers(admin_token), json=schedule
     )
@@ -291,7 +299,12 @@ def test_complete_workflow(monkeypatch):
         ).status_code
         == 200
     )
-    assert client.post("/api/activities/check", json=activity).json()["conflicts"] == []
+    assert (
+        client.post(
+            "/api/activities/check", headers=headers(user_token), json=activity
+        ).json()["conflicts"]
+        == []
+    )
     assert any(
         x["status"] == "superseded"
         for x in client.get(
@@ -304,7 +317,8 @@ def test_complete_workflow(monkeypatch):
     )
     assert (
         client.delete(
-            "/api/admin/locations/" + district_id, headers=headers(admin_token)
+            "/api/admin/locations/" + district_id + "?version=2",
+            headers=headers(admin_token),
         ).status_code
         == 409
     )

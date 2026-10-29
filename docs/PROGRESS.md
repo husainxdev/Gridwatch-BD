@@ -11,10 +11,10 @@ Checked items are implemented locally. Days are a priority guide, not a deadline
 - [x] 6. Per-connection reports, request idempotency and duplicate cooldown.
 - [x] 7. User dashboard and saved areas.
 - [x] 8. Community report list and evidence/uncertainty display.
-- [x] 9. Admin dashboard and listing controls; search/sort/pagination API.
-- [x] 10. Activity conflict check and verified-event history.
-- [x] 11. Foundation functional, permission and data-correctness integration tests.
-- [x] 12. Initial responsive polish and desktop/mobile browser checks.
+- [x] 9. Integrated Admin workspace, URL-backed server listings, version checks and transactional audit.
+- [x] 10. Saved private activities, fresh announcement conflict checks and recorded personal history.
+- [ ] 11. Dedicated full-phase functional, permission and data-correctness review (phase-specific integration tests already exist).
+- [ ] 12. Dedicated full usability/responsive review (initial polish and phase-specific desktop/mobile checks already exist).
 - [ ] 13. Hosted deployment and live verification; no deployment target or credentials supplied.
 - [x] 14a. Setup, architecture and submission-oriented documentation; local account creation instructions.
 - [ ] 14b. Verified pilot evidence, real demo content, screenshots and final presentation.
@@ -65,3 +65,23 @@ See [phase scope, API contracts and limitations](SECTIONS-5-6.md). Earlier check
 - [x] Migration 0004, populated-upgrade checks and focused backend/browser validation.
 
 See [phase API and freshness rules](SECTIONS-7-8.md). This phase covers Sections 7–8 and necessary prerequisites; it does not certify Sections 9–14.
+
+## Sections 9–10 current phase
+
+- [x] Admin overview, integrated existing forms, server-side filters/sort/pagination and shareable URL state.
+- [x] Versioned safe actions, evidence-preserving cancellation/archive and immutable-through-API audit views.
+- [x] Report context, reviewed event association/unassociation and independent personal histories.
+- [x] Owned saved activities, half-open/union conflict calculations, fresh results after revision/cancellation.
+- [x] Personal episode history, range clipping, Bangladesh-midnight splitting and explicit unknown/review states.
+- [x] Migrations 0005–0006, isolated PostgreSQL tests, desktop/mobile browser journey and build checks.
+- [x] Source-backed electricity-office/feeder-claim CRUD, review, invalidation, audit and reference preservation.
+- [ ] Externally verified real Sylhet pilot/office/feeder data (not supplied; no invented records seeded).
+
+See [API contracts, counting rules, limits and startup instructions](SECTIONS-9-10.md). This phase implements Sections 9–10 for supported entities. Historical checked entries for Sections 11–14 do not mean their full requested phases or hosted deployment are complete.
+
+## Requested stack update and implementation review
+
+- [x] Next.js App Router replaces Vite/React Router; React, TypeScript/JavaScript and Tailwind retained.
+- [x] Cross-tab session coordination, exact expiry checks, repeated-restoration fixes and reference-safe concurrent location deletion.
+- [x] Review findings and limitations recorded in [the review](REVIEW-2026-10-29.md).
+- [ ] Hosted Next.js/API deployment and external SMTP delivery verification.
