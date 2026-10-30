@@ -27,7 +27,13 @@ try:
     original = matches[0] if len(matches) == 1 else None
     if not original or not original.endswith("/gridwatch"):
         raise SystemExit("Unexpected development database URL; test setup stopped.")
-    env = dict(os.environ, DATABASE_URL=original.rsplit("/", 1)[0] + "/" + name)
+    env = dict(
+        os.environ,
+        DATABASE_URL=original.rsplit("/", 1)[0] + "/" + name,
+        APP_ENV="test",
+        DEMO_INSTANCE="false",
+        SMTP_HOST="127.0.0.1",
+    )
     run([python, "-m", "alembic", "upgrade", "head"], cwd=backend, env=env)
     run([python, "-m", "alembic", "downgrade", "0001"], cwd=backend, env=env)
     run([python, "-m", "alembic", "upgrade", "head"], cwd=backend, env=env)

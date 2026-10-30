@@ -15,3 +15,11 @@ frontend/playwright-report/
 frontend/.next/
 frontend/.next-test/
 frontend/next-env.d.ts
+
+.private/
+artifacts/
+*.dump
+*.backup
+*.sql
+.vercel/
+.release-revision

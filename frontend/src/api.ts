@@ -7,6 +7,7 @@ export type DemoArea = {
 };
 export async function fetchAreas(signal: AbortSignal): Promise<DemoArea[]> {
   const response = await fetch("/api/demo/areas", { signal });
+  if (response.status === 404) return []; // Demo data is deliberately disabled on pilot deployments.
   if (!response.ok)
     throw new Error(
       "এলাকার তথ্য লোড করা যায়নি। ব্যাকএন্ড চালু আছে কি না দেখুন।",

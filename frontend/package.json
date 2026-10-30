@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0 --port 5173",
     "build": "next build",
-    "format:check": "prettier --check src app e2e playwright.config.ts next.config.ts postcss.config.mjs tsconfig.json",
+    "format:check": "prettier --check src app e2e playwright.config.ts next.config.ts postcss.config.mjs tsconfig.json scripts",
     "lint": "next typegen && tsc --noEmit --noUnusedLocals --noUnusedParameters",
-    "start": "next start --hostname 127.0.0.1 --port 5173"
+    "start": "next start --hostname 127.0.0.1 --port 5173",
+    "check:release": "node scripts/check-release-config.mjs"
   },
   "dependencies": {
     "@fontsource/noto-sans-bengali": "^5.3.0",

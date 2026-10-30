@@ -54,6 +54,8 @@ try:
         DATABASE_URL=urls[0].rsplit("/", 1)[0] + "/" + name,
         FRONTEND_URL="http://localhost:15173",
         APP_ENV="test",
+        DEMO_INSTANCE="false",
+        NEXT_PUBLIC_DEMO_INSTANCE="false",
         AUTH_RATE_LIMIT="500",
         CORS_ORIGINS='["http://localhost:15173"]',
         GRIDWATCH_API_TARGET="http://127.0.0.1:18000",

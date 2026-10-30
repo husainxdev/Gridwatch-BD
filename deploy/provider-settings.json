@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "prepared_not_deployed",
+  "source_revision": "derive_from_git_HEAD_before_release",
+  "frontend": {
+    "provider": "Vercel",
+    "root_directory": "frontend",
+    "framework": "nextjs",
+    "install_command": "npm ci",
+    "build_command": "npm run build",
+    "output": "Next.js framework default (.next); not static export",
+    "public_origin": null,
+    "api_proxy": "same-origin /api using server-only GRIDWATCH_API_TARGET",
+    "automatic_production_deployment": "disabled_until_owner_configures_and_verifies"
+  },
+  "backend": {
+    "provider": "Render",
+    "runtime": "Python 3.12",
+    "root_directory": ".",
+    "build_command": "pip install uv==0.12.23 && uv sync --project backend --python 3.12 --frozen --no-dev",
+    "pre_deploy_command": "backend/.venv/bin/python scripts/release-migrate.py --expected-database \"$EXPECTED_DATABASE_NAME\"",
+    "start_command": "backend/.venv/bin/python scripts/serve.py",
+    "health_check_path": "/api/health/ready",
+    "instances": 1,
+    "workers": 1,
+    "public_origin": null,
+    "auto_deploy": false
+  },
+  "database": {
+    "provider": "Render",
+    "engine": "PostgreSQL 17",
+    "storage": "persistent managed database, selected by owner",
+    "connection": "provider secret DATABASE_URL with explicit TLS sslmode",
+    "plan": null
+  },
+  "pricing_quotas_sleep_timeouts": "account-specific; unverified, no free-tier or uptime promise",
+  "account_validation": "blocked_missing_authorized_accounts"
+}

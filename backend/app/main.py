@@ -37,7 +37,12 @@ app.add_middleware(
 
 @app.get("/api/health/live")
 def live():
-    return {"status": "ok", "service": "gridwatch-bd"}
+    return {
+        "status": "ok",
+        "service": "gridwatch-bd",
+        "revision": settings.release_revision,
+        "instance_mode": "demo" if settings.demo_instance else "pilot",
+    }
 
 
 @app.get("/api/health/ready")
@@ -56,7 +61,9 @@ def ready(db: Session = Depends(get_db)):
 
 @app.get("/api/demo/areas")
 def demo_areas(db: Session = Depends(get_db)):
-    if not settings.demo_enabled or settings.app_env == "production":
+    if not settings.demo_enabled or (
+        settings.app_env == "production" and not settings.demo_instance
+    ):
         raise HTTPException(404, "Not found")
     try:
         rows = db.scalars(select(DemoArea).order_by(DemoArea.sort_order)).all()

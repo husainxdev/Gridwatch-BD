@@ -15,9 +15,9 @@ Checked items are implemented locally. Days are a priority guide, not a deadline
 - [x] 10. Saved private activities, fresh announcement conflict checks and recorded personal history.
 - [x] 11. Core journeys, permissions, calculations and migration verification against isolated PostgreSQL; see QA report for scope and external exceptions.
 - [x] 12. Reproduced fixes, four viewport sizes, automated accessibility/keyboard and failure-state checks; physical devices/screen readers remain unverified.
-- [ ] 13. Hosted deployment and live verification; no deployment target or credentials supplied.
-- [x] 14a. Setup, architecture and submission-oriented documentation; local account creation instructions.
-- [ ] 14b. Verified pilot evidence, real demo content, screenshots and final presentation.
+- [ ] 13. Hosted deployment and live verification; Vercel/Render path prepared, actual origins/access pending.
+- [x] 14a. Setup/operations/submission documentation, architecture/viva/demo script, real QA screenshots and tested private local demo accounts.
+- [ ] 14b. Verified real pilot evidence, live URLs, tested hosted demo accounts and final live submission acceptance.
 
 | Suggested day | Focus | Exit evidence |
 | --- | --- | --- |
@@ -96,3 +96,18 @@ See [API contracts, counting rules, limits and startup instructions](SECTIONS-9-
 - [ ] Native Windows/browser-extension reproduction, physical mobile keyboards and screen-reader session (not locally available).
 
 See [verification matrix and QA handoff](QA-SECTIONS-11-12.md). Sections 13–14 deployment/submission remain separate; no public deployment was performed.
+
+## Sections 13–14 release preparation
+
+- [x] One selected Vercel Next.js / Render FastAPI / persistent PostgreSQL 17 path with exact settings and official-source evidence/limitations.
+- [x] Production PORT/source/TLS/origin/pool/demo guards, safe release identity and same-origin authentication deployment instructions.
+- [x] Expected-target migration lock, private backup/checksum/isolated restore and restart persistence tested locally.
+- [x] 58 backend tests, 24 real-backend browser tests, eight release-config cases, formatting/type checks and normal production build.
+- [x] Separate private local Admin/User accounts; both UI login/reload/roles/logout checked without exposing passwords.
+- [x] README, deployment/data-source/submission guides, real QA screenshots, architecture/viva/demo script and PowerShell fallback.
+- [x] Owner dashboard setup instructions; local release receipt records exact preparation source without pretending to deploy.
+- [ ] Actual provider configuration/access, plan/runtime/proxy limits, real HTTPS origins and remote CI verification.
+- [ ] Hosted A–F journeys, secure-cookie behavior, tested deployed demo accounts, controlled-recipient SMTP and actual redeploy/backup proof.
+- [ ] Final live URL/credential submission acceptance. Sections 13–14 remain **partial**, not completed by preparation.
+
+See [release evidence and exact check results](RELEASE-STATUS.md) and [owner dashboard steps](DASHBOARD_SETUP.md). No billable service was purchased, repository visibility changed or existing user database reset.

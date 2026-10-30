@@ -63,10 +63,10 @@ export function Overview() {
       <div className="demo-banner" role="note">
         <FiInfoIcon />
         <div>
-          <strong>এটি একটি ডেমো পরিবেশ</strong>
+          <strong>নমুনা তথ্যের প্রদর্শন</strong>
           <p>
-            এখানে কোনো লাইভ বা সরকারি বিদ্যুৎ তথ্য নেই। নমুনা এলাকাগুলো কেবল
-            ইন্টারফেস প্রদর্শনের জন্য।
+            এই পাতার নমুনা এলাকাগুলো বাস্তব পর্যবেক্ষণ নয়। লাইভ সরকারি API
+            সংযুক্ত নেই।
           </p>
         </div>
         <Link to="/sources">
@@ -122,8 +122,9 @@ export function Overview() {
         </div>
       ) : !area ? (
         <Card title="এলাকার তথ্য">
-          <EmptyState title="নমুনা এলাকা যোগ করা হয়নি">
-            সেটআপ নির্দেশনা অনুসারে ডেমো seed চালান।
+          <EmptyState title="নমুনা তথ্য এখানে দেখানো হচ্ছে না">
+            বাস্তব এলাকার তথ্য দেখতে ড্যাশবোর্ডে এলাকা বাছুন; তথ্য না থাকলে
+            অবস্থা অজানা।
           </EmptyState>
         </Card>
       ) : (
@@ -350,6 +351,12 @@ export default function App({ children }: { children: ReactNode }) {
         </div>
       </aside>
       <div className="workspace">
+        {process.env.NEXT_PUBLIC_DEMO_INSTANCE === "true" && (
+          <p className="demo-banner" role="note">
+            বিচ্ছিন্ন অনুশীলন পরিবেশ — সব ডেমো এলাকা, সময়সূচি ও ঘটনা কাল্পনিক;
+            বাস্তব বিদ্যুৎ তথ্য নয়। ব্যক্তিগত তথ্য দেবেন না।
+          </p>
+        )}
         <header>
           <span>
             <FiMapPin /> বাংলাদেশ <span className="header-divider">/</span>{" "}
