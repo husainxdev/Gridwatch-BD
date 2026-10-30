@@ -16,6 +16,11 @@ def main():
     parser.add_argument(
         "--private-directory", default=str(ROOT / ".private" / "local-demo")
     )
+    parser.add_argument(
+        "--with-content",
+        action="store_true",
+        help="Add explicitly fictional walkthrough records to this new isolated database",
+    )
     args = parser.parse_args()
     settings = load_settings()
     base = make_url(settings.database_url)
@@ -52,7 +57,7 @@ def main():
     python = str(
         BACKEND / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
     )
-    for command in [
+    commands = [
         [
             python,
             str(ROOT / "scripts" / "release-migrate.py"),
@@ -66,7 +71,10 @@ def main():
             str(directory / "credentials.json"),
         ],
         [python, "-m", "app.seed"],
-    ]:
+    ]
+    if args.with_content:
+        commands.append([python, "-m", "app.demo_seed"])
+    for command in commands:
         result = subprocess.run(
             command, cwd=BACKEND, env=env, capture_output=True, check=False
         )
@@ -78,6 +86,7 @@ def main():
         "database": name,
         "instance_mode": "local_disposable_demo",
         "publicly_deployed": False,
+        "has_walkthrough_content": args.with_content,
         "credentials": "credentials.json",
         "reset_procedure": "Create another fresh namespace/directory; this command never deletes or resets existing records.",
     }

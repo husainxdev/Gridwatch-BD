@@ -12,13 +12,17 @@ from .models import Location, Notice, OutageEvent, Report, Schedule, User
 from .security import hash_password
 
 
-def provision_demo(settings, db, output):
+def require_demo_database(settings):
     if not settings.demo_instance or not (
         make_url(settings.database_url).database or ""
     ).startswith("gridwatch_demo_"):
         raise ValueError(
             "Only a separately configured gridwatch_demo_ instance can receive demo accounts"
         )
+
+
+def provision_demo(settings, db, output):
+    require_demo_database(settings)
     if any(
         db.scalar(select(func.count()).select_from(model))
         for model in (User, Location, Notice, Schedule, Report, OutageEvent)

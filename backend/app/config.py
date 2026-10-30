@@ -73,6 +73,10 @@ class Settings(BaseSettings):
             raise ValueError(
                 "Demo instances require a separate gridwatch_demo_ database"
             )
+        if (url.database or "").startswith(
+            "gridwatch_demo_"
+        ) and not self.demo_instance:
+            raise ValueError("A gridwatch_demo_ database must keep DEMO_INSTANCE=true")
         if self.app_env == "production":
             front = urlsplit(self.frontend_url)
             if (

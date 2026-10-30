@@ -544,8 +544,9 @@ function HistoryResults({
       </Card>
       <Card title="ব্যক্তিগত episodes">
         <p>
-          একই episode-এ একাধিক রিপোর্ট থাকতে পারে। প্রত্যাখ্যাত, pending ও demo
-          রিপোর্ট বাদ দিয়ে ইতিহাস পুনর্গণনা হয়।
+          {process.env.NEXT_PUBLIC_DEMO_INSTANCE === "true"
+            ? "এটি কাল্পনিক অনুশীলনের ব্যক্তিগত ইতিহাস; বাস্তব বিভ্রাটের পরিসংখ্যান নয়। Pending ও প্রত্যাখ্যাত রিপোর্ট বাদ থাকে।"
+            : "একই episode-এ একাধিক রিপোর্ট থাকতে পারে। প্রত্যাখ্যাত, pending ও demo রিপোর্ট বাদ দিয়ে ইতিহাস পুনর্গণনা হয়।"}
         </p>
         {items.map((x) => (
           <div className="record" key={x.id}>

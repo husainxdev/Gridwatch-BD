@@ -15,6 +15,9 @@ A Bengali-first load shedding and power outage management university project. Th
 - [Data sources and evidence limits](docs/DATA_SOURCES.md)
 - [Submission acceptance and repository links](docs/SUBMISSION.md)
 - [Presentation/viva/local fallback](docs/DEMO_SCRIPT.md)
+- [Populated local demo: one launcher, private accounts and data](docs/LOCAL-DEMO.md)
+
+Already set up on Windows but seeing empty schedules/history? Update the repository, then double-click **`START-DEMO.cmd`** in the project folder. It creates a separate, clearly fictional demo database and opens **http://127.0.0.1:5174/login**. Private credentials are generated in `.private/demo-ready/credentials.json` on that machine. Normal records/accounts are preserved. See [exact setup and limitations](docs/LOCAL-DEMO.md); no verified official feed is supplied.
 
 ## Repository and architecture
 

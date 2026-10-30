@@ -9,6 +9,7 @@ from sqlalchemy import String, cast, func, or_, select
 from sqlalchemy.orm import Session
 
 from .api import aware, find, list_page
+from .data_mode import evidence_visibility
 from .db import get_db
 from .evidence import serialize, visible_notice
 from .models import (
@@ -41,7 +42,7 @@ def overview(db: Session = Depends(get_db), actor: User = Depends(admin_user)):
 
     return {
         "draft_notices": count(
-            Notice, Notice.lifecycle == "draft", Notice.is_demo.is_(False)
+            Notice, Notice.lifecycle == "draft", evidence_visibility(Notice)
         ),
         "upcoming_schedules": db.scalar(
             select(func.count())
@@ -51,12 +52,12 @@ def overview(db: Session = Depends(get_db), actor: User = Depends(admin_user)):
                 *visible_notice(),
                 Schedule.lifecycle == "published",
                 Schedule.status == "announced",
-                Schedule.is_demo.is_(False),
+                evidence_visibility(Schedule),
                 Schedule.starts_at >= now(),
             )
         ),
         "pending_reports": count(
-            Report, Report.moderation == "pending", Report.is_demo.is_(False)
+            Report, Report.moderation == "pending", evidence_visibility(Report)
         ),
         "unrestored_events": count(OutageEvent, OutageEvent.restored_at.is_(None)),
         "candidate_events_supported": False,
@@ -84,7 +85,7 @@ def listing(
     m = MODELS[entity]
     stmt = select(m)
     if entity in {"notices", "schedules", "reports"}:
-        stmt = stmt.where(m.is_demo.is_(False))
+        stmt = stmt.where(evidence_visibility(m))
     names = {
         "notices": Notice.title,
         "locations": Location.name_bn,
@@ -243,8 +244,8 @@ def report_context(
             ),
             Schedule.starts_at <= report.observed_at,
             Schedule.ends_at > report.observed_at,
-            Schedule.is_demo.is_(False),
-            Notice.is_demo.is_(False),
+            evidence_visibility(Schedule),
+            evidence_visibility(Notice),
         )
         .order_by(Schedule.starts_at, Schedule.id)
         .limit(20)
@@ -276,7 +277,7 @@ def offices(
 ):
     stmt = (
         select(Notice.publisher, func.count().label("notices"))
-        .where(Notice.is_demo.is_(False), Notice.publisher.ilike("%" + search + "%"))
+        .where(evidence_visibility(Notice), Notice.publisher.ilike("%" + search + "%"))
         .group_by(Notice.publisher)
     )
     total = db.scalar(select(func.count()).select_from(stmt.subquery()))

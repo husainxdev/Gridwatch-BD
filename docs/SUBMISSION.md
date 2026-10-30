@@ -40,6 +40,8 @@ For another machine, run the [local demo procedure](DEMO_SCRIPT.md) to create a 
 
 ## Live acceptance checklist — all currently unverified
 
+For a populated local presentation, [the launcher](LOCAL-DEMO.md) generates an independent private pair in `.private/demo-ready/credentials.json` and fictional walkthrough records. It does not supply deployed credentials or verified electricity data.
+
 Record actual URL/source SHA/date/browser/results before changing these statuses:
 
 - [ ] Frontend HTTPS, certificate/security headers, deep-link reload and intended backend proxy.

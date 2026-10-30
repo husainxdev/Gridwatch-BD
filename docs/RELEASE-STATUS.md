@@ -1,5 +1,7 @@
 # Sections 13–14 release evidence
 
+The checks below record release preparation at `56913b8`. The subsequent [populated local demo follow-up](LOCAL-DEMO.md) adds 59-test backend verification, two dedicated filled-demo browser journeys and a Windows launcher. It does not change the blocked hosted acceptance below.
+
 **Status: partial; no public deployment has been verified.** The owner is preparing the Vercel/Render dashboards. Actual service origins, provider access, selected plans and authorized external SMTP are not available in this workspace. The latest owner clarification was that hosting is not ready and setup instructions are needed. Follow [the dashboard guide](DASHBOARD_SETUP.md); never send credentials in chat.
 
 ## Source and scope

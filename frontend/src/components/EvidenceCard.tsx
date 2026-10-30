@@ -28,9 +28,18 @@ export function EvidenceCard({
   stale?: boolean;
   children: ReactNode;
 }) {
+  const demo = process.env.NEXT_PUBLIC_DEMO_INSTANCE === "true";
   return (
     <Card title={title} className={`evidence-card ${stale ? "outdated" : ""}`}>
-      <p className="eyebrow">{type}</p>
+      <p className="eyebrow">
+        {demo ? "কাল্পনিক অনুশীলন · " : ""}
+        {type}
+      </p>
+      {demo && (
+        <p className="hint">
+          এই উৎস ও review status অনুশীলনের অংশ; সরকারি যাচাই নয়।
+        </p>
+      )}
       <p className="hint">
         সূত্র:{" "}
         {source ? (

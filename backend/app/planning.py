@@ -11,6 +11,8 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from .api import ActivityInput, aware, find, list_page
+from .config import get_settings
+from .data_mode import evidence_visibility
 from .db import get_db
 from .evidence import serialize, visible_notice
 from .models import (
@@ -86,7 +88,7 @@ def check_activity(db, location_id, start, end):
             *visible_notice(),
             Schedule.lifecycle == "published",
             Schedule.status == "announced",
-            Schedule.is_demo.is_(False),
+            evidence_visibility(Schedule),
             Schedule.starts_at < end,
             Schedule.ends_at > start,
             or_(*conditions),
@@ -367,7 +369,7 @@ def history_snapshot(
                 Report.episode_id.in_(ids),
                 Report.user_id == user.id,
                 Report.moderation == "accepted",
-                Report.is_demo.is_(False),
+                evidence_visibility(Report),
             )
             .group_by(Report.episode_id)
         ).all()
@@ -397,7 +399,9 @@ def history_snapshot(
         "summary": summary,
         "start": start,
         "end": end,
-        "source": "accepted personal observations; pending/rejected/demo excluded",
+        "source": "fictional demo observations; not real electricity evidence"
+        if get_settings().demo_instance
+        else "accepted personal observations; pending/rejected/demo excluded",
         "scope": "one user, one selected location; incomplete monitoring",
         "checked_at": now(),
     }

@@ -23,7 +23,11 @@ if (
     "Vercel deployments require the explicit HTTPS backend origin",
   );
 }
-if (process.env.VERCEL === "1" && process.env.NEXT_PUBLIC_E2E_TEST === "1") {
+if (
+  process.env.VERCEL === "1" &&
+  (process.env.NEXT_PUBLIC_E2E_TEST === "1" ||
+    process.env.GRIDWATCH_LOCAL_DEMO === "1")
+) {
   throw new Error("Do not deploy browser-test builds");
 }
 if (process.env.VERCEL === "1") {
@@ -42,7 +46,12 @@ const config: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   devIndicators: false,
-  distDir: process.env.GRIDWATCH_TEST_BUILD === "1" ? ".next-test" : ".next",
+  distDir:
+    process.env.GRIDWATCH_TEST_BUILD === "1"
+      ? ".next-test"
+      : process.env.GRIDWATCH_LOCAL_DEMO === "1"
+        ? ".next-demo"
+        : ".next",
   turbopack: { root: path.resolve(process.cwd()) },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${url.origin}/api/:path*` }];

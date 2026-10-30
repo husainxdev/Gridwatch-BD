@@ -46,6 +46,9 @@ def test_production_config_normalization_tls_origin_revision_and_demo_isolation(
         dict(jwt_secret="REPLACE_WITH_SOMETHING_LONG_ENOUGH"),
         dict(demo_instance=True),
         dict(demo_enabled=True),
+        dict(
+            database_url="postgresql://qa:private@localhost/gridwatch_demo_isolated?sslmode=require"
+        ),
     ]:
         with pytest.raises(ValidationError) as error:
             Settings(**(values | invalid))
@@ -548,3 +551,170 @@ def test_release_entrypoint_port_revision_and_untrusted_forwarding():
     rejected = script("serve.py", env)
     assert rejected.returncode != 0
     assert env["JWT_SECRET"] not in rejected.stderr
+
+
+def test_populated_demo_walkthrough_and_normal_instance_exclusion(
+    release_databases, tmp_path, monkeypatch
+):
+    from datetime import UTC, datetime, timedelta
+
+    from fastapi.testclient import TestClient
+    from sqlalchemy import func, select
+    from sqlalchemy.orm import sessionmaker
+
+    from app import data_mode, evidence, planning
+    from app.db import get_db
+    from app.demo_seed import key, seed_content
+    from app.main import app
+    from app.models import EvidenceAudit, Notice, PersonalEpisode, Report, User
+
+    _, _, demo = release_databases
+    name = make_url(demo["DATABASE_URL"]).database
+    assert (
+        script("release-migrate.py", demo, "--expected-database", name).returncode == 0
+    )
+    private = tmp_path / "accounts.json"
+    assert (
+        script("provision-demo.py", demo, "--credentials-file", str(private)).returncode
+        == 0
+    )
+    settings = Settings(
+        _env_file=None,
+        database_url=demo["DATABASE_URL"],
+        jwt_secret=get_settings().jwt_secret,
+        demo_instance=True,
+        app_env="test",
+    )
+    engine = create_engine(settings.database_url)
+    sessions = sessionmaker(engine)
+    anchor = datetime.now(UTC).replace(microsecond=0)
+    try:
+        with sessions.begin() as db:
+            manifest = seed_content(settings, db, anchor)
+            assert not manifest["already_seeded"] and manifest["locations"] == 9
+        with sessions.begin() as db:
+            # Re-running after time has passed keeps observations and source timestamps.
+            again = seed_content(settings, db, anchor + timedelta(days=5))
+            assert (
+                again["already_seeded"] and again["seeded_at"] == manifest["seeded_at"]
+            )
+            assert db.scalar(select(func.count()).select_from(Report)) == 10
+            assert db.scalar(select(func.count()).select_from(PersonalEpisode)) == 5
+            assert db.scalar(select(func.count()).select_from(User)) == 3
+            assert (
+                db.get(EvidenceAudit, key("manifest")).snapshot["official_sources_used"]
+                == []
+            )
+
+        def override():
+            with sessions() as db:
+                yield db
+
+        app.dependency_overrides[get_db] = override
+        for module in (data_mode, evidence, planning):
+            monkeypatch.setattr(module, "get_settings", lambda: settings)
+        with TestClient(app, headers={"Origin": "http://localhost:5173"}) as browser:
+            assert (
+                browser.get("/api/notices").json()["total"] == 1
+            )  # Draft/withdrawn stay private.
+            schedules = browser.get("/api/schedules").json()
+            assert schedules["total"] == 3 and all(
+                row["is_demo"] for row in schedules["items"]
+            )
+            credentials = json.loads(private.read_text())["accounts"]
+            account = next(a for a in credentials if a["role"] == "user")
+            login = browser.post(
+                "/api/auth/login",
+                json={"email": account["email"], "password": account["password"]},
+            )
+            assert login.status_code == 200
+            browser.headers["Authorization"] = "Bearer " + login.json()["access_token"]
+            saved = browser.get("/api/saved-areas").json()
+            assert saved["total"] == 2 and saved["items"][0]["is_default"]
+            area = manifest["default_location_id"]
+            dashboard = browser.get(
+                "/api/dashboard", params={"location_id": area}
+            ).json()
+            assert dashboard["community"]["evidence_label"] == "mixed"
+            assert dashboard["community"]["unique_reporters"] == 2
+            assert dashboard["community"]["area_status"] == "unknown"
+            assert len(dashboard["schedules"]["items"]) == 3
+            assert dashboard["personal"]["latest_report"]["kind"] == "power_back"
+            check = browser.get(f"/api/activities/{key('activity:conflict')}").json()[
+                "check"
+            ]
+            assert check["affected_minutes"] == 60 and len(check["conflicts"]) == 2
+            boundary = browser.get(
+                f"/api/activities/{key('activity:boundary')}"
+            ).json()["check"]
+            assert not boundary["announced_overlap"]
+            history = browser.get(
+                "/api/history",
+                params={
+                    "location_id": area,
+                    "start": (anchor - timedelta(days=7)).isoformat(),
+                    "end": anchor.isoformat(),
+                },
+            ).json()
+            assert history["summary"]["known_minutes"] == 60
+            assert history["summary"]["completed"] == 2
+            assert history["summary"]["incomplete"] == 1
+            assert "fictional" in history["source"]
+            assert sum(row["accepted_observations"] for row in history["items"]) == 5
+            assert browser.get("/api/admin/overview").status_code == 403
+            report = browser.post(
+                "/api/reports",
+                json={
+                    "location_id": area,
+                    "kind": "power_off",
+                    "observed_at": datetime.now(UTC).isoformat(),
+                    "idempotency_key": str(uuid.uuid4()),
+                },
+            )
+            assert report.status_code == 201 and report.json()["is_demo"] is True
+            # Changing mode never exposes flagged fixtures through normal evidence queries.
+            admin_account = next(a for a in credentials if a["role"] == "admin")
+            admin_login = browser.post(
+                "/api/auth/login",
+                json={
+                    "email": admin_account["email"],
+                    "password": admin_account["password"],
+                },
+            )
+            assert admin_login.status_code == 200
+            browser.headers["Authorization"] = (
+                "Bearer " + admin_login.json()["access_token"]
+            )
+            overview = browser.get("/api/admin/overview").json()
+            assert overview["draft_notices"] == 1 and overview["pending_reports"] == 1
+            assert browser.get("/api/admin/list/notices").json()["total"] == 3
+            normal = settings.model_copy(update={"demo_instance": False})
+            monkeypatch.setattr(data_mode, "get_settings", lambda: normal)
+            assert browser.get("/api/notices").json()["total"] == 0
+            assert browser.get("/api/schedules").json()["total"] == 0
+            assert (
+                browser.get("/api/reports", params={"location_id": area}).json()[
+                    "total"
+                ]
+                == 0
+            )
+            assert (
+                browser.get(
+                    "/api/reports/summary", params={"location_id": area}
+                ).json()["unique_reporters"]
+                == 0
+            )
+        with sessions.begin() as db:
+            with pytest.raises(ValueError):
+                seed_content(normal, db, anchor)
+            assert db.scalar(select(func.count()).select_from(Notice)) == 3
+            with db.begin_nested() as temporary:
+                db.delete(db.get(EvidenceAudit, key("manifest")))
+                db.flush()
+                with pytest.raises(ValueError, match="empty operational"):
+                    seed_content(settings, db, anchor)
+                temporary.rollback()
+            assert db.get(EvidenceAudit, key("manifest")) is not None
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        engine.dispose()

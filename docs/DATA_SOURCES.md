@@ -4,6 +4,8 @@ Release preparation date: 2026-10-29. **No real Sylhet pilot boundary/provider, 
 
 ## What is actually used
 
+The later [populated local walkthrough](LOCAL-DEMO.md) seeds only a separate marked demo DB. All locations, review statuses, observations and evidence there are fictional, including the reserved example.com placeholder. They are not additions to verified Sylhet records. Re-running preserves original fixture timestamps. Normal configurations continue excluding demo notices/schedules/reports.
+
 | Data | Actual provenance/status | Date/freshness meaning |
 | --- | --- | --- |
 | Official outage schedules | None supplied as verified real-world records. CRUD/publication is implemented and tested with fictional isolated fixtures. | Real publication/source dates remain unavailable until an Admin checks an original notice. Unknown publication date stays unknown. |

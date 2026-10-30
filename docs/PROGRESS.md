@@ -111,3 +111,11 @@ See [verification matrix and QA handoff](QA-SECTIONS-11-12.md). Sections 13–14
 - [ ] Final live URL/credential submission acceptance. Sections 13–14 remain **partial**, not completed by preparation.
 
 See [release evidence and exact check results](RELEASE-STATUS.md) and [owner dashboard steps](DASHBOARD_SETUP.md). No billable service was purchased, repository visibility changed or existing user database reset.
+
+## Populated local demonstration follow-up
+
+- [x] Transactional, idempotent fictional dataset in a separate namespace, with private accounts/defaults, notice/schedule states, independent observations, personal history and activity conflicts.
+- [x] Local launcher and Windows double-click entry point; normal database/config preserved, separate frontend build output and loopback ports.
+- [x] Demo-only evidence visibility; new demo notices/reports remain flagged; normal instances retain exclusion and namespace guards.
+- [x] 59 backend tests, two populated-demo browser journeys, normal regression suite, strict types/format/build checks (details in the local demo guide).
+- [ ] Native Windows execution confirmation, verified real Sylhet data and hosted acceptance remain outstanding.

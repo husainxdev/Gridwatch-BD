@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from .api import NoticeInput, ReportInput, ScheduleInput, aware, find, list_page
 from .config import get_settings
+from .data_mode import evidence_visibility
 from .db import get_db
 from .models import (
     EvidenceAudit,
@@ -89,12 +90,12 @@ class VersionBody(BaseModel):
     version: int = Field(ge=1)
 
 
-# All public queries deliberately exclude drafts and demo records.
+# Drafts always remain private. Demo records require an isolated demo instance.
 def visible_notice():
     return (
         Notice.lifecycle == "published",
         Notice.verification_status == "verified",
-        Notice.is_demo.is_(False),
+        evidence_visibility(Notice),
     )
 
 
@@ -164,6 +165,7 @@ def add_notice(
 ):
     data = body.model_dump(exclude={"version"})
     data["source_url"] = str(body.source_url)
+    data["is_demo"] = get_settings().demo_instance or body.is_demo
     item = Notice(**data, lifecycle="draft", created_by=actor.id, updated_by=actor.id)
     db.add(item)
     db.flush()
@@ -183,6 +185,7 @@ def edit_notice(
     audit(db, actor, item, "before_edit")
     for k, v in body.model_dump(exclude={"version"}).items():
         setattr(item, k, str(v) if k == "source_url" else v)
+    item.is_demo = get_settings().demo_instance or body.is_demo
     item.lifecycle = "draft"
     item.verification_status = "unverified"
     item.verified_by = None
@@ -273,7 +276,7 @@ def schedule_query():
         .where(
             *visible_notice(),
             Schedule.lifecycle == "published",
-            Schedule.is_demo.is_(False),
+            evidence_visibility(Schedule),
         )
     )
 
@@ -601,7 +604,12 @@ def submit_report(
         )
         .with_for_update()
     )
-    item = Report(user_id=user.id, **body.model_dump(), moderation="accepted")
+    item = Report(
+        user_id=user.id,
+        **body.model_dump(),
+        moderation="accepted",
+        is_demo=config.demo_instance,
+    )
     if (
         ep
         and body.kind == "power_back"
@@ -660,7 +668,7 @@ def recent_reports(
         .where(
             Report.location_id == location_id,
             Report.moderation == "accepted",
-            Report.is_demo.is_(False),
+            evidence_visibility(Report),
         )
         .order_by(Report.observed_at.desc(), Report.id),
         page,
@@ -736,7 +744,7 @@ def summary(location_id: uuid.UUID, db: Session = Depends(get_db)):
             Report.observed_at >= start,
             Report.observed_at <= instant,
             Report.moderation == "accepted",
-            Report.is_demo.is_(False),
+            evidence_visibility(Report),
         )
         .subquery()
     )
@@ -876,7 +884,11 @@ def rebuild_episodes(db, user_id, location_id):
     ep = None
     last_closed = None
     for r in rows:
-        if r.moderation != "accepted" or r.is_demo or r.observed_at > now():
+        if (
+            r.moderation != "accepted"
+            or (r.is_demo and not get_settings().demo_instance)
+            or r.observed_at > now()
+        ):
             continue
         if ep is None and r.kind == "power_back" and last_closed is not None:
             r.episode_id = last_closed.id

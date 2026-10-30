@@ -50,6 +50,8 @@ The hosting boxes are the **selected path, not live deployed services**. Current
 
 ## Local fallback — no hosting/internet required after dependencies are installed
 
+**Preferred populated fallback:** use [the local demo launcher](LOCAL-DEMO.md), or double-click `START-DEMO.cmd` on Windows. It supplies marked fictional operational records, private accounts and a default area without changing the normal DB. The older procedure below creates only private accounts and home-page samples; add `--with-content` to `create-local-demo.py` for a new profile with the walkthrough.
+
 Run from **PowerShell** on the owner's machine. Docker Desktop must show Engine running. Keep the existing normal `.env`/database; the creator makes a new marked database and never resets it.
 
 ```powershell

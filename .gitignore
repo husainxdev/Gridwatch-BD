@@ -23,3 +23,7 @@ artifacts/
 *.sql
 .vercel/
 .release-revision
+
+frontend/.next-demo/
+
+test-results/

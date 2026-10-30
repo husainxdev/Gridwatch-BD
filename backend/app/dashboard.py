@@ -8,6 +8,7 @@ from sqlalchemy import func, or_, select, text
 from sqlalchemy.orm import Session
 
 from .api import find, loc_json
+from .data_mode import evidence_visibility
 from .db import get_db
 from .evidence import schedule_json, serialize, summary, visible_notice
 from .models import Location, Notice, PersonalEpisode, Report, Schedule, User
@@ -30,7 +31,7 @@ def build_dashboard(db, user_id, location_id, page):
         .where(
             *visible_notice(),
             Schedule.lifecycle == "published",
-            Schedule.is_demo.is_(False),
+            evidence_visibility(Schedule),
             or_(
                 Schedule.location_id == location_id,
                 Schedule.coverage.contains([{"id": str(location_id)}]),
@@ -72,7 +73,7 @@ def build_dashboard(db, user_id, location_id, page):
             Report.user_id == user_id,
             Report.location_id == location_id,
             Report.moderation == "accepted",
-            Report.is_demo.is_(False),
+            evidence_visibility(Report),
             Report.observed_at <= instant,
         )
         .order_by(Report.observed_at.desc(), Report.created_at.desc(), Report.id.desc())
