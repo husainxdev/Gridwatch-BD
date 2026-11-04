@@ -60,3 +60,7 @@ The release guards were additionally checked after the 24-browser run; their pos
 - **Section 13: incomplete.** Release configuration and local recovery checks are implemented; required deployed-site evidence is blocked.
 - **Section 14: partially complete.** Documentation, repository directory links, real screenshots, private local demo accounts and presentation/fallback are prepared. Required live links and tested deployed demo credentials are missing.
 - **Overall: not fully deployed/submitted; no production-readiness claim.** [SUBMISSION.md](SUBMISSION.md) classifies each deliverable and contains the remaining live checklist. Obtain actual origins/access, review provider costs/limits, configure secrets privately, run the guarded release and verify the real site before changing these statuses.
+
+## Normal website follow-up
+
+The [public interface and launcher work](PUBLIC-WEBSITE-REVIEW.md) replaces the earlier preference for a populated fictional demo. Use `START-WEBSITE.cmd` for the actual normal local database, no seed/accounts. Production now rejects all demo flags; isolated developer fixtures remain local-only. Earlier test counts in this document are historical. Real-source import and public HTTPS acceptance remain incomplete.

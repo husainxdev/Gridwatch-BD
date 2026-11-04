@@ -53,16 +53,17 @@ def test_production_config_normalization_tls_origin_revision_and_demo_isolation(
         with pytest.raises(ValidationError) as error:
             Settings(**(values | invalid))
         assert "qa:private" not in str(error.value)
-    assert Settings(
-        **(
-            values
-            | {
-                "demo_instance": True,
-                "demo_enabled": True,
-                "database_url": "postgresql://qa:private@localhost/gridwatch_demo_isolated?sslmode=require",
-            }
+    with pytest.raises(ValidationError):
+        Settings(
+            **(
+                values
+                | {
+                    "demo_instance": True,
+                    "demo_enabled": True,
+                    "database_url": "postgresql://qa:private@localhost/gridwatch_demo_isolated?sslmode=require",
+                }
+            )
         )
-    ).demo_instance
     with pytest.raises(ValidationError):
         Settings(**(values | {"db_pool_size": 0}))
 

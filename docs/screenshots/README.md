@@ -10,3 +10,5 @@ These are unaltered Playwright screenshots of the actual local Next.js/FastAPI/P
 The screenshots may show earlier phase labels/layout details; the current source and executable checks are authoritative. A hosted screenshot should only replace them after real-site verification, with the same privacy precautions and an accurate capture date/context.
 
 Updated actual application captures from 2026-11-04: [public home mobile, 390px](home-public-mobile.png), [public home desktop, 1440px](home-public-desktop.png). These show the real local public API view of an explicitly fictional isolated dataset, including unknown area status and separate schedule/report evidence. They are anonymous captures, not hosted-site or official-outage evidence.
+
+The normal website captures `website-home-390.png` and `website-home-1440.png` were taken from the actual seed-free local launcher on 2026-11-04. They show the real empty normal database, without fictional accounts/notices, private credentials or a government live-data claim. Existing earlier screenshots remain historical QA evidence.

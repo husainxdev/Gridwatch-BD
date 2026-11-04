@@ -16,7 +16,7 @@ else:
     password = secrets.token_hex(24)
     values = [
         f"POSTGRES_PASSWORD={password}\n",
-        f"DATABASE_URL=postgresql+psycopg://gridwatch:{password}@127.0.0.1:5432/gridwatch\nAPP_ENV=development\nDEMO_ENABLED=true\nJWT_SECRET={secrets.token_hex(48)}\nSMTP_HOST=127.0.0.1\n",
+        f"DATABASE_URL=postgresql+psycopg://gridwatch:{password}@127.0.0.1:5432/gridwatch\nAPP_ENV=development\nDEMO_ENABLED=false\nJWT_SECRET={secrets.token_hex(48)}\nSMTP_HOST=127.0.0.1\n",
     ]
     for path, value in zip(paths, values):
         with path.open("x") as file:

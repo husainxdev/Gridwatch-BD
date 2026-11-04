@@ -29,9 +29,9 @@ Set in Vercel **Production** settings, then rebuild:
 
 - `GRIDWATCH_API_TARGET`: actual Render HTTPS origin, with no path/query/userinfo. Server-side rewrite target; never a database URL or signing key. Vercel builds reject a missing/insecure target.
 - `RELEASE_REVISION`: full 40-character source commit, matching the backend. The release-info handler also supports provider `VERCEL_GIT_COMMIT_SHA`; configure/verify the system variable if relying on it.
-- `NEXT_PUBLIC_DEMO_INSTANCE=false` for a real pilot. Use `true` only for a separate disposable demo DB matching backend `DEMO_INSTANCE=true`.
+- `NEXT_PUBLIC_DEMO_INSTANCE=false` for a real pilot. Public production rejects demo configuration. Use fictional data only in an isolated local developer/test environment.
 - Optional `NEXT_PUBLIC_POLL_INTERVAL_MS=30000`. No secrets in `NEXT_PUBLIC_*`.
-- Never set `NEXT_PUBLIC_E2E_TEST` or `GRIDWATCH_TEST_BUILD` on a deployed project. Vercel refuses the test-helper flag.
+- Never set `NEXT_PUBLIC_E2E_TEST` or `GRIDWATCH_TEST_BUILD` on a deployed project. Vercel refuses test-helper, test-build, local-website and demo flags.
 
 Browser requests stay on **frontend `/api/*`**. Next rewrites to Render over HTTPS. Backend refresh cookies have no Domain attribute, so forwarded Set-Cookie belongs to the frontend origin: Secure, HttpOnly refresh token, SameSite Strict, Path `/api/auth`; readable CSRF cookie at `/`. The frontend's existing `credentials: same-origin` is correct for this topology. Cross-site direct browser API calls are not the supported setup.
 
@@ -124,3 +124,7 @@ Inspect Render runtime/deploy logs and Vercel build/function logs for the record
 Revert application code by selecting a previously verified immutable provider deployment/commit after checking schema compatibility. This phase still targets schema `0006`; a prior code revision may require the normalized psycopg URI and environment it supports. **Application rollback does not reverse migrations.** Never automatically run `alembic downgrade` on real data. For incompatible changes, keep traffic off, restore into an isolated new DB, validate and plan a controlled cutover rather than overwriting the original.
 
 Rotate database/SMTP credentials through provider secrets and restart affected pools/services. Rotate signing keys privately; when revocation is required, use an authorized DB maintenance session to revoke active `refresh_sessions` before resuming access. Rotating only JWT signing material does not erase valid hashed refresh sessions. Revoke exposed demo sessions and provision a new isolated demo namespace/credentials; do not reuse personal passwords or print passwords in logs.
+
+## Normal website presentation
+
+Use [WEBSITE.md](WEBSITE.md) for the seed-free local launcher and Admin provisioning. Public navigation, help/privacy pages and metadata have no student-project/demo branding. Production rejects `DEMO_INSTANCE=true` or `DEMO_ENABLED=true`; Vercel also rejects `NEXT_PUBLIC_DEMO_INSTANCE=true`. These flags cannot be used to present fictional evidence as real. No migration removes or converts old records. Local website startup is not public deployment.

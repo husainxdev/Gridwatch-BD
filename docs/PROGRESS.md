@@ -131,3 +131,15 @@ See [release evidence and exact check results](RELEASE-STATUS.md) and [owner das
 - [ ] Network research draft activation, primary-source Sylhet import and actual hosted release remain blocked; not counted complete.
 
 See [reproduction details, coverage and external blockers](FULL-REVIEW-2026-11-04.md).
+
+## Public website follow-up — 2026-11-04
+
+- [x] Replace project/demo-facing normal navigation, footer and metadata with public service wording.
+- [x] Responsive task navigation, compact mobile menu, help/FAQ, privacy page and accessible password visibility.
+- [x] Put area selection ahead of secondary workflow shortcuts; translate administrative types and provide location retry/empty states.
+- [x] Add seed-free `START-WEBSITE.cmd`, normal-database validation and private process logs; preserve accounts, secrets and custom database ports.
+- [x] Disable fixtures by default in initialization/setup; refuse demo mode in public production and keep legacy sample endpoint isolated.
+- [ ] Import independently verified real Sylhet data — primary-source access remains blocked.
+- [ ] Public HTTPS deployment, external email, hosted acceptance and operations — actual provider setup still required.
+
+Verification results and screenshots: [public website handoff](PUBLIC-WEBSITE-REVIEW.md).

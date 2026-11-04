@@ -7,5 +7,5 @@ python3 scripts/init-local.py
 uv sync --project backend --frozen
 npm ci --prefix frontend --no-audit --no-fund
 docker compose up -d --wait db mail
-(cd backend && .venv/bin/alembic upgrade head && .venv/bin/python -m app.seed)
+(cd backend && .venv/bin/alembic upgrade head)
 npm run build --prefix frontend

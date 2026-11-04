@@ -67,7 +67,8 @@ def test_readiness_failure_is_safe():
         app.dependency_overrides.clear()
 
 
-def test_seed_repeatability_and_isolation(db, client):
+def test_seed_repeatability_and_isolation(db, client, monkeypatch):
+    monkeypatch.setattr(settings, "demo_enabled", True)
     before = {
         model.__tablename__: db.scalar(select(func.count()).select_from(model))
         for model in (Location, Notice, Schedule, Report, OutageEvent, User)
@@ -80,6 +81,9 @@ def test_seed_repeatability_and_isolation(db, client):
             db.scalar(select(func.count()).select_from(model))
             == before[model.__tablename__]
         )
+    # Legacy sample rows stay private even if an older normal config enabled seed.
+    assert client.get("/api/demo/areas").status_code == 404
+    monkeypatch.setattr(settings, "demo_instance", True)
     payload = client.get("/api/demo/areas").json()
     assert payload["data_mode"] == "demonstration"
     assert len(payload["items"]) == 2

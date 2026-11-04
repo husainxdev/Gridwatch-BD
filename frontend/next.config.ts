@@ -26,9 +26,12 @@ if (
 if (
   process.env.VERCEL === "1" &&
   (process.env.NEXT_PUBLIC_E2E_TEST === "1" ||
-    process.env.GRIDWATCH_LOCAL_DEMO === "1")
+    process.env.GRIDWATCH_LOCAL_DEMO === "1" ||
+    process.env.NEXT_PUBLIC_DEMO_INSTANCE === "true" ||
+    process.env.GRIDWATCH_TEST_BUILD === "1" ||
+    process.env.GRIDWATCH_LOCAL_WEBSITE === "1")
 ) {
-  throw new Error("Do not deploy browser-test builds");
+  throw new Error("Do not deploy demo, browser-test or local website builds");
 }
 if (process.env.VERCEL === "1") {
   const commit =
@@ -51,7 +54,9 @@ const config: NextConfig = {
       ? ".next-test"
       : process.env.GRIDWATCH_LOCAL_DEMO === "1"
         ? ".next-demo"
-        : ".next",
+        : process.env.GRIDWATCH_LOCAL_WEBSITE === "1"
+          ? ".next-website"
+          : ".next",
   turbopack: { root: path.resolve(process.cwd()) },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${url.origin}/api/:path*` }];

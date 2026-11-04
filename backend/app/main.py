@@ -61,8 +61,10 @@ def ready(db: Session = Depends(get_db)):
 
 @app.get("/api/demo/areas")
 def demo_areas(db: Session = Depends(get_db)):
-    if not settings.demo_enabled or (
-        settings.app_env == "production" and not settings.demo_instance
+    if (
+        not settings.demo_enabled
+        or not settings.demo_instance
+        or settings.app_env == "production"
     ):
         raise HTTPException(404, "Not found")
     try:

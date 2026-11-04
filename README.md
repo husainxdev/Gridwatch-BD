@@ -2,7 +2,9 @@
 
 Built with **Next.js App Router, React, TypeScript/JavaScript, Tailwind CSS/DaisyUI, FastAPI and PostgreSQL**.
 
-A Bengali-first load shedding and power outage management university project. The application is functional for a **small, manually verified pilot**, with no official feed or real Sylhet area connected yet. The public home reads source-reviewed announcements and community evidence from the backend. Fresh normal setup leaves operational facts empty; the populated fictional demonstration runs in a separately marked database. No real coverage or production readiness is claimed.
+A Bengali-first website for announced power interruptions, personal connection reports and activity planning. The normal site uses persisted PostgreSQL records, excludes fictional evidence and provides responsive Bengali navigation, help and privacy pages. No verified Sylhet pilot/feed is connected yet, and no live deployment has been verified. Missing data stays unknown.
+
+**Windows: use `START-WEBSITE.cmd` for the normal website at http://localhost:5173.** It starts Docker, checks the normal database schema and launches API/frontend without adding sample records or accounts. Existing normal users and settings are preserved; old isolated demo accounts do not become real accounts. [Exact startup, Admin setup and publishing prerequisites](docs/WEBSITE.md).
 
 - [Scope, sources, user flows and data rules](docs/SCOPE.md)
 - [Progress and seven-day work sequence](docs/PROGRESS.md)
@@ -15,10 +17,11 @@ A Bengali-first load shedding and power outage management university project. Th
 - [Data sources and evidence limits](docs/DATA_SOURCES.md)
 - [Submission acceptance and repository links](docs/SUBMISSION.md)
 - [Presentation/viva/local fallback](docs/DEMO_SCRIPT.md)
+- [Normal public website, UI and startup verification](docs/PUBLIC-WEBSITE-REVIEW.md)
 - [Full application review, fixes and remaining gates (2026-11-04)](docs/FULL-REVIEW-2026-11-04.md)
 - [Populated local demo: one launcher, private accounts and data](docs/LOCAL-DEMO.md)
 
-Already set up on Windows but seeing empty schedules/history? Update the repository, then double-click **`START-DEMO.cmd`** in the project folder. It creates a separate, clearly fictional demo database and opens **http://127.0.0.1:5174/login**. Private credentials are generated in `.private/demo-ready/credentials.json` on that machine. Normal records/accounts are preserved. See [exact setup and limitations](docs/LOCAL-DEMO.md); no verified official feed is supplied.
+The historical `START-DEMO.cmd` is retained only for isolated developer/testing walkthroughs. It is **not** the normal website launcher and must not be used for a public release.
 
 ## Repository and architecture
 
@@ -44,7 +47,7 @@ Node.js 22.12+ (tested with 24), npm, Python 3.12+, uv, Docker and Docker Compos
 bash scripts/setup.sh
 ```
 
-The script installs frozen dependencies, starts PostgreSQL and Mailpit, applies the migration, retains two legacy sample-table records for compatibility, and builds the frontend. These sample-table rows do not become operational locations or notices. Root, backend and frontend `.env.example` files describe the variables. `.env` values are ignored by Git. If you already have one `.env` file, finish configuring the other from its example; the initializer intentionally refuses partial configuration.
+The script installs frozen dependencies, starts PostgreSQL and Mailpit, applies migrations and builds the frontend. It does not run a seed or create default accounts. Existing legacy sample-table rows, if any, are preserved and unavailable on the normal site. Root, backend and frontend `.env.example` files describe the variables. `.env` values are ignored by Git. If you already have one `.env` file, finish configuring the other from its example; the initializer intentionally refuses partial configuration.
 
 Run the API and web application in separate terminals:
 
@@ -74,7 +77,7 @@ Any user may register in the app. The new admin can add a location hierarchy, at
 - Admin location and notice CRUD with verified-source review; schedule CRUD, cancellation, search/filter/sort/page APIs; read-only public notice browsing.
 - Per-connection power-off, power-back and still-off reports, request-key idempotency and a ten-minute duplicate cooldown.
 - Separately reviewed outage events requiring restoration evidence, recent reports, recorded history, and activity overlap checks against announced schedules.
-- Bengali-first responsive UI with explicit demo/unknown labels, source links, loading, error and empty states.
+- Bengali-first responsive public interface, mobile menu, help/privacy pages, accessible forms, source links, unknown/loading/error/stale/empty states; fictional warnings exist only in explicitly isolated developer environments.
 
 Public API docs are available locally at `/docs`. Unverified notice entries are labeled. Source URLs are administrator input, not independently authenticated by the software. A report does not determine area-wide status; no reports is **unknown**, and a scheduled end does not close an actual event.
 

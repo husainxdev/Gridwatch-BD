@@ -95,6 +95,8 @@ const returnRoutes = new Set([
   "/admin",
   "/notices",
   "/sources",
+  "/help",
+  "/privacy",
 ]);
 export function safeReturnPath(value: string | null): string {
   if (

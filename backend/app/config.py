@@ -114,10 +114,8 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "Production JWT_SECRET must be a securely generated signing secret"
                 )
-            if self.demo_enabled and not self.demo_instance:
-                raise ValueError(
-                    "Production demo fixtures require a separate demo instance"
-                )
+            if self.demo_enabled or self.demo_instance:
+                raise ValueError("Public production instances cannot enable demo data")
         return self
 
 

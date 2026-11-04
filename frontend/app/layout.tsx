@@ -9,7 +9,7 @@ import "../src/styles.css";
 export const metadata: Metadata = {
   title: "GridWatch BD — বিদ্যুতের খবর",
   description:
-    "ঘোষিত বিদ্যুৎ বন্ধ, ব্যক্তিগত রিপোর্ট ও যাচাইকৃত ঘটনার বাংলাদেশভিত্তিক বিশ্ববিদ্যালয় প্রকল্প।",
+    "আপনার এলাকার ঘোষিত বিদ্যুৎ বন্ধের সময়সূচি ও মূল নোটিশ দেখুন, নিজের সংযোগের খবর জানান এবং কাজের সময় মিলিয়ে নিন।",
 };
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

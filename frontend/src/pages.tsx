@@ -1,3 +1,4 @@
+import { FiEye, FiEyeOff, FiLock } from "react-icons/fi";
 import { RegistryWorkspace } from "./Registry";
 import {
   NoticeSelector,
@@ -174,6 +175,7 @@ export function AuthPage({
   const authSuffix = params.has("next")
     ? `?next=${encodeURIComponent(returnPath)}`
     : "";
+  const [showPassword, setShowPassword] = useState(false);
   const [resetToken] = useState(
     () =>
       new URLSearchParams(window.location.hash.slice(1)).get("token") ||
@@ -252,6 +254,9 @@ export function AuthPage({
           }[mode]
         }
       >
+        <div className="auth-mark">
+          <FiLock aria-hidden="true" />
+        </div>
         <p className="hint">
           শুধু যাচাইকৃত এলাকা বেছে রিপোর্ট দিন। আপনার রিপোর্ট আপনার সংযোগের
           অভিজ্ঞতা বোঝায়।
@@ -262,6 +267,7 @@ export function AuthPage({
               <input
                 className="input input-bordered"
                 name="name"
+                autoComplete="name"
                 required
                 minLength={2}
                 maxLength={100}
@@ -274,23 +280,56 @@ export function AuthPage({
                 className="input input-bordered"
                 type="email"
                 name="email"
+                autoComplete="email"
+                inputMode="email"
+                autoCapitalize="none"
+                spellCheck={false}
                 required
               />
             </Field>
           )}
           {mode !== "forgot" && (
-            <Field label="পাসওয়ার্ড">
-              <input
-                className="input input-bordered"
-                type="password"
-                name="password"
-                required
-                autoComplete={
-                  mode === "login" ? "current-password" : "new-password"
-                }
-                maxLength={72}
-              />
-            </Field>
+            <div className="field">
+              <label htmlFor="account-password">পাসওয়ার্ড</label>
+              <div className="password-control">
+                <input
+                  id="account-password"
+                  className="input input-bordered"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  required
+                  autoComplete={
+                    mode === "login" ? "current-password" : "new-password"
+                  }
+                  maxLength={72}
+                  aria-describedby={
+                    mode === "register" || mode === "reset"
+                      ? "password-help"
+                      : undefined
+                  }
+                />
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  aria-label={
+                    showPassword ? "পাসওয়ার্ড লুকান" : "পাসওয়ার্ড দেখুন"
+                  }
+                  aria-pressed={showPassword}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <FiEyeOff aria-hidden="true" />
+                  ) : (
+                    <FiEye aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+              {(mode === "register" || mode === "reset") && (
+                <small id="password-help" className="hint">
+                  ৮–৭২ UTF-8 বাইট। বাংলা অক্ষর সাধারণত একাধিক বাইট নেয়।
+                </small>
+              )}
+            </div>
           )}
           <ErrorBox message={error} />
           {success && (

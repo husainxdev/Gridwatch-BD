@@ -14,6 +14,9 @@ const keys = [
   "RELEASE_REVISION",
   "VERCEL_GIT_COMMIT_SHA",
   "GRIDWATCH_LOCAL_DEMO",
+  "NEXT_PUBLIC_DEMO_INSTANCE",
+  "GRIDWATCH_TEST_BUILD",
+  "GRIDWATCH_LOCAL_WEBSITE",
 ];
 const original = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
 let run = 0;
@@ -47,6 +50,9 @@ try {
     { GRIDWATCH_API_TARGET: "https://user:secret@backend.example.com" },
     { NEXT_PUBLIC_E2E_TEST: "1" },
     { GRIDWATCH_LOCAL_DEMO: "1" },
+    { NEXT_PUBLIC_DEMO_INSTANCE: "true" },
+    { GRIDWATCH_TEST_BUILD: "1" },
+    { GRIDWATCH_LOCAL_WEBSITE: "1" },
     { VERCEL_GIT_COMMIT_SHA: "" },
     { RELEASE_REVISION: "b".repeat(40) },
   ])
@@ -60,7 +66,7 @@ try {
     ),
   );
   console.log(
-    "10 release-config cases passed: HTTPS, source identity, no test build, rewrite and HSTS; no provider contacted.",
+    "13 release-config cases passed: HTTPS, source identity, no test build, rewrite and HSTS; no provider contacted.",
   );
 } finally {
   for (const key of keys) {

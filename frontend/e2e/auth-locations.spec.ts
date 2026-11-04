@@ -23,10 +23,10 @@ for (const width of [1440, 390]) {
     ).toBeVisible();
     await page
       .getByLabel("বিভাগ", { exact: true })
-      .selectOption({ label: "পরীক্ষামূলক বিভাগ · division" });
+      .selectOption({ label: "পরীক্ষামূলক বিভাগ · বিভাগ" });
     await page
       .getByLabel("পরের প্রশাসনিক স্তর", { exact: true })
-      .selectOption({ label: "পরীক্ষামূলক জেলা · district" });
+      .selectOption({ label: "পরীক্ষামূলক জেলা · জেলা" });
     await page
       .getByRole("button", { name: "এলাকা সংরক্ষণ", exact: true })
       .click();

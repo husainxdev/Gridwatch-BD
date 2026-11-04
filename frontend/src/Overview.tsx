@@ -163,16 +163,25 @@ export function Overview() {
           <Link to="/sources">উৎস ও যাচাই সম্পর্কে জানুন →</Link>
         </div>
       </section>
+      <Card title="কোন এলাকার তথ্য দেখতে চান?" className="home-picker">
+        <div id="area-picker" tabIndex={-1}>
+          <p className="hint">
+            বাংলা বা ইংরেজি নাম দিয়ে খুঁজুন, অথবা নিচে ধাপে ধাপে এলাকা বাছুন।
+          </p>
+          {selectionError && <p role="status">{selectionError}</p>}
+          <LocationPicker value={selected} onChange={choose} />
+        </div>
+      </Card>
       <div className="home-workflows" aria-label="ব্যবহারের ধাপ">
         <Link to={dashboard}>
           <FiMapPin aria-hidden="true" />
           <strong>এলাকা ও নিজের সংযোগ</strong>
-          <span>সংরক্ষণ, ডিফল্ট ও off/back রিপোর্ট</span>
+          <span>এলাকা সংরক্ষণ ও বিদ্যুতের খবর জানান</span>
         </Link>
         <Link to="/activities">
           <FiCalendar aria-hidden="true" />
           <strong>কাজের সময় মিলিয়ে নিন</strong>
-          <span>ঘোষণার সঙ্গে overlap দেখুন</span>
+          <span>ঘোষিত বন্ধের সঙ্গে সময় মেলে কি না দেখুন</span>
         </Link>
         <Link to="/history">
           <FiZap aria-hidden="true" />
@@ -180,16 +189,6 @@ export function Overview() {
           <span>জানা ও অসম্পূর্ণ সময় আলাদা</span>
         </Link>
       </div>
-      <Card title="কোন এলাকার তথ্য দেখতে চান?" className="home-picker">
-        <div id="area-picker" tabIndex={-1}>
-          <p className="hint">
-            নাম, English alias বা ID দিয়ে খুঁজুন। সরকারি প্রশাসনিক এলাকা ও
-            বিদ্যুতের feeder coverage এক নয়।
-          </p>
-          {selectionError && <p role="status">{selectionError}</p>}
-          <LocationPicker value={selected} onChange={choose} />
-        </div>
-      </Card>
       <section
         className="home-board"
         aria-label="নির্বাচিত এলাকার প্রকাশ্য তথ্য"
