@@ -1,5 +1,5 @@
 import { SavedPager } from "./components/SavedPager";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useSearchParams } from "./navigation";
 import toast from "react-hot-toast";
 import { api, bdToIso, localInputTime, shortTime } from "./client";
@@ -385,6 +385,33 @@ type History = {
 export function HistoryPage() {
   const [params, setParams] = useSearchParams();
   const area = params.get("location_id") || "";
+  const initialSelection = useRef(false);
+  const [savedPage, setSavedPage] = useState(1);
+  const saved = useRequest<{
+    total: number;
+    items: {
+      id: string;
+      name_bn: string;
+      label: string;
+      is_default: boolean;
+      available: boolean;
+    }[];
+  }>(`/api/saved-areas?page=${savedPage}`);
+  useEffect(() => {
+    if (initialSelection.current || !saved.data) return;
+    initialSelection.current = true;
+    if (area) return;
+    const chosen = saved.data.items.find(
+      (item) => item.is_default && item.available,
+    );
+    if (chosen)
+      setParams((old) => {
+        if (old.has("location_id")) return old;
+        const next = new URLSearchParams(old);
+        next.set("location_id", chosen.id);
+        return next;
+      });
+  }, [saved.data, area, setParams]);
   const [today] = useState(() => localInputTime(new Date()).slice(0, 10));
   const [monthAgo] = useState(() =>
     localInputTime(new Date(Date.now() - 30 * 86400000)).slice(0, 10),
@@ -395,6 +422,7 @@ export function HistoryPage() {
     sort = params.get("sort") || "newest",
     page = Math.max(1, Number(params.get("page")) || 1);
   function update(key: string, value: string) {
+    initialSelection.current = true;
     setParams((old) => {
       const p = new URLSearchParams(old);
       if (value) p.set(key, value);
@@ -410,6 +438,42 @@ export function HistoryPage() {
         শুধু নিজের নির্বাচিত এলাকার গৃহীত পর্যবেক্ষণ। সম্পূর্ণ monitoring নয়;
         রিপোর্টবিহীন দিন বিদ্যুৎ থাকার প্রমাণ নয়।
       </p>
+      {saved.loading && <p role="status">সংরক্ষিত এলাকা যাচাই হচ্ছে…</p>}
+      {saved.error && (
+        <p role="alert">
+          সংরক্ষিত এলাকা লোড হয়নি: {saved.error} নিচে নাম দিয়ে খুঁজতে পারেন।
+        </p>
+      )}
+      {!!saved.data?.items.length && (
+        <label className="field">
+          ইতিহাসের সংরক্ষিত এলাকা
+          <select
+            className="select"
+            value={area}
+            onChange={(event) => update("location_id", event.target.value)}
+          >
+            <option value="">এলাকা বাছুন</option>
+            {area && !saved.data.items.some((item) => item.id === area) && (
+              <option value={area}>নির্বাচিত এলাকা · এই তালিকার বাইরে</option>
+            )}
+            {saved.data.items.map((item) => (
+              <option key={item.id} value={item.id} disabled={!item.available}>
+                {item.label || item.name_bn}
+                {item.is_default ? " · ডিফল্ট" : ""}
+                {!item.available ? " · যাচাই উপলব্ধ নয়" : ""}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      {saved.data && (
+        <SavedPager
+          page={savedPage}
+          total={saved.data.total}
+          loading={saved.loading}
+          onChange={setSavedPage}
+        />
+      )}
       <LocationPicker value={area} onChange={(v) => update("location_id", v)} />
       <div className="toolbar">
         <label>
@@ -469,7 +533,11 @@ export function HistoryPage() {
           move={(n) => update("page", String(n))}
         />
       ) : (
-        <p>এলাকা ও বৈধ তারিখ বাছুন।</p>
+        <p>
+          {saved.loading && !area
+            ? "ডিফল্ট এলাকার জন্য অপেক্ষা করুন বা নিজে এলাকা বাছুন।"
+            : "এলাকা ও বৈধ তারিখ বাছুন।"}
+        </p>
       )}
     </>
   );

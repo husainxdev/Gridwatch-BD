@@ -96,3 +96,12 @@ Manual review: login → select/save area → label/set default → reload or si
 No hosted deployment, real outage verification, cross-tab refresh redesign, new complaint directory or additional infrastructure is part of this phase. Frontend automated validation uses Chromium; Windows/macOS native browsers and screen-reader behavior have not been independently tested here.
 
 Validation recorded: **37 backend tests passed**, including populated migration preservation and bounded dashboard query count; **8 Chromium journeys passed**, including 1440px/390px layouts, two-account personal status, controlled polling timers, stale network recovery and unavailable defaults. TypeScript lint, Prettier, Vite production build, Ruff lint/format and Git whitespace checks passed. One upstream Starlette/httpx deprecation warning remains. Targeted mobile/desktop dashboard captures were inspected locally; no real user credentials or mail were captured.
+
+
+## Public area home follow-up
+
+`GET /api/area-overview?location_id=UUID&page=1` is anonymous/read-only, with a repeatable-read snapshot of one administrative location. It returns area/breadcrumb, a deterministic page of at most ten source-reviewed published schedules for today plus seven days (Asia/Dhaka), community latest-per-reporter counts with their own observation window, and at most five accepted past observations. The latter list is historical recent order; only the community counts use the displayed rolling window. Drafts and demo evidence remain excluded outside a separate marked demo instance.
+
+No private notes, user IDs, session data, idempotency keys, private episodes/history or author foreign keys are included. `available` refers to location verification, **not power availability**. `restoration_estimate` remains null. An invalid UUID/page returns 422; missing location returns 404; backend failure is an error rather than zero facts. Private Dashboard/History remain authenticated and ownership-scoped.
+
+Home uses this API and public notices with cancellation, polling, retry/stale labels and area-switch isolation. Login/signup preserve an allowlisted internal destination; History restores a valid saved default once. See [the full review](FULL-REVIEW-2026-11-04.md) for privacy, pool and browser tests.

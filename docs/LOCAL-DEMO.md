@@ -61,6 +61,12 @@ Real local PostgreSQL/Linux Chromium checks cover both roles, reload, defaults, 
 
 Native Windows batch/process cleanup needs the owner's execution check. External email is disabled in this demo. Real Sylhet sources/public deployment remain unverified. During this change, official Sylhet district/BPDB requests returned 503 and SCC returned 403; no official record was imported from those responses. No public deployment or purchase is part of this workflow.
 
+### Local password reset and updated public home
+
+The updated launcher enables password-reset SMTP **only to the Compose Mailpit loopback binding**, even for an existing private profile; it does not rewrite that profile's credentials/config file. Open the printed Mailpit address (normally `http://127.0.0.1:8025`), request a reset for your demo account and open its message locally. Never share a reset link or expose Mailpit publicly. This verifies local SMTP flow, not delivery to a real external inbox. If you reset a demo password, use the password you chose afterward: `credentials.json` contains the initial handoff, and the launcher cannot recover or overwrite your new password.
+
+Home now displays actual public location/schedule/report records. The isolated demo automatically selects its first verified practice neighborhood. Normal installations require an area selection or show real published notices/accurate empty/error states. History restores a valid saved default; login preserves a safe intended route. See [the full follow-up](FULL-REVIEW-2026-11-04.md) for current results and remaining external gates; the earlier check table below is historical.
+
 Actual follow-up checks:
 
 | Check | Result |

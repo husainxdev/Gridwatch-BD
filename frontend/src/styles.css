@@ -1087,3 +1087,232 @@ textarea:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+/* Public evidence board uses the same visual system as the private dashboard. */
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 2rem;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #d9e7de;
+  border-radius: 20px;
+  background: linear-gradient(115deg, #edf5ef 0%, #fff 100%);
+}
+.home-hero h1 {
+  font-size: clamp(1.8rem, 3.1vw, 2.6rem);
+}
+.home-hero p {
+  max-width: 42rem;
+}
+.home-actions {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin-top: 1.4rem;
+}
+.home-actions .btn {
+  height: auto;
+  min-height: 48px;
+  white-space: normal;
+  padding-block: 0.75rem;
+}
+.home-principles {
+  background: #1a4538;
+  color: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  align-self: center;
+}
+.home-principles > svg {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 0.8rem;
+}
+.home-principles a {
+  color: #fff;
+  text-decoration: underline;
+}
+.home-principles p {
+  color: #e5efe8;
+  font-size: 0.9rem;
+}
+.home-workflows {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.home-workflows > a {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.2rem;
+  background: #fff;
+  border: 1px solid #dfe7e1;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #254b3b;
+}
+.home-workflows > a:hover {
+  border-color: #17634f;
+  background: #eef5f0;
+}
+.home-workflows svg {
+  font-size: 1.4rem;
+}
+.home-workflows span {
+  font-size: 0.85rem;
+  color: #4d6357;
+}
+.home-picker {
+  margin-bottom: 1.5rem;
+}
+.home-picker #area-picker {
+  scroll-margin-top: 1.5rem;
+}
+.home-board-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+.home-board-heading h2 {
+  margin-bottom: 0;
+  font-size: 1.25rem;
+}
+.home-evidence-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+.home-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin: 1rem 0;
+}
+.home-counts > div {
+  padding: 0.75rem;
+  background: #f0f5f1;
+  border-radius: 8px;
+}
+.home-counts dt {
+  color: #4d6357;
+  font-size: 0.75rem;
+}
+.home-counts dd {
+  margin: 0.5rem 0 0;
+  font-size: 1.7rem;
+  font-weight: 650;
+  color: #174b3b;
+}
+.home-report-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.7rem;
+}
+.home-report-list li {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  padding: 0.9rem;
+  border: 1px solid #e1e9e3;
+  border-radius: 9px;
+}
+.home-report-list small {
+  width: 100%;
+  color: #4d6357;
+}
+.home-notices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-block: 1rem;
+}
+.home-board .record {
+  overflow-wrap: anywhere;
+}
+.home-board .record small {
+  display: block;
+  margin-top: 0.5rem;
+}
+@media (max-width: 1100px) {
+  .home-hero,
+  .home-evidence-grid {
+    grid-template-columns: 1fr;
+  }
+  .home-notices {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .home-hero {
+    padding: 1.2rem;
+    gap: 1rem;
+  }
+  .home-workflows {
+    grid-template-columns: 1fr;
+  }
+  .home-workflows > a {
+    padding: 1rem;
+  }
+  .home-board-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .home-counts {
+    grid-template-columns: 1fr;
+  }
+  .home-counts > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .home-counts dd {
+    margin: 0;
+  }
+}
+.home-notices .panel {
+  overflow-wrap: anywhere;
+}
+
+/* Names can be long in either script, especially breadcrumb/search results. */
+.home-board-heading > div {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.inline-actions .btn,
+.form-stack ul .btn {
+  max-width: 100%;
+  height: auto;
+  min-height: 44px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: start;
+  padding-block: 0.5rem;
+}
+.home-board-heading .btn-outline,
+.home-actions .btn-outline {
+  color: #175b46;
+  background: #fff;
+  border-color: #17634f;
+  transition-property: box-shadow, transform;
+}
+.home-board-heading .btn-outline:hover:not(:disabled),
+.home-actions .btn-outline:hover:not(:disabled) {
+  color: #fff;
+  background: #17634f;
+}
+.home-board-heading .btn-outline:disabled {
+  color: #42564b;
+  background: #e4eae5;
+  border-color: #cbd8ce;
+  opacity: 1;
+}
+.home-evidence-grid {
+  align-items: start;
+}

@@ -29,7 +29,7 @@ Checked items are implemented locally. Days are a priority guide, not a deadline
 | 6 | Conflicts, history, usability | Overlap tests, keyboard and mobile checks |
 | 7 | Hosted deployment and submission | Live smoke tests and verified pilot |
 
-Outstanding risk: actual pilot location/provider data and published notice sources have not been verified. Until then the operational database is intentionally empty after setup and the home screen uses labeled fictional fixtures. Public deployment also needs ingress rate limiting, independent security review, backups and live verification.
+Outstanding risk: actual pilot location/provider data and published notice sources have not been verified. Fresh normal setup leaves operational facts empty; the optional populated demo has a separate marked database. Home reads actual public records and shows meaningful empty/error states. Public deployment also needs ingress rate limiting, independent security review, backups and live verification.
 
 ## Sections 3–4 verification scope
 
@@ -119,3 +119,15 @@ See [release evidence and exact check results](RELEASE-STATUS.md) and [owner das
 - [x] Demo-only evidence visibility; new demo notices/reports remain flagged; normal instances retain exclusion and namespace guards.
 - [x] 59 backend tests, two populated-demo browser journeys, normal regression suite, strict types/format/build checks (details in the local demo guide).
 - [ ] Native Windows execution confirmation, verified real Sylhet data and hosted acceptance remain outstanding.
+
+## Full follow-up — 2026-11-04
+
+- [x] Replace home placeholders with real public area evidence, source/times and clear User/Admin workflow entry points.
+- [x] Privacy-filtered public snapshot; anonymous session failure preserves public evidence while private account cache still clears.
+- [x] Safe login/signup return paths, valid saved default/history picker and corrected Sources/service-status copy.
+- [x] Controlled loopback Mailpit password reset for local demo, without inherited SMTP credentials or external delivery claims.
+- [x] Reproduce/fix Dashboard and History connection-pool starvation, preserving owner checks and repeatable-read consistency.
+- [x] 63 backend tests, 26 normal browser journeys, three dedicated demo/SMTP journeys and three development checks; responsive/axe/keyboard, type/format/build checks pass.
+- [ ] Network research draft activation, primary-source Sylhet import and actual hosted release remain blocked; not counted complete.
+
+See [reproduction details, coverage and external blockers](FULL-REVIEW-2026-11-04.md).

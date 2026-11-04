@@ -60,20 +60,7 @@ for (const width of [390, 1440]) {
       .getByRole("link", { name: /আমার ইতিহাস/ })
       .first()
       .click();
-    await page
-      .getByLabel("বিভাগ", { exact: true })
-      .selectOption({ label: "কাল্পনিক ডেমো বিভাগ · division" });
-    for (const label of [
-      "কাল্পনিক ডেমো জেলা · district",
-      "কাল্পনিক ডেমো সিটি কর্পোরেশন · city_corporation",
-      "কাল্পনিক ডেমো ওয়ার্ড · ward",
-      "কাল্পনিক ডেমো মহল্লা ক · neighborhood",
-    ]) {
-      await page
-        .getByLabel("পরের প্রশাসনিক স্তর", { exact: true })
-        .last()
-        .selectOption({ label });
-    }
+    await expect(page.getByLabel("ইতিহাসের সংরক্ষিত এলাকা")).toHaveValue(/.+/);
     await expect(
       page.getByRole("heading", { name: "রেকর্ডভিত্তিক ব্যক্তিগত সারাংশ" }),
     ).toBeVisible();
@@ -93,7 +80,13 @@ for (const width of [390, 1440]) {
       .getByRole("button", { name: "প্রবেশ করুন", exact: true })
       .click();
     await expect(
-      page.getByRole("heading", { name: "স্বাগতম, কাল্পনিক ডেমো admin" }),
+      page.getByRole("link", { name: "অ্যাডমিন", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "আমার রেকর্ড করা বিভ্রাটের ইতিহাস" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("২০ মিনিট", { exact: true }).first(),
     ).toBeVisible();
     await page.goto("/admin?tab=notices");
     await expect(

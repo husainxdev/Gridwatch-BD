@@ -1,221 +1,19 @@
-import { useEffect, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Link, NavLink } from "./navigation";
 import {
   FiActivity,
-  FiArrowRight,
   FiBookOpen,
-  FiClock,
   FiGrid,
   FiMapPin,
-  FiRefreshCw,
   FiShield,
   FiZap,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
-import { fetchAreas, formatTime, type DemoArea } from "./api";
-import { Card, EmptyState, EvidenceBadge } from "./components/ui";
+import { Card } from "./components/ui";
 import { useSession } from "./session";
 
-export function Overview() {
-  const [areas, setAreas] = useState<DemoArea[]>([]);
-  const [selected, setSelected] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [attempt, setAttempt] = useState(0);
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-    setError("");
-    fetchAreas(controller.signal)
-      .then((items) => {
-        if (controller.signal.aborted) return;
-        setAreas(items);
-        setSelected((current) =>
-          items.some((a) => a.id === current) ? current : items[0]?.id || "",
-        );
-      })
-      .catch((e) => {
-        if (!controller.signal.aborted) setError(e.message);
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
-  }, [attempt]);
-  const area = areas.find((a) => a.id === selected);
-  return (
-    <>
-      <div className="page-heading">
-        <div>
-          <p className="eyebrow">আপনার এলাকার বিদ্যুৎ তথ্য</p>
-          <h1>
-            আগে জানুন,
-            <br className="mobile-break" /> প্রস্তুত থাকুন।
-          </h1>
-          <p>
-            পরিকল্পিত বন্ধ, ব্যক্তিগত রিপোর্ট ও যাচাইকৃত ঘটনা — আলাদা করে দেখুন।
-          </p>
-        </div>
-        <span className="pilot-tag">
-          <span /> সিলেট পাইলট · প্রস্তুতি পর্ব
-        </span>
-      </div>
-      <div className="demo-banner" role="note">
-        <FiInfoIcon />
-        <div>
-          <strong>নমুনা তথ্যের প্রদর্শন</strong>
-          <p>
-            এই পাতার নমুনা এলাকাগুলো বাস্তব পর্যবেক্ষণ নয়। লাইভ সরকারি API
-            সংযুক্ত নেই।
-          </p>
-        </div>
-        <Link to="/sources">
-          তথ্যের নীতি <FiArrowRight />
-        </Link>
-      </div>
-      <section className="location-bar" aria-label="এলাকা নির্বাচন">
-        <FiMapPin />
-        <div>
-          <label htmlFor="area">নমুনা এলাকা নির্বাচন</label>
-          <select
-            className="select"
-            id="area"
-            value={selected}
-            disabled={loading || !!error || areas.length === 0}
-            onChange={(e) => setSelected(e.target.value)}
-          >
-            {!areas.length && (
-              <option value="">
-                {loading ? "লোড হচ্ছে…" : "কোনো এলাকা নেই"}
-              </option>
-            )}
-            {areas.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name_bn}
-              </option>
-            ))}
-          </select>
-        </div>
-        <span className="location-note">সময়: বাংলাদেশ (UTC+6)</span>
-        <button
-          className="btn btn-ghost"
-          aria-label="তথ্য পুনরায় লোড করুন"
-          onClick={() => setAttempt((n) => n + 1)}
-          disabled={loading}
-        >
-          <FiRefreshCw />
-        </button>
-      </section>
-      {loading ? (
-        <div className="loading-state" role="status">
-          <span className="loading loading-spinner" /> এলাকার তথ্য লোড হচ্ছে…
-        </div>
-      ) : error ? (
-        <div className="alert alert-error" role="alert">
-          <span>{error}</span>
-          <button
-            className="btn btn-sm"
-            onClick={() => setAttempt((n) => n + 1)}
-          >
-            আবার চেষ্টা করুন
-          </button>
-        </div>
-      ) : !area ? (
-        <Card title="এলাকার তথ্য">
-          <EmptyState title="নমুনা তথ্য এখানে দেখানো হচ্ছে না">
-            বাস্তব এলাকার তথ্য দেখতে ড্যাশবোর্ডে এলাকা বাছুন; তথ্য না থাকলে
-            অবস্থা অজানা।
-          </EmptyState>
-        </Card>
-      ) : (
-        <>
-          <div className="overview-grid">
-            <section className="status-card">
-              <div className="status-top">
-                <span>
-                  <FiActivity /> সংযোগের অবস্থা
-                </span>
-                <EvidenceBadge>অজানা</EvidenceBadge>
-              </div>
-              <div className="status-symbol">
-                <FiZap />
-              </div>
-              <h2>বর্তমান অবস্থা জানা নেই</h2>
-              <p>
-                যাচাইকৃত তথ্য নেই। রিপোর্ট না থাকা মানেই বিদ্যুৎ আছে — এমন নয়।
-              </p>
-              <div className="status-meta">
-                <FiMapPin /> {area.name_bn}
-                <span>ডেমো</span>
-              </div>
-            </section>
-            <Card title="পরবর্তী ঘোষিত সময়সূচি" className="schedule-card">
-              <EvidenceBadge>কোনো সরকারি তথ্য সংযুক্ত নেই</EvidenceBadge>
-              <EmptyState title="যাচাইকৃত সময়সূচি নেই">
-                সময়সূচি যোগ হলে মূল নোটিশের উৎস ও যাচাইয়ের অবস্থা এখানে দেখা
-                যাবে।
-              </EmptyState>
-              <div className="card-foot">
-                <FiClock /> নির্ধারিত সময় শেষ হওয়া বিদ্যুৎ ফেরার প্রমাণ নয়।
-              </div>
-            </Card>
-          </div>
-          <div className="detail-grid">
-            <Card title="কমিউনিটির সাম্প্রতিক রিপোর্ট">
-              <div className="section-subtitle">
-                রিপোর্ট একজনের সংযোগের অভিজ্ঞতা জানায়।
-              </div>
-              <EmptyState title="এখনো কোনো রিপোর্ট নেই">
-                ব্যক্তিগত রিপোর্ট দিতে লগইন করে ড্যাশবোর্ডে যান। এই ডেমোতে
-                বাস্তব রিপোর্ট নেই।
-              </EmptyState>
-            </Card>
-            <Card title="তথ্যের পরিচয়">
-              <dl className="evidence-list">
-                <div>
-                  <dt>তথ্যের ধরন</dt>
-                  <dd>প্রদর্শনী / ডেমো</dd>
-                </div>
-                <div>
-                  <dt>উৎস</dt>
-                  <dd>স্থানীয় development seed</dd>
-                </div>
-                <div>
-                  <dt>যাচাই</dt>
-                  <dd>বাস্তব এলাকার তথ্য নয়</dd>
-                </div>
-                <div>
-                  <dt>নমুনা আপডেট</dt>
-                  <dd>{formatTime(area.updated_at)}</dd>
-                </div>
-              </dl>
-              <p className="fine-print">
-                এটি নমুনা রেকর্ডের সময়; বিদ্যুৎ অবস্থার আপডেট নয়।
-              </p>
-            </Card>
-          </div>
-          <div className="next-panel">
-            <div className="next-icon">
-              <FiShield />
-            </div>
-            <div>
-              <h2>বিশ্বস্ত তথ্য দিয়ে ছোট পরিসরে শুরু</h2>
-              <p>
-                পাইলটের সীমানা ও সরকারি উৎস যাচাইয়ের পর বাস্তব তথ্য যুক্ত হবে।
-              </p>
-            </div>
-            <Link className="btn" to="/sources">
-              কীভাবে যাচাই হবে <FiArrowRight />
-            </Link>
-          </div>
-        </>
-      )}
-    </>
-  );
-}
-function FiInfoIcon() {
-  return <FiShield aria-hidden="true" />;
-}
+export { Overview } from "./Overview";
+
 export function Sources() {
   return (
     <>
@@ -247,10 +45,10 @@ export function Sources() {
         </Card>
         <Card title="এই সংস্করণে যা আছে">
           <p>
-            এলাকা নির্বাচনের ডেমো, তথ্যের স্পষ্ট লেবেল, ডেটাবেস কাঠামো ও health
-            API। লগইন, রিপোর্ট জমা, অ্যাডমিন ব্যবস্থাপনা ও কার্যক্রমের সময়
-            মেলানো রয়েছে; যাচাইকৃত পাইলট এলাকা ও তথ্য যুক্ত না হওয়া পর্যন্ত
-            বাস্তব ফল দেখাবে না। কোনো সরকারি API সংযুক্ত নেই।
+            অ্যাকাউন্ট, সংরক্ষিত এলাকা, নিজের সংযোগের রিপোর্ট, ঘোষণার জীবনচক্র,
+            কাজের সময়ের মিল এবং ব্যক্তিগত ইতিহাস ব্যবহার করা যায়। Admin-এর
+            পরিবর্তনে version check ও audit থাকে। সরকারি live API সংযুক্ত নেই;
+            বাস্তব তথ্য আসল notice হাতে যাচাই করে প্রকাশ করতে হবে।
           </p>
           <button
             className="btn btn-outline"
@@ -269,29 +67,87 @@ export function Sources() {
   );
 }
 export function Roadmap() {
+  const capabilities = [
+    [
+      "অ্যাকাউন্ট ও নিরাপত্তা",
+      "নিবন্ধন, login, refresh, logout, role/ownership এবং password reset-এর workflow আছে। বহিরাগত email delivery আলাদা করে যাচাই করতে হবে।",
+      "/login",
+    ],
+    [
+      "এলাকা ও সংরক্ষণ",
+      "প্রশাসনিক hierarchy, Bangla/English/alias search, একাধিক saved area ও একটি default। প্রশাসনিক এলাকা থেকে feeder অনুমান করা হয় না।",
+      "/dashboard",
+    ],
+    [
+      "নোটিশ ও ঘোষণা",
+      "মূল উৎসসহ draft, review, publication, revision ও cancellation। ব্যক্তিগত রিপোর্ট থেকে ঘোষিত schedule তৈরি হয় না।",
+      "/notices",
+    ],
+    [
+      "ব্যক্তিগত সংযোগ",
+      "Off, back ও still-off observation; একই request-এর retry আরেকটি outage তৈরি করে না।",
+      "/dashboard",
+    ],
+    [
+      "কাজের সময়",
+      "সংরক্ষিত activity ও বর্তমান ঘোষণার overlap; overlapping সময় একবার গণনা এবং শেষ boundary-তে overlap নেই।",
+      "/activities",
+    ],
+    [
+      "নিজের ইতিহাস",
+      "রেকর্ডভিত্তিক duration, Bangladesh daily split, range clipping এবং অজানা/open সময় আলাদা।",
+      "/history",
+    ],
+  ];
   return (
     <>
-      <p className="eyebrow">নির্মাণের অগ্রগতি</p>
-      <h1>স্বচ্ছভাবে, ধাপে ধাপে।</h1>
+      <p className="eyebrow">সক্ষমতা ও সীমাবদ্ধতা</p>
+      <h1>কী ব্যবহার করতে পারবেন, কী এখনও বাকি</h1>
+      <p>
+        ফিচার চালু থাকা, বাস্তব বিদ্যুৎ তথ্য থাকা এবং online deployment—তিনটি
+        আলাদা বিষয়। নিচের তালিকা কোনো production-readiness সনদ নয়।
+      </p>
+      <div className="home-notices">
+        {capabilities.map(([title, description, route]) => (
+          <Card key={title} title={title}>
+            <p>{description}</p>
+            <Link className="btn btn-outline" to={route}>
+              খুলুন →
+            </Link>
+          </Card>
+        ))}
+      </div>
       <div className="reading">
-        <Card title="ভিত্তি ও তথ্যের নীতি">
+        <Card title="স্থানীয়ভাবে যা যাচাই হয়েছে">
           <p>
-            স্কোপ, তথ্যের নীতি, ডেটাবেস, migration, health API এবং এই অ্যাপ শেল
-            তৈরি হয়েছে।
+            বাস্তব PostgreSQL-এ login/অনুমতি, refresh/logout, independent
+            reports, interval/history calculations ও migration পরীক্ষা হয়েছে।
+            Chromium-এ mobile/desktop, keyboard এবং automated accessibility
+            checks হয়েছে; সব browser বা screen reader-এর certification নয়।
           </p>
         </Card>
-        <Card title="কার্যকর ধাপ · অ্যাকাউন্ট ও তথ্যপ্রবাহ">
-          <p>
-            JWT access token, refresh cookie, bcrypt, লগআউট, password reset,
-            এলাকা API, অ্যাডমিন অনুমতি, নোটিশ ও রিপোর্টের কার্যপ্রবাহ যুক্ত
-            হয়েছে। SMTP ও যাচাইকৃত পাইলট উৎস সেট করতে হবে।
-          </p>
+        <Card title="প্রকাশের আগে এখনও যা দরকার">
+          <ul>
+            <li>
+              একটি বাস্তব Sylhet এলাকার প্রশাসনিক সীমানা, বিদ্যুৎ সরবরাহকারী ও
+              মূল notice যাচাই।
+            </li>
+            <li>
+              আসল HTTPS frontend/backend URL, hosted cookies/CSRF, persistence,
+              backup ও core journeys যাচাই।
+            </li>
+            <li>
+              অনুমোদিত SMTP sender দিয়ে নিয়ন্ত্রিত recipient-এ delivery
+              পরীক্ষা এবং public ingress rate protection।
+            </li>
+          </ul>
+          <Link to="/sources">উৎস ও তথ্যের সীমা দেখুন →</Link>
         </Card>
-        <Card title="প্রকাশের আগে">
+        <Card title="ডেমো পরিবেশের অর্থ">
           <p>
-            অনুমতি ও তথ্যের নির্ভুলতা পরীক্ষা, মোবাইল ব্যবহারযোগ্যতা, যাচাইকৃত
-            পাইলট উৎস এবং বাস্তব deployment যাচাই করতে হবে। সাত দিনের পরিকল্পনা
-            কাজের নির্দেশনা; শেষ করার নিশ্চয়তা নয়।
+            আলাদা demo database-এর সব এলাকা, review status, schedule, report ও
+            event কাল্পনিক। পুরোনো পর্যবেক্ষণের সময় নিজে থেকে বদলায় না। সরকারি
+            data বা সম্পূর্ণ monitoring হিসেবে ব্যবহার করবেন না।
           </p>
         </Card>
       </div>
@@ -337,7 +193,7 @@ export default function App({ children }: { children: ReactNode }) {
             </NavLink>
           )}
           <NavLink to="/progress">
-            <FiActivity /> অগ্রগতি
+            <FiActivity /> সেবার অবস্থা
           </NavLink>
         </nav>
         <div className="sidebar-bottom">

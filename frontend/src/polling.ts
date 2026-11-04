@@ -132,11 +132,14 @@ class Entry<T> {
 }
 if (typeof window !== "undefined")
   window.addEventListener("gridwatch-session-ended", () => {
-    entries.forEach((e) => {
+    entries.forEach((e, key) => {
+      // Published, privacy-filtered evidence belongs to no account. A failed
+      // anonymous startup refresh must not erase an otherwise healthy public board.
+      if (key.startsWith("public:")) return;
       e.stop();
       e.emit({ ...empty });
+      entries.delete(key);
     });
-    entries.clear();
   });
 export function usePolling<T>(path: string | null, userId: string) {
   const entry = useMemo(() => {

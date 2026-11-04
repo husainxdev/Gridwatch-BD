@@ -35,3 +35,7 @@ The local demo creator provisions a **new** `gridwatch_demo_...` database and ne
 A hosted disposable demo must have its own DB/secret set, backend `DEMO_INSTANCE=true`, matching frontend `NEXT_PUBLIC_DEMO_INSTANCE=true`, and private examiner-only Admin credentials. The application validates the DB namespace and shows a persistent warning; the operator must additionally verify physical/account isolation. Never publish a privileged password on a real-user environment. Publicly shared demo Admin capability isolation has not been implemented or authorized here.
 
 Before claiming a real Sylhet pilot: verify original administrative/provider evidence, create only the small confirmed hierarchy, record source/review metadata and add an original source-named notice. No source dates, citations, feeder codes, confidence percentages or APIs should be invented to complete a submission field.
+
+## Research follow-up — 2026-11-04
+
+Canonical and `www` Sylhet district/BPDB requests returned 503, SCC returned 403. The BPDB proxy diagnostic reported upstream TLS certificate verification failure; verification was not disabled. No content/facts were imported from those responses. An alternative official-portal/document/search network draft was saved for platform review/publication and is not evidence of access or verification. The exact candidate hosts, observations and remaining verification procedure are in [the full review](FULL-REVIEW-2026-11-04.md).

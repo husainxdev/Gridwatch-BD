@@ -103,8 +103,12 @@ test("two tabs coordinate refresh and logout without persisting tokens", async (
   await expect(
     other.getByText("সংরক্ষিত কাজ নেই।", { exact: true }),
   ).toBeVisible();
+  const intended = new URL(other.url());
   await page.getByRole("button", { name: "লগআউট", exact: true }).click();
-  await expect(other).toHaveURL(/\/login$/);
+  await expect(other).toHaveURL(/\/login\?next=/);
+  expect(new URL(other.url()).searchParams.get("next")).toBe(
+    intended.pathname + intended.search,
+  );
   await expect(
     other.getByRole("heading", { name: "অ্যাকাউন্টে প্রবেশ" }),
   ).toBeVisible();

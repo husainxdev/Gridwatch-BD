@@ -32,6 +32,7 @@ for (const width of [360, 390, 768, 1440]) {
     for (const path of [
       "/",
       "/sources",
+      "/progress",
       "/login",
       "/register",
       "/forgot",

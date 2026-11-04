@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("leaving pages cancels pending fetches without unhandled rejections", async ({
   page,
+  request,
 }) => {
   const failures: string[] = [];
   const pending: string[] = [];
@@ -21,6 +22,13 @@ test("leaving pages cancels pending fetches without unhandled rejections", async
       ).unhandledRequests.push(String(event.reason));
     });
   });
+  const selected = (
+    await (
+      await request.get(
+        "/api/locations?kind=district&status=verified&page_size=1",
+      )
+    ).json()
+  ).items[0].id;
   let release!: () => void;
   const gate = new Promise<void>((resolve) => {
     release = resolve;
@@ -46,9 +54,9 @@ test("leaving pages cancels pending fetches without unhandled rejections", async
       .catch(() => {});
   });
   try {
-    await page.goto("/");
+    await page.goto(`/?location_id=${selected}`);
     await expect(page.locator("main h1")).toBeVisible();
-    await expect.poll(() => pending.includes("/api/demo/areas")).toBe(true);
+    await expect.poll(() => pending.includes("/api/area-overview")).toBe(true);
     const nav = page.getByRole("navigation", { name: "প্রধান নেভিগেশন" });
     await nav.getByRole("link", { name: "নোটিশ", exact: true }).click();
     await expect
@@ -63,7 +71,7 @@ test("leaving pages cancels pending fetches without unhandled rejections", async
       .click();
     await expect(page).toHaveURL(/\/sources$/);
     release();
-    for (const path of ["/api/demo/areas", "/api/notices", "/api/schedules"])
+    for (const path of ["/api/area-overview", "/api/notices", "/api/schedules"])
       await expect.poll(() => aborted.includes(path)).toBe(true);
     expect(
       await page.evaluate(

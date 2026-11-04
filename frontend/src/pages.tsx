@@ -20,7 +20,14 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
-import { Link, Navigate, useNavigate, useSearchParams } from "./navigation";
+import {
+  Link,
+  Navigate,
+  useNavigate,
+  useSearchParams,
+  safeReturnPath,
+  useCurrentPath,
+} from "./navigation";
 import toast from "react-hot-toast";
 import {
   api,
@@ -163,6 +170,10 @@ export function AuthPage({
   const { user, checking, signIn, signUp } = useSession();
   const nav = useNavigate(),
     [params] = useSearchParams();
+  const returnPath = safeReturnPath(params.get("next"));
+  const authSuffix = params.has("next")
+    ? `?next=${encodeURIComponent(returnPath)}`
+    : "";
   const [resetToken] = useState(
     () =>
       new URLSearchParams(window.location.hash.slice(1)).get("token") ||
@@ -197,11 +208,13 @@ export function AuthPage({
       if (mode === "register")
         await signUp(email, password, String(fd.get("name") || ""));
       if (mode === "forgot") {
-        const x = await api<{ message: string }>(
-          "/api/auth/password-reset/request",
-          { method: "POST", body: JSON.stringify({ email }) },
+        await api<{ message: string }>("/api/auth/password-reset/request", {
+          method: "POST",
+          body: JSON.stringify({ email }),
+        });
+        setSuccess(
+          "এই ইমেইলে যোগ্য অ্যাকাউন্ট থাকলে এবং মেইল পৌঁছানোর ব্যবস্থা কাজ করলে রিসেট নির্দেশনা পেতে পারেন। ইনবক্স দেখুন; এখানে মেইল পৌঁছানো নিশ্চিত করা হচ্ছে না।",
         );
-        setSuccess(x.message);
         return;
       }
       if (mode === "reset") {
@@ -214,7 +227,7 @@ export function AuthPage({
         nav("/login");
         return;
       }
-      nav("/dashboard");
+      nav(returnPath);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -225,7 +238,7 @@ export function AuthPage({
   if (checking && (mode === "login" || mode === "register"))
     return <div className="loading-state">সেশন যাচাই হচ্ছে…</div>;
   if (user && (mode === "login" || mode === "register"))
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={returnPath} replace />;
   return (
     <div className="auth-wrap">
       <Card
@@ -296,8 +309,8 @@ export function AuthPage({
           </Submit>
         </form>
         <div className="auth-links">
-          <Link to="/login">প্রবেশ</Link>
-          <Link to="/register">নিবন্ধন</Link>
+          <Link to={`/login${authSuffix}`}>প্রবেশ</Link>
+          <Link to={`/register${authSuffix}`}>নিবন্ধন</Link>
           <Link to="/forgot">পাসওয়ার্ড ভুলে গেছেন?</Link>
         </div>
       </Card>
@@ -312,11 +325,18 @@ export function RequireUser({
   children: ReactNode;
 }) {
   const { user, checking } = useSession();
+  const currentPath = useCurrentPath();
   if (checking) return <div className="loading-state">সেশন যাচাই হচ্ছে…</div>;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user)
+    return (
+      <Navigate
+        to={`/login?next=${encodeURIComponent(safeReturnPath(currentPath))}`}
+        replace
+      />
+    );
   if (admin && user.role !== "admin")
     return (
-      <div className="alert alert-error">
+      <div className="alert alert-error" role="alert">
         এই পাতায় অ্যাডমিন অনুমতি প্রয়োজন।
       </div>
     );

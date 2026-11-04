@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import sys
 import uuid
 from pathlib import Path
 
@@ -77,7 +78,7 @@ print('Populated 0003 -> 0004 -> 0005 -> 0006 upgrade preserved saved area and l
         cwd=backend,
         env=env,
     )
-    run([python, "-m", "pytest", "-q"], cwd=backend, env=env)
+    run([python, "-m", "pytest", "-q", *sys.argv[1:]], cwd=backend, env=env)
     run([python, "-m", "alembic", "check"], cwd=backend, env=env)
 finally:
     run(

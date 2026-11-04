@@ -11,6 +11,7 @@ import sys
 import time
 import webbrowser
 from pathlib import Path
+from urllib.parse import urlsplit
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +35,36 @@ def run(command, cwd=ROOT, **kwargs):
             "Command failed: " + Path(command[0]).name + "; existing records preserved"
         )
     return result
+
+
+def local_mail_settings():
+    """Use only this Compose Mailpit's loopback bindings; never inherited SMTP credentials."""
+    mappings = {}
+    for port in (1025, 8025):
+        binding = (
+            run(["docker", "compose", "port", "mail", str(port)])
+            .stdout.decode()
+            .strip()
+        )
+        parsed = urlsplit("http://" + binding)
+        if (
+            parsed.hostname not in {"127.0.0.1", "localhost", "::1"}
+            or not parsed.port
+            or "\n" in binding
+        ):
+            raise SetupError(
+                "Local Mailpit must have a single loopback binding; public/remote SMTP is refused"
+            )
+        mappings[port] = parsed
+    smtp, mailbox = mappings[1025], mappings[8025]
+    return {
+        "SMTP_HOST": smtp.hostname,
+        "SMTP_PORT": str(smtp.port),
+        "SMTP_STARTTLS": "false",
+        "SMTP_USERNAME": "",
+        "SMTP_PASSWORD": "",
+        "MAIL_FROM": "no-reply@gridwatch.local",
+    }, "http://" + mailbox.netloc
 
 
 def docker_ready():
@@ -191,7 +222,9 @@ def main():
         raise SetupError(
             "Launcher requires its isolated development demo config; normal/production config is refused"
         )
+    mail_values, mailbox_url = local_mail_settings()
     backend_env = dict(os.environ, **values)
+    backend_env.update(mail_values)
     result = run([str(PYTHON), "-m", "app.demo_seed"], env=backend_env, cwd=BACKEND)
     manifest = json.loads(result.stdout)
     print(
@@ -206,6 +239,10 @@ def main():
         "Private login file: "
         + str(directory / "credentials.json")
         + " (do not share publicly)",
+        flush=True,
+    )
+    print(
+        "Password reset stays in local Mailpit: " + mailbox_url + " (not a real inbox)",
         flush=True,
     )
     if args.prepare_only:

@@ -86,6 +86,6 @@ npm.cmd run dev --prefix frontend -- --hostname 127.0.0.1 --port 5174
 
 Open **http://127.0.0.1:5174** in a separate browser profile/incognito window. This is a **local fallback**, not a verified live URL. Using 127.0.0.1 instead of normal localhost also avoids host-cookie collision with a normal localhost development session. Do not run two Next development servers for the same build directory simultaneously; stop the normal frontend first. Keep both terminals open. These development settings must never be publicly exposed.
 
-External email is deliberately not configured in this fallback. Show the tested local SMTP-sink result or explain the missing live delivery; do not reveal a reset link or claim that an email reached a real mailbox.
+The preferred launcher now routes reset messages only into local loopback Mailpit; [the local guide](LOCAL-DEMO.md) explains that workflow. The manual two-terminal fallback above still uses its older environment file. External email is deliberately not configured in this fallback. Show the tested local SMTP-sink result or explain the missing live delivery; do not reveal a reset link or claim that an email reached a real mailbox.
 
 If even the local services cannot run, use [real application captures](screenshots/README.md), the architecture/matrix and explain the failure honestly. Do not describe screenshots as a functioning live deployment or create fake UI images.

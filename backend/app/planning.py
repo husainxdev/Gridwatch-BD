@@ -315,12 +315,12 @@ def history_snapshot(
     location_id: uuid.UUID,
     start: datetime,
     end: datetime,
+    user_id: uuid.UUID,
+    db: Session,
     status: Literal["all", "open", "completed", "incomplete"] = "all",
     sort: Literal["newest", "oldest"] = "newest",
-    page: int = Query(1, ge=1),
-    page_size: int = Query(10, ge=1, le=100),
-    db: Session = Depends(get_db),
-    user: User = Depends(current_user),
+    page: int = 1,
+    page_size: int = 10,
 ):
     interval(start, end)
     find(db, Location, location_id)
@@ -328,7 +328,7 @@ def history_snapshot(
     lower = func.coalesce(PersonalEpisode.started_at, PersonalEpisode.last_observed_at)
     upper = func.coalesce(PersonalEpisode.ended_at, now())
     stmt = select(PersonalEpisode).where(
-        PersonalEpisode.user_id == user.id,
+        PersonalEpisode.user_id == user_id,
         PersonalEpisode.location_id == location_id,
         lower < end,
         upper > start,
@@ -367,7 +367,7 @@ def history_snapshot(
             select(Report.episode_id, func.count())
             .where(
                 Report.episode_id.in_(ids),
-                Report.user_id == user.id,
+                Report.user_id == user_id,
                 Report.moderation == "accepted",
                 evidence_visibility(Report),
             )
@@ -380,7 +380,7 @@ def history_snapshot(
             .join(EvidenceAudit, EvidenceAudit.entity_id == Report.id)
             .where(
                 Report.episode_id.in_(ids),
-                Report.user_id == user.id,
+                Report.user_id == user_id,
                 EvidenceAudit.entity_type == "reports",
                 EvidenceAudit.action == "moderate",
             )
@@ -419,6 +419,9 @@ def history(
     db: Session = Depends(get_db),
     user: User = Depends(current_user),
 ):
+    user_id = user.id
+    # Do not retain the authentication transaction while borrowing a snapshot lease.
+    db.rollback()
     with (
         db.get_bind()
         .connect()
@@ -434,5 +437,5 @@ def history(
                 page=page,
                 page_size=page_size,
                 db=snapshot,
-                user=user,
+                user_id=user_id,
             )

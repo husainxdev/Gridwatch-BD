@@ -86,3 +86,39 @@ export function useSearchParams() {
   );
   return [params, setParams] as const;
 }
+
+const returnRoutes = new Set([
+  "/",
+  "/dashboard",
+  "/activities",
+  "/history",
+  "/admin",
+  "/notices",
+  "/sources",
+]);
+export function safeReturnPath(value: string | null): string {
+  if (
+    !value ||
+    value.length > 2048 ||
+    !value.startsWith("/") ||
+    value.startsWith("//") ||
+    /[\\\u0000-\u001f\u007f]/.test(value)
+  )
+    return "/dashboard";
+  try {
+    const parsed = new URL(value, "https://gridwatch.invalid");
+    if (
+      parsed.origin !== "https://gridwatch.invalid" ||
+      !returnRoutes.has(parsed.pathname)
+    )
+      return "/dashboard";
+    return parsed.pathname + parsed.search;
+  } catch {
+    return "/dashboard";
+  }
+}
+export function useCurrentPath() {
+  const pathname = usePathname();
+  const params = useNextSearchParams().toString();
+  return pathname + (params ? `?${params}` : "");
+}

@@ -25,7 +25,7 @@ test("reset email browser journey is single-use and revokes another live session
     await reset.getByRole("button", { name: "রিসেট লিংক পাঠান" }).click();
     expect((await delivered).status()).toBe(202);
     await expect(reset.locator("main").getByRole("status")).toContainText(
-      "If the account is eligible",
+      "যোগ্য অ্যাকাউন্ট থাকলে",
     );
     const message = await request.get(
       `${process.env.QA_MAILBOX_URL}/?recipient=${encodeURIComponent(email)}`,
@@ -57,7 +57,7 @@ test("reset email browser journey is single-use and revokes another live session
       }
     });
     expect(revoked).toBe(401);
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(page).toHaveURL(/\/login\?next=%2Fdashboard/);
     await reset.evaluate((url) => window.location.assign(url), link);
     await reset
       .getByLabel("পাসওয়ার্ড", { exact: true })
