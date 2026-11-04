@@ -143,3 +143,14 @@ See [reproduction details, coverage and external blockers](FULL-REVIEW-2026-11-0
 - [ ] Public HTTPS deployment, external email, hosted acceptance and operations — actual provider setup still required.
 
 Verification results and screenshots: [public website handoff](PUBLIC-WEBSITE-REVIEW.md).
+
+## Area search repair — 2026-11-04
+
+- [x] Reproduce the actual empty normal directory and confirm that styling alone cannot make search work.
+- [x] Retrieve and review original SCC/division pages; bundle 45 real administrative records with source/date/hash evidence, excluding electricity/neighborhood assumptions.
+- [x] Safe first-start import and explicit `--import-catalog` merge for existing directories, transactional/concurrent-safe and non-overwriting.
+- [x] Direct city shortcut, full 42-ward picker, Bengali/English/number search, literal wildcard handling, keyboard results and distinct error/empty/loading states.
+- [x] Repair Home → auth → Dashboard area handoff, URL/reload/back synchronization and unavailable-default fallback.
+- [ ] Real outage notice/provider/feeder evidence and public hosted release remain separate unverified work.
+
+Current checks and known limits: [area search repair](AREA-SEARCH-REVIEW.md).

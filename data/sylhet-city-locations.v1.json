@@ -1,0 +1,893 @@
+{
+  "version": 1,
+  "catalog_id": "sylhet-city-administrative-2026-11-04",
+  "reviewed_at": "2026-11-04T10:54:45+00:00",
+  "scope": "Administrative names and parent relationships only. No neighborhood-to-ward, feeder, electricity-provider or schedule coverage is implied. Aliases are curated search spellings/translations, not government codes.",
+  "conflicts_note": "SCC overview contains older historical prose mentioning 27 wards. The current top summary says 42, independently corroborated by the ward-assignment page updated 2026-09-13 listing groups 1 through 42. No historical neighborhood or former union boundary was inferred.",
+  "sources": [
+    {
+      "key": "division-about",
+      "publisher": "সিলেট বিভাগীয় কমিশনারের কার্যালয়",
+      "title": "এক নজরে সিলেট বিভাগ",
+      "url": "https://sylhetdiv.gov.bd/pages/static-pages/696cb9bfc4774958d7ba981e",
+      "retrieved_at": "2026-11-04T10:50:10.034363+00:00",
+      "response_sha256": "5ed7cba7c8a9a0987c9abcdf17994c4df4c1ac8a9b5b836a86b732f6a3205ada",
+      "reviewed_excerpt": "১৯৯৫ সালে বৃহত্তর সিলেটের ৪ টি জেলা (সিলেট, সুনামগঞ্জ, মৌলভীবাজার, হবিগঞ্জ) নিয়ে পৃথক সিলেট বিভাগ যাত্রা শুরু করে।"
+    },
+    {
+      "key": "city-about",
+      "publisher": "সিলেট সিটি কর্পোরেশন",
+      "title": "আমাদের নগরী সিলেট সিটি কর্পোরেশন",
+      "url": "https://scc.gov.bd/pages/static-pages/6922df09933eb65569e1f5f4",
+      "retrieved_at": "2026-11-04T10:50:09.769329+00:00",
+      "response_sha256": "9efd193cdc87d3ed50628b2f4d9cef343b75038912310ca09055108eaf52def5",
+      "reviewed_excerpt": "ওয়ার্ড সংখ্যা\n৪২"
+    },
+    {
+      "key": "city-wards",
+      "publisher": "সিলেট সিটি কর্পোরেশন",
+      "title": "দায়িত্বপ্রাপ্ত কর্মকর্তাবৃন্দের তালিকা (ওয়ার্ড ভিত্তিক)",
+      "url": "https://scc.gov.bd/pages/static-pages/6922dcfd933eb65569e1310d",
+      "retrieved_at": "2026-11-04T10:50:10.641851+00:00",
+      "response_sha256": "82e93621762b558c6b714e4cb8d88208cdb1d322cfabb9af2e9338649d73c7b8",
+      "reviewed_excerpt": "সিলেট সিটি কর্পোরেশনের\nদায়িত্বপ্রাপ্ত কর্মকর্তাদের নামের পার্শ্বে উল্লিখিত ওয়ার্ডসমূহে দায়িত্ব",
+      "ward_groups": [
+        "১, ২ ও ৩",
+        "৪, ৫ ও ৬",
+        "৭, ৮ ও ৯",
+        "১০, ১১ ও ১২",
+        "১৩, ১৪ ও ১৫",
+        "১৬, ১৭ ও ১৮",
+        "১৯, ২০ ও ২১",
+        "২২, ২৩ ও ২৪",
+        "২৫, ২৬ ও ২৭",
+        "২৮, ২৯ ও ৩০",
+        "৩১, ৩২ ও ৩৩",
+        "৩৪, ৩৫ ও ৩৬",
+        "৩৭, ৩৮ ও ৩৯",
+        "৪০, ৪১ ও ৪২"
+      ]
+    }
+  ],
+  "locations": [
+    {
+      "key": "sylhet-division",
+      "name_bn": "সিলেট বিভাগ",
+      "name_en": "Sylhet Division",
+      "kind": "division",
+      "parent": null,
+      "aliases": [
+        "সিলেট",
+        "Sylhet",
+        "সিলেট ডিভিশন"
+      ],
+      "source": "division-about"
+    },
+    {
+      "key": "sylhet-district",
+      "name_bn": "সিলেট জেলা",
+      "name_en": "Sylhet District",
+      "kind": "district",
+      "parent": "sylhet-division",
+      "aliases": [
+        "সিলেট",
+        "Sylhet",
+        "Sylhet Zila"
+      ],
+      "source": "division-about"
+    },
+    {
+      "key": "sylhet-city-corporation",
+      "name_bn": "সিলেট সিটি কর্পোরেশন",
+      "name_en": "Sylhet City Corporation",
+      "kind": "city_corporation",
+      "parent": "sylhet-district",
+      "aliases": [
+        "সিলেট শহর",
+        "সিলেট সিটি",
+        "সিসিক",
+        "SCC",
+        "Sylhet City"
+      ],
+      "source": "city-about"
+    },
+    {
+      "key": "sylhet-city-ward-01",
+      "name_bn": "১ নম্বর ওয়ার্ড",
+      "name_en": "Ward 01",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 1",
+        "ওয়ার্ড ১",
+        "ওয়ার্ড ১",
+        "ওয়ার্ড ০১",
+        "১ নং ওয়ার্ড",
+        "Sylhet Ward 1",
+        "SCC Ward 1",
+        "সিলেট ওয়ার্ড ১",
+        "সিলেট ওয়ার্ড ১"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-02",
+      "name_bn": "২ নম্বর ওয়ার্ড",
+      "name_en": "Ward 02",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 2",
+        "ওয়ার্ড ২",
+        "ওয়ার্ড ২",
+        "ওয়ার্ড ০২",
+        "২ নং ওয়ার্ড",
+        "Sylhet Ward 2",
+        "SCC Ward 2",
+        "সিলেট ওয়ার্ড ২",
+        "সিলেট ওয়ার্ড ২"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-03",
+      "name_bn": "৩ নম্বর ওয়ার্ড",
+      "name_en": "Ward 03",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 3",
+        "ওয়ার্ড ৩",
+        "ওয়ার্ড ৩",
+        "ওয়ার্ড ০৩",
+        "৩ নং ওয়ার্ড",
+        "Sylhet Ward 3",
+        "SCC Ward 3",
+        "সিলেট ওয়ার্ড ৩",
+        "সিলেট ওয়ার্ড ৩"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-04",
+      "name_bn": "৪ নম্বর ওয়ার্ড",
+      "name_en": "Ward 04",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 4",
+        "ওয়ার্ড ৪",
+        "ওয়ার্ড ৪",
+        "ওয়ার্ড ০৪",
+        "৪ নং ওয়ার্ড",
+        "Sylhet Ward 4",
+        "SCC Ward 4",
+        "সিলেট ওয়ার্ড ৪",
+        "সিলেট ওয়ার্ড ৪"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-05",
+      "name_bn": "৫ নম্বর ওয়ার্ড",
+      "name_en": "Ward 05",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 5",
+        "ওয়ার্ড ৫",
+        "ওয়ার্ড ৫",
+        "ওয়ার্ড ০৫",
+        "৫ নং ওয়ার্ড",
+        "Sylhet Ward 5",
+        "SCC Ward 5",
+        "সিলেট ওয়ার্ড ৫",
+        "সিলেট ওয়ার্ড ৫"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-06",
+      "name_bn": "৬ নম্বর ওয়ার্ড",
+      "name_en": "Ward 06",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 6",
+        "ওয়ার্ড ৬",
+        "ওয়ার্ড ৬",
+        "ওয়ার্ড ০৬",
+        "৬ নং ওয়ার্ড",
+        "Sylhet Ward 6",
+        "SCC Ward 6",
+        "সিলেট ওয়ার্ড ৬",
+        "সিলেট ওয়ার্ড ৬"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-07",
+      "name_bn": "৭ নম্বর ওয়ার্ড",
+      "name_en": "Ward 07",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 7",
+        "ওয়ার্ড ৭",
+        "ওয়ার্ড ৭",
+        "ওয়ার্ড ০৭",
+        "৭ নং ওয়ার্ড",
+        "Sylhet Ward 7",
+        "SCC Ward 7",
+        "সিলেট ওয়ার্ড ৭",
+        "সিলেট ওয়ার্ড ৭"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-08",
+      "name_bn": "৮ নম্বর ওয়ার্ড",
+      "name_en": "Ward 08",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 8",
+        "ওয়ার্ড ৮",
+        "ওয়ার্ড ৮",
+        "ওয়ার্ড ০৮",
+        "৮ নং ওয়ার্ড",
+        "Sylhet Ward 8",
+        "SCC Ward 8",
+        "সিলেট ওয়ার্ড ৮",
+        "সিলেট ওয়ার্ড ৮"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-09",
+      "name_bn": "৯ নম্বর ওয়ার্ড",
+      "name_en": "Ward 09",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 9",
+        "ওয়ার্ড ৯",
+        "ওয়ার্ড ৯",
+        "ওয়ার্ড ০৯",
+        "৯ নং ওয়ার্ড",
+        "Sylhet Ward 9",
+        "SCC Ward 9",
+        "সিলেট ওয়ার্ড ৯",
+        "সিলেট ওয়ার্ড ৯"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-10",
+      "name_bn": "১০ নম্বর ওয়ার্ড",
+      "name_en": "Ward 10",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 10",
+        "ওয়ার্ড ১০",
+        "ওয়ার্ড ১০",
+        "ওয়ার্ড ১০",
+        "১০ নং ওয়ার্ড",
+        "Sylhet Ward 10",
+        "SCC Ward 10",
+        "সিলেট ওয়ার্ড ১০",
+        "সিলেট ওয়ার্ড ১০"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-11",
+      "name_bn": "১১ নম্বর ওয়ার্ড",
+      "name_en": "Ward 11",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 11",
+        "ওয়ার্ড ১১",
+        "ওয়ার্ড ১১",
+        "ওয়ার্ড ১১",
+        "১১ নং ওয়ার্ড",
+        "Sylhet Ward 11",
+        "SCC Ward 11",
+        "সিলেট ওয়ার্ড ১১",
+        "সিলেট ওয়ার্ড ১১"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-12",
+      "name_bn": "১২ নম্বর ওয়ার্ড",
+      "name_en": "Ward 12",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 12",
+        "ওয়ার্ড ১২",
+        "ওয়ার্ড ১২",
+        "ওয়ার্ড ১২",
+        "১২ নং ওয়ার্ড",
+        "Sylhet Ward 12",
+        "SCC Ward 12",
+        "সিলেট ওয়ার্ড ১২",
+        "সিলেট ওয়ার্ড ১২"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-13",
+      "name_bn": "১৩ নম্বর ওয়ার্ড",
+      "name_en": "Ward 13",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 13",
+        "ওয়ার্ড ১৩",
+        "ওয়ার্ড ১৩",
+        "ওয়ার্ড ১৩",
+        "১৩ নং ওয়ার্ড",
+        "Sylhet Ward 13",
+        "SCC Ward 13",
+        "সিলেট ওয়ার্ড ১৩",
+        "সিলেট ওয়ার্ড ১৩"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-14",
+      "name_bn": "১৪ নম্বর ওয়ার্ড",
+      "name_en": "Ward 14",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 14",
+        "ওয়ার্ড ১৪",
+        "ওয়ার্ড ১৪",
+        "ওয়ার্ড ১৪",
+        "১৪ নং ওয়ার্ড",
+        "Sylhet Ward 14",
+        "SCC Ward 14",
+        "সিলেট ওয়ার্ড ১৪",
+        "সিলেট ওয়ার্ড ১৪"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-15",
+      "name_bn": "১৫ নম্বর ওয়ার্ড",
+      "name_en": "Ward 15",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 15",
+        "ওয়ার্ড ১৫",
+        "ওয়ার্ড ১৫",
+        "ওয়ার্ড ১৫",
+        "১৫ নং ওয়ার্ড",
+        "Sylhet Ward 15",
+        "SCC Ward 15",
+        "সিলেট ওয়ার্ড ১৫",
+        "সিলেট ওয়ার্ড ১৫"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-16",
+      "name_bn": "১৬ নম্বর ওয়ার্ড",
+      "name_en": "Ward 16",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 16",
+        "ওয়ার্ড ১৬",
+        "ওয়ার্ড ১৬",
+        "ওয়ার্ড ১৬",
+        "১৬ নং ওয়ার্ড",
+        "Sylhet Ward 16",
+        "SCC Ward 16",
+        "সিলেট ওয়ার্ড ১৬",
+        "সিলেট ওয়ার্ড ১৬"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-17",
+      "name_bn": "১৭ নম্বর ওয়ার্ড",
+      "name_en": "Ward 17",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 17",
+        "ওয়ার্ড ১৭",
+        "ওয়ার্ড ১৭",
+        "ওয়ার্ড ১৭",
+        "১৭ নং ওয়ার্ড",
+        "Sylhet Ward 17",
+        "SCC Ward 17",
+        "সিলেট ওয়ার্ড ১৭",
+        "সিলেট ওয়ার্ড ১৭"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-18",
+      "name_bn": "১৮ নম্বর ওয়ার্ড",
+      "name_en": "Ward 18",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 18",
+        "ওয়ার্ড ১৮",
+        "ওয়ার্ড ১৮",
+        "ওয়ার্ড ১৮",
+        "১৮ নং ওয়ার্ড",
+        "Sylhet Ward 18",
+        "SCC Ward 18",
+        "সিলেট ওয়ার্ড ১৮",
+        "সিলেট ওয়ার্ড ১৮"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-19",
+      "name_bn": "১৯ নম্বর ওয়ার্ড",
+      "name_en": "Ward 19",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 19",
+        "ওয়ার্ড ১৯",
+        "ওয়ার্ড ১৯",
+        "ওয়ার্ড ১৯",
+        "১৯ নং ওয়ার্ড",
+        "Sylhet Ward 19",
+        "SCC Ward 19",
+        "সিলেট ওয়ার্ড ১৯",
+        "সিলেট ওয়ার্ড ১৯"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-20",
+      "name_bn": "২০ নম্বর ওয়ার্ড",
+      "name_en": "Ward 20",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 20",
+        "ওয়ার্ড ২০",
+        "ওয়ার্ড ২০",
+        "ওয়ার্ড ২০",
+        "২০ নং ওয়ার্ড",
+        "Sylhet Ward 20",
+        "SCC Ward 20",
+        "সিলেট ওয়ার্ড ২০",
+        "সিলেট ওয়ার্ড ২০"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-21",
+      "name_bn": "২১ নম্বর ওয়ার্ড",
+      "name_en": "Ward 21",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 21",
+        "ওয়ার্ড ২১",
+        "ওয়ার্ড ২১",
+        "ওয়ার্ড ২১",
+        "২১ নং ওয়ার্ড",
+        "Sylhet Ward 21",
+        "SCC Ward 21",
+        "সিলেট ওয়ার্ড ২১",
+        "সিলেট ওয়ার্ড ২১"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-22",
+      "name_bn": "২২ নম্বর ওয়ার্ড",
+      "name_en": "Ward 22",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 22",
+        "ওয়ার্ড ২২",
+        "ওয়ার্ড ২২",
+        "ওয়ার্ড ২২",
+        "২২ নং ওয়ার্ড",
+        "Sylhet Ward 22",
+        "SCC Ward 22",
+        "সিলেট ওয়ার্ড ২২",
+        "সিলেট ওয়ার্ড ২২"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-23",
+      "name_bn": "২৩ নম্বর ওয়ার্ড",
+      "name_en": "Ward 23",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 23",
+        "ওয়ার্ড ২৩",
+        "ওয়ার্ড ২৩",
+        "ওয়ার্ড ২৩",
+        "২৩ নং ওয়ার্ড",
+        "Sylhet Ward 23",
+        "SCC Ward 23",
+        "সিলেট ওয়ার্ড ২৩",
+        "সিলেট ওয়ার্ড ২৩"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-24",
+      "name_bn": "২৪ নম্বর ওয়ার্ড",
+      "name_en": "Ward 24",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 24",
+        "ওয়ার্ড ২৪",
+        "ওয়ার্ড ২৪",
+        "ওয়ার্ড ২৪",
+        "২৪ নং ওয়ার্ড",
+        "Sylhet Ward 24",
+        "SCC Ward 24",
+        "সিলেট ওয়ার্ড ২৪",
+        "সিলেট ওয়ার্ড ২৪"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-25",
+      "name_bn": "২৫ নম্বর ওয়ার্ড",
+      "name_en": "Ward 25",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 25",
+        "ওয়ার্ড ২৫",
+        "ওয়ার্ড ২৫",
+        "ওয়ার্ড ২৫",
+        "২৫ নং ওয়ার্ড",
+        "Sylhet Ward 25",
+        "SCC Ward 25",
+        "সিলেট ওয়ার্ড ২৫",
+        "সিলেট ওয়ার্ড ২৫"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-26",
+      "name_bn": "২৬ নম্বর ওয়ার্ড",
+      "name_en": "Ward 26",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 26",
+        "ওয়ার্ড ২৬",
+        "ওয়ার্ড ২৬",
+        "ওয়ার্ড ২৬",
+        "২৬ নং ওয়ার্ড",
+        "Sylhet Ward 26",
+        "SCC Ward 26",
+        "সিলেট ওয়ার্ড ২৬",
+        "সিলেট ওয়ার্ড ২৬"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-27",
+      "name_bn": "২৭ নম্বর ওয়ার্ড",
+      "name_en": "Ward 27",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 27",
+        "ওয়ার্ড ২৭",
+        "ওয়ার্ড ২৭",
+        "ওয়ার্ড ২৭",
+        "২৭ নং ওয়ার্ড",
+        "Sylhet Ward 27",
+        "SCC Ward 27",
+        "সিলেট ওয়ার্ড ২৭",
+        "সিলেট ওয়ার্ড ২৭"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-28",
+      "name_bn": "২৮ নম্বর ওয়ার্ড",
+      "name_en": "Ward 28",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 28",
+        "ওয়ার্ড ২৮",
+        "ওয়ার্ড ২৮",
+        "ওয়ার্ড ২৮",
+        "২৮ নং ওয়ার্ড",
+        "Sylhet Ward 28",
+        "SCC Ward 28",
+        "সিলেট ওয়ার্ড ২৮",
+        "সিলেট ওয়ার্ড ২৮"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-29",
+      "name_bn": "২৯ নম্বর ওয়ার্ড",
+      "name_en": "Ward 29",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 29",
+        "ওয়ার্ড ২৯",
+        "ওয়ার্ড ২৯",
+        "ওয়ার্ড ২৯",
+        "২৯ নং ওয়ার্ড",
+        "Sylhet Ward 29",
+        "SCC Ward 29",
+        "সিলেট ওয়ার্ড ২৯",
+        "সিলেট ওয়ার্ড ২৯"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-30",
+      "name_bn": "৩০ নম্বর ওয়ার্ড",
+      "name_en": "Ward 30",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 30",
+        "ওয়ার্ড ৩০",
+        "ওয়ার্ড ৩০",
+        "ওয়ার্ড ৩০",
+        "৩০ নং ওয়ার্ড",
+        "Sylhet Ward 30",
+        "SCC Ward 30",
+        "সিলেট ওয়ার্ড ৩০",
+        "সিলেট ওয়ার্ড ৩০"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-31",
+      "name_bn": "৩১ নম্বর ওয়ার্ড",
+      "name_en": "Ward 31",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 31",
+        "ওয়ার্ড ৩১",
+        "ওয়ার্ড ৩১",
+        "ওয়ার্ড ৩১",
+        "৩১ নং ওয়ার্ড",
+        "Sylhet Ward 31",
+        "SCC Ward 31",
+        "সিলেট ওয়ার্ড ৩১",
+        "সিলেট ওয়ার্ড ৩১"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-32",
+      "name_bn": "৩২ নম্বর ওয়ার্ড",
+      "name_en": "Ward 32",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 32",
+        "ওয়ার্ড ৩২",
+        "ওয়ার্ড ৩২",
+        "ওয়ার্ড ৩২",
+        "৩২ নং ওয়ার্ড",
+        "Sylhet Ward 32",
+        "SCC Ward 32",
+        "সিলেট ওয়ার্ড ৩২",
+        "সিলেট ওয়ার্ড ৩২"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-33",
+      "name_bn": "৩৩ নম্বর ওয়ার্ড",
+      "name_en": "Ward 33",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 33",
+        "ওয়ার্ড ৩৩",
+        "ওয়ার্ড ৩৩",
+        "ওয়ার্ড ৩৩",
+        "৩৩ নং ওয়ার্ড",
+        "Sylhet Ward 33",
+        "SCC Ward 33",
+        "সিলেট ওয়ার্ড ৩৩",
+        "সিলেট ওয়ার্ড ৩৩"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-34",
+      "name_bn": "৩৪ নম্বর ওয়ার্ড",
+      "name_en": "Ward 34",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 34",
+        "ওয়ার্ড ৩৪",
+        "ওয়ার্ড ৩৪",
+        "ওয়ার্ড ৩৪",
+        "৩৪ নং ওয়ার্ড",
+        "Sylhet Ward 34",
+        "SCC Ward 34",
+        "সিলেট ওয়ার্ড ৩৪",
+        "সিলেট ওয়ার্ড ৩৪"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-35",
+      "name_bn": "৩৫ নম্বর ওয়ার্ড",
+      "name_en": "Ward 35",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 35",
+        "ওয়ার্ড ৩৫",
+        "ওয়ার্ড ৩৫",
+        "ওয়ার্ড ৩৫",
+        "৩৫ নং ওয়ার্ড",
+        "Sylhet Ward 35",
+        "SCC Ward 35",
+        "সিলেট ওয়ার্ড ৩৫",
+        "সিলেট ওয়ার্ড ৩৫"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-36",
+      "name_bn": "৩৬ নম্বর ওয়ার্ড",
+      "name_en": "Ward 36",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 36",
+        "ওয়ার্ড ৩৬",
+        "ওয়ার্ড ৩৬",
+        "ওয়ার্ড ৩৬",
+        "৩৬ নং ওয়ার্ড",
+        "Sylhet Ward 36",
+        "SCC Ward 36",
+        "সিলেট ওয়ার্ড ৩৬",
+        "সিলেট ওয়ার্ড ৩৬"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-37",
+      "name_bn": "৩৭ নম্বর ওয়ার্ড",
+      "name_en": "Ward 37",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 37",
+        "ওয়ার্ড ৩৭",
+        "ওয়ার্ড ৩৭",
+        "ওয়ার্ড ৩৭",
+        "৩৭ নং ওয়ার্ড",
+        "Sylhet Ward 37",
+        "SCC Ward 37",
+        "সিলেট ওয়ার্ড ৩৭",
+        "সিলেট ওয়ার্ড ৩৭"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-38",
+      "name_bn": "৩৮ নম্বর ওয়ার্ড",
+      "name_en": "Ward 38",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 38",
+        "ওয়ার্ড ৩৮",
+        "ওয়ার্ড ৩৮",
+        "ওয়ার্ড ৩৮",
+        "৩৮ নং ওয়ার্ড",
+        "Sylhet Ward 38",
+        "SCC Ward 38",
+        "সিলেট ওয়ার্ড ৩৮",
+        "সিলেট ওয়ার্ড ৩৮"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-39",
+      "name_bn": "৩৯ নম্বর ওয়ার্ড",
+      "name_en": "Ward 39",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 39",
+        "ওয়ার্ড ৩৯",
+        "ওয়ার্ড ৩৯",
+        "ওয়ার্ড ৩৯",
+        "৩৯ নং ওয়ার্ড",
+        "Sylhet Ward 39",
+        "SCC Ward 39",
+        "সিলেট ওয়ার্ড ৩৯",
+        "সিলেট ওয়ার্ড ৩৯"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-40",
+      "name_bn": "৪০ নম্বর ওয়ার্ড",
+      "name_en": "Ward 40",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 40",
+        "ওয়ার্ড ৪০",
+        "ওয়ার্ড ৪০",
+        "ওয়ার্ড ৪০",
+        "৪০ নং ওয়ার্ড",
+        "Sylhet Ward 40",
+        "SCC Ward 40",
+        "সিলেট ওয়ার্ড ৪০",
+        "সিলেট ওয়ার্ড ৪০"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-41",
+      "name_bn": "৪১ নম্বর ওয়ার্ড",
+      "name_en": "Ward 41",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 41",
+        "ওয়ার্ড ৪১",
+        "ওয়ার্ড ৪১",
+        "ওয়ার্ড ৪১",
+        "৪১ নং ওয়ার্ড",
+        "Sylhet Ward 41",
+        "SCC Ward 41",
+        "সিলেট ওয়ার্ড ৪১",
+        "সিলেট ওয়ার্ড ৪১"
+      ],
+      "source": "city-wards"
+    },
+    {
+      "key": "sylhet-city-ward-42",
+      "name_bn": "৪২ নম্বর ওয়ার্ড",
+      "name_en": "Ward 42",
+      "kind": "ward",
+      "parent": "sylhet-city-corporation",
+      "aliases": [
+        "Ward 42",
+        "ওয়ার্ড ৪২",
+        "ওয়ার্ড ৪২",
+        "ওয়ার্ড ৪২",
+        "৪২ নং ওয়ার্ড",
+        "Sylhet Ward 42",
+        "SCC Ward 42",
+        "সিলেট ওয়ার্ড ৪২",
+        "সিলেট ওয়ার্ড ৪২"
+      ],
+      "source": "city-wards"
+    }
+  ]
+}

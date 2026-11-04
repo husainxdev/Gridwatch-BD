@@ -18,7 +18,7 @@ The launcher:
 - Preserves `.env`, `backend/.env`, custom PostgreSQL ports and existing normal accounts/records. It never changes a user's password or overwrites secrets.
 - Starts Docker Desktop from its actual per-user/system path when needed on Windows, then starts the existing Compose PostgreSQL and Mailpit services.
 - Checks that the mapped Compose database port matches the configured local PostgreSQL URL, and that the schema is current. It refuses hosted/production, demo, test, restore and browser databases.
-- Forces demo endpoints/fixtures and browser helpers off at runtime. It does not run any seed or create accounts, notices, observations or history.
+- Forces demo endpoints/fixtures and browser helpers off at runtime. On a genuinely empty directory, it imports the reviewed 45-record Sylhet administrative catalog. It does not create accounts, notices, schedules, observations, feeder mappings or history.
 - Requires your own account through registration. Password reset uses configured SMTP; standard local setup catches messages at **http://127.0.0.1:8025**. This is a local mailbox, not external delivery.
 - Runs locally in development mode. It does not make your PC reachable to the public internet or claim HTTPS/provider acceptance.
 
@@ -63,10 +63,24 @@ Verify the backup/restore using [deployment operations](DEPLOYMENT.md); then run
 3. Save the original notice as a draft. Review its text, coverage and times, then verify and publish it. Link a schedule to that notice and publish separately. Revisions/cancellations preserve the traceable history.
 4. Users may then save supported areas and submit their own connection observations. A schedule never creates an actual outage. An absence of reports never establishes available power.
 
-The current environment still receives 403/503 from the permitted official Sylhet/BPDB/SCC sources. No real Sylhet import or government live API is claimed. The saved broader research network draft was not activated as of this change.
+The administrative catalog now uses three successfully retrieved original government pages. It contains the division/district/city corporation and 42 general wards only. No neighborhood-to-ward or electricity/feeder mapping is inferred, and no official live outage API is connected. See [current evidence](DATA_SOURCES.md).
 
 ## Before public publishing
 
 Use [DEPLOYMENT.md](DEPLOYMENT.md) and [DASHBOARD_SETUP.md](DASHBOARD_SETUP.md) for actual hosting accounts, HTTPS frontend/backend URLs, persistent PostgreSQL, trusted same-origin `/api` routing, external SMTP, backups, ingress rate protection and live acceptance. Configure `DEMO_INSTANCE=false`, `DEMO_ENABLED=false`, `NEXT_PUBLIC_DEMO_INSTANCE=false`; remove all browser/local build flags. Public production rejects demo mode rather than hiding its banner.
 
 The public interface now contains no project-progress checklist or demo CTA. `/help` explains real workflows; `/privacy` describes actual fields and retention limits. Legacy `/progress` shows the same help content for old links. Missing real records display actionable empty states instead of fake status cards.
+
+## Existing directory: merge reviewed wards once
+
+On an empty directory the normal launcher imports the real administrative catalog automatically. If you already have custom locations, default startup leaves them untouched. To explicitly merge the reviewed directory, preserving existing matching identities and all human edits, run:
+
+```text
+C:\Users\USER\Gridwatch-BD\START-WEBSITE.cmd --import-catalog
+```
+
+The importer uses one transaction and the same advisory locks as Admin hierarchy mutations. Existing records are reused and never silently re-verified or renamed. A conflicting type/parent stops and rolls back the import. No passwords, accounts or electricity facts are added. Normal repeated startup does not re-create a removed individual ward in a nonempty directory.
+
+For a hosted operator, use the reviewed backend configuration and actual database name, then run `backend/.venv/bin/python scripts/import-location-catalog.py --expected-database ACTUAL_NAME` as a controlled one-time step. The command reads the bundled reviewed manifest; it never fetches arbitrary submitted URLs.
+
+Search examples that work within this catalog: `সিলেট`, `Ward 1`, `ওয়ার্ড ১`, `ওয়ার্ড ০১`. You can also select the city shortcut and choose any of the 42 ward buttons. A neighborhood name such as আম্বরখানা is not mapped to a ward without an original verified source.

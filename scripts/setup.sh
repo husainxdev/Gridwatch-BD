@@ -8,4 +8,5 @@ uv sync --project backend --frozen
 npm ci --prefix frontend --no-audit --no-fund
 docker compose up -d --wait db mail
 (cd backend && .venv/bin/alembic upgrade head)
+backend/.venv/bin/python scripts/import-location-catalog.py --expected-database gridwatch --only-if-empty
 npm run build --prefix frontend

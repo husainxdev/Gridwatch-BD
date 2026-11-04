@@ -22,6 +22,7 @@ export type Location = {
   slug: string;
   verification_status: "verified" | "unverified";
   source_url: string | null;
+  verified_at?: string | null;
   updated_at: string;
 };
 export type Notice = {

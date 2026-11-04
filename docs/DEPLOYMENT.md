@@ -128,3 +128,7 @@ Rotate database/SMTP credentials through provider secrets and restart affected p
 ## Normal website presentation
 
 Use [WEBSITE.md](WEBSITE.md) for the seed-free local launcher and Admin provisioning. Public navigation, help/privacy pages and metadata have no student-project/demo branding. Production rejects `DEMO_INSTANCE=true` or `DEMO_ENABLED=true`; Vercel also rejects `NEXT_PUBLIC_DEMO_INSTANCE=true`. These flags cannot be used to present fictional evidence as real. No migration removes or converts old records. Local website startup is not public deployment.
+
+## Reviewed administrative directory
+
+After migration, a fresh normal pilot can receive the bundled source-reviewed Sylhet division/district/city/42-ward directory using `backend/.venv/bin/python scripts/import-location-catalog.py --expected-database ACTUAL_NAME --only-if-empty`. For an existing directory, review the manifest and use the explicit merge command without `--only-if-empty`; exact matching identities are preserved, conflicting parents/types roll back, and no existing review is silently refreshed. This adds no electrical coverage, notices, schedules or observations. Review [source evidence](DATA_SOURCES.md) and [operator instructions](WEBSITE.md) before hosted acceptance.

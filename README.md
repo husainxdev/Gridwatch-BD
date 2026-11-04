@@ -2,9 +2,9 @@
 
 Built with **Next.js App Router, React, TypeScript/JavaScript, Tailwind CSS/DaisyUI, FastAPI and PostgreSQL**.
 
-A Bengali-first website for announced power interruptions, personal connection reports and activity planning. The normal site uses persisted PostgreSQL records, excludes fictional evidence and provides responsive Bengali navigation, help and privacy pages. No verified Sylhet pilot/feed is connected yet, and no live deployment has been verified. Missing data stays unknown.
+A Bengali-first website for announced power interruptions, personal connection reports and activity planning. The normal site uses persisted PostgreSQL records, excludes fictional evidence and provides responsive Bengali navigation, help and privacy pages. A source-reviewed Sylhet administrative directory (division/district/city corporation/42 wards) is bundled. No official live outage feed, feeder mapping or public deployment has been verified. Missing power evidence stays unknown.
 
-**Windows: use `START-WEBSITE.cmd` for the normal website at http://localhost:5173.** It starts Docker, checks the normal database schema and launches API/frontend without adding sample records or accounts. Existing normal users and settings are preserved; old isolated demo accounts do not become real accounts. [Exact startup, Admin setup and publishing prerequisites](docs/WEBSITE.md).
+**Windows: use `START-WEBSITE.cmd` for the normal website at http://localhost:5173.** It starts Docker, checks the normal database schema and launches API/frontend without adding sample electricity records or accounts; an empty administrative directory receives the reviewed real Sylhet catalog. Existing normal users and settings are preserved; old isolated demo accounts do not become real accounts. [Exact startup, Admin setup and publishing prerequisites](docs/WEBSITE.md).
 
 - [Scope, sources, user flows and data rules](docs/SCOPE.md)
 - [Progress and seven-day work sequence](docs/PROGRESS.md)
@@ -17,6 +17,7 @@ A Bengali-first website for announced power interruptions, personal connection r
 - [Data sources and evidence limits](docs/DATA_SOURCES.md)
 - [Submission acceptance and repository links](docs/SUBMISSION.md)
 - [Presentation/viva/local fallback](docs/DEMO_SCRIPT.md)
+- [Area search repair and original-source catalog](docs/AREA-SEARCH-REVIEW.md)
 - [Normal public website, UI and startup verification](docs/PUBLIC-WEBSITE-REVIEW.md)
 - [Full application review, fixes and remaining gates (2026-11-04)](docs/FULL-REVIEW-2026-11-04.md)
 - [Populated local demo: one launcher, private accounts and data](docs/LOCAL-DEMO.md)
@@ -68,7 +69,7 @@ Create your own local administrator through a password prompt (no default admin 
 backend/.venv/bin/python scripts/create-admin.py
 ```
 
-Any user may register in the app. The new admin can add a location hierarchy, attach source URLs, mark an area and a notice verified, and create a schedule or a verified outage event. For practice, use the separate populated demo workflow; never enter fictional notices as verified facts in the normal pilot database. For a real Sylhet pilot, first verify the administrative chain, provider and original notice against authoritative sources as described in [SCOPE.md](docs/SCOPE.md). Demo fixtures never appear in the operational dashboard.
+Any user may register in the app. The new admin can add a location hierarchy, attach source URLs, mark an area and a notice verified, and create a schedule or a verified outage event. For practice, use the separate populated demo workflow; never enter fictional notices as verified facts in the normal pilot database. The bundled catalog supplies a verified administrative starting point. Verify actual provider/coverage and original notices separately before publishing electricity facts, as described in [SCOPE.md](docs/SCOPE.md). Demo fixtures never appear in the operational dashboard.
 
 ## What works
 

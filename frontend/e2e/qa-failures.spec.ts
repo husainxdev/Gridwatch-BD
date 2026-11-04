@@ -105,7 +105,7 @@ test("two users retain independent histories across a lost response and retry", 
       await expect(
         tab.getByRole("heading", { name: `স্বাগতম, Fictional QA user ${i}` }),
       ).toBeVisible();
-      await tab.getByLabel("এলাকার নাম বা ID খুঁজুন").fill(alias);
+      await tab.getByLabel("এলাকার নাম খুঁজুন").fill(alias);
       await tab.getByRole("button").filter({ hasText: areaName }).click();
       await expect(
         tab.getByRole("button", { name: "বিদ্যুৎ নেই", exact: true }),

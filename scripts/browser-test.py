@@ -81,8 +81,10 @@ from datetime import datetime, UTC
 from app.db import SessionLocal
 from app.models import Location, User
 from app.security import hash_password
+from app.location_catalog import import_catalog
 import os
 with SessionLocal.begin() as db:
+    import_catalog(db)
     db.add(User(email="phase-admin@example.com",display_name="Phase test admin",password_hash=hash_password(os.environ["BROWSER_TEST_PASSWORD"]),role="admin"))
     root = Location(name_bn="পরীক্ষামূলক বিভাগ", name_en="Browser test division", slug="browser-division", kind="division")
     db.add(root)

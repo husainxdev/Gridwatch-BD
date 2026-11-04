@@ -191,6 +191,11 @@ def main():
     parser.add_argument("--no-browser", action="store_true")
     parser.add_argument("--check-only", action="store_true")
     parser.add_argument("--create-admin", action="store_true")
+    parser.add_argument(
+        "--import-catalog",
+        action="store_true",
+        help="Merge reviewed administrative locations into an existing directory without overwriting records",
+    )
     parser.add_argument("--backup-reference", default="")
     args = parser.parse_args()
     if not shutil.which("docker") or not shutil.which("node"):
@@ -231,6 +236,24 @@ def main():
         raise StartupError(
             "Schema check stopped. An older populated database needs a backup first; see docs/WEBSITE.md. No database reset was performed."
         ) from None
+    # The first normal start installs reviewed administrative names only.
+    # Nonempty databases, including intentionally deactivated records, are left alone.
+    catalog = run(
+        [
+            str(PYTHON),
+            str(ROOT / "scripts/import-location-catalog.py"),
+            "--expected-database",
+            database.database,
+            *([] if args.import_catalog else ["--only-if-empty"]),
+        ],
+        env=env,
+    )
+    imported = json.loads(catalog.stdout)
+    if imported["created"]:
+        print(
+            f"Added {imported['created']} source-reviewed Sylhet administrative locations; no schedules, reports or feeder mappings added.",
+            flush=True,
+        )
     if args.create_admin:
         # Interactive getpass; never generate, print or save a public Admin password.
         return subprocess.call(

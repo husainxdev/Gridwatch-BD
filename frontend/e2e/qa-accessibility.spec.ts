@@ -75,7 +75,7 @@ for (const width of [360, 390, 768, 1440]) {
     ).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(page.locator("#main")).toBeFocused();
-    const search = page.getByLabel("এলাকার নাম বা ID খুঁজুন");
+    const search = page.getByLabel("এলাকার নাম খুঁজুন");
     await search.fill("Browser district alias");
     const choice = page
       .getByRole("button")

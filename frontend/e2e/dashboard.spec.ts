@@ -13,7 +13,7 @@ async function signup(page, suffix: string) {
   ).toBeVisible();
 }
 async function select(page, alias = "Browser district alias") {
-  await page.getByLabel("এলাকার নাম বা ID খুঁজুন").fill(alias);
+  await page.getByLabel("এলাকার নাম খুঁজুন").fill(alias);
   await page
     .getByRole("button", {
       name: alias.startsWith("Alternate")

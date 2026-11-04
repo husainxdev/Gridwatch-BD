@@ -79,9 +79,7 @@ test("admin publication and personal outage restoration use real backend", async
     sourceRecord.getByRole("link", { name: "মূল নোটিশের উৎস ↗" }),
   ).toHaveAttribute("rel", /noopener/);
   await page.goto("/dashboard");
-  await page
-    .getByLabel("এলাকার নাম বা ID খুঁজুন")
-    .fill("Browser district alias");
+  await page.getByLabel("এলাকার নাম খুঁজুন").fill("Browser district alias");
   await page
     .getByRole("button", { name: /পরীক্ষামূলক বিভাগ \/ পরীক্ষামূলক জেলা/ })
     .click();

@@ -1,6 +1,6 @@
 import { SavedPager } from "./components/SavedPager";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Link } from "./navigation";
+import { Link, useSearchParams } from "./navigation";
 import { FiRefreshCw, FiMapPin } from "react-icons/fi";
 import toast from "react-hot-toast";
 import {
@@ -195,7 +195,12 @@ export function DashboardView({
 }) {
   const { user } = useSession();
   const uid = user!.id;
-  const [selected, updateSelected] = useState(viewing.get(uid) || ""),
+  const [params, setParams] = useSearchParams();
+  const requestedArea = params.get("location_id") || "";
+  const previousRequest = useRef(requestedArea);
+  const [selected, updateSelected] = useState(
+      requestedArea || viewing.get(uid) || "",
+    ),
     [page, setPage] = useState(1),
     [actionError, setActionError] = useState(""),
     [busy, setBusy] = useState(false),
@@ -235,11 +240,25 @@ export function DashboardView({
   function choose(id: string) {
     initialized.current = true;
     viewing.set(uid, id);
+    previousRequest.current = id;
     updateSelected(id);
     setPage(1);
     setActionError("");
     setFallback("");
+    if ((params.get("location_id") || "") !== id)
+      setParams((old) => {
+        const next = new URLSearchParams(old);
+        if (id) next.set("location_id", id);
+        else next.delete("location_id");
+        return next;
+      });
   }
+  useEffect(() => {
+    if (requestedArea !== previousRequest.current) {
+      previousRequest.current = requestedArea;
+      choose(requestedArea);
+    }
+  }, [requestedArea]);
   useEffect(() => {
     if (!saved.data || initialized.current) return;
     initialized.current = true;
@@ -271,20 +290,29 @@ export function DashboardView({
       setFallback(
         removed
           ? "নির্বাচিত সংরক্ষিত এলাকাটি সরানো হয়েছে। নতুন এলাকা নিজে বাছুন।"
-          : "নির্বাচিত এলাকাটি এখন যাচাইকৃত নয়। অন্য এলাকা নিজে বাছুন।",
+          : saved.data.items.find((item) => item.id === selected)?.is_default
+            ? "আপনার ডিফল্ট এলাকাটি এখন উপলব্ধ নয়। নিজে একটি যাচাইকৃত এলাকা বাছুন।"
+            : "নির্বাচিত এলাকাটি এখন যাচাইকৃত নয়। অন্য এলাকা নিজে বাছুন।",
       );
     }
     savedBefore.current = { page: savedPage, items: saved.data.items };
   }, [saved.data, selected]);
   const data = dashboard.data;
   useEffect(() => {
+    if (!selected) return;
+    if (data?.available === false && !saved.data && !saved.error) return;
     if (dashboard.status === 404 || data?.available === false) {
+      const wasDefault = saved.data?.items.some(
+        (x) => x.id === selected && x.is_default,
+      );
       choose("");
       setFallback(
-        "নির্বাচিত এলাকাটি এখন পাওয়া যাচ্ছে না বা যাচাইকৃত নয়। অন্য এলাকা নিজে বাছুন।",
+        wasDefault
+          ? "আপনার ডিফল্ট এলাকাটি এখন উপলব্ধ নয়। নিজে একটি যাচাইকৃত এলাকা বাছুন।"
+          : "নির্বাচিত এলাকাটি এখন পাওয়া যাচ্ছে না বা যাচাইকৃত নয়। অন্য এলাকা নিজে বাছুন।",
       );
     }
-  }, [dashboard.status, data?.available]);
+  }, [dashboard.status, data?.available, saved.data, saved.error]);
   const available = !!selected && data?.available === true && !dashboard.error;
   type Payload = {
     location_id: string;

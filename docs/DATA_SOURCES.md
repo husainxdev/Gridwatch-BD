@@ -1,3 +1,27 @@
+# Current administrative catalog — 2026-11-04
+
+A reviewed real administrative directory is now bundled at [`data/sylhet-city-locations.v1.json`](../data/sylhet-city-locations.v1.json): Sylhet Division → Sylhet District → Sylhet City Corporation → 42 general wards (45 records total). This does **not** establish electricity coverage, feeder/provider mappings, live power status, neighborhoods, or any outage schedule.
+
+Original pages were successfully retrieved over verified HTTPS on 2026-11-04:
+
+| Original publisher | URL | Facts imported |
+| --- | --- | --- |
+| Sylhet divisional commissioner's office | https://sylhetdiv.gov.bd/pages/static-pages/696cb9bfc4774958d7ba981e | Sylhet division and its Sylhet district membership |
+| Sylhet City Corporation | https://scc.gov.bd/pages/static-pages/6922df09933eb65569e1f5f4 | City corporation identity and current summary of 42 wards |
+| Sylhet City Corporation | https://scc.gov.bd/pages/static-pages/6922dcfd933eb65569e1310d | Independent current ward assignments, all 14 groups covering ward numbers 1–42 |
+
+Review timestamp: **2026-11-04 10:54:45 UTC** (16:54:45 Asia/Dhaka). Source retrieval times, response SHA-256 hashes, short excerpts and ward-number groups are retained in the manifest. The SCC overview also contains historical prose about 27 wards; current 42-ward coverage is corroborated against the separate assignment page updated 13 September 2026. No outdated neighborhood/union boundary or officer contact information was imported.
+
+Bangla/English display names and search aliases are curated spelling/translation aids, **not official administrative codes**. IDs are internal deterministic UUIDs. `Location.source_url` and `verified_at` preserve each initial source/date. Re-running an import does not refresh verification dates or overwrite later Admin changes. Read [the area repair report](AREA-SEARCH-REVIEW.md) and [normal startup](WEBSITE.md) for commands and preservation behavior.
+
+The cloud network policy is now unrestricted/enforced (observed revision 30), allowing direct original-source research through the configured proxy. Earlier 403/503 and draft-only findings below are historical. District-root requests still returned 503, so those pages are not used as evidence; district membership is supported by the divisional source above. Search-engine snippets were not used as official facts.
+
+No verified official outage notice, live official API, real feeder mapping or public deployment is supplied by this catalog. Electricity facts still require original notice/evidence review through the existing Admin workflow.
+
+---
+
+## Earlier research and limitations (historical record)
+
 # Data sources, provenance and monitoring limits
 
 Release preparation date: 2026-10-29. **No real Sylhet pilot boundary/provider, official notice or feeder-coverage dataset has been independently verified or loaded as operational facts in this handoff. No working official live electricity API is connected.**

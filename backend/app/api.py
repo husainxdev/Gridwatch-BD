@@ -7,7 +7,7 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
-from sqlalchemy import String, cast, func, or_, select, text, update
+from sqlalchemy import String, case, cast, func, or_, select, text, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
@@ -274,21 +274,45 @@ def locations(
         stmt = stmt.where(Location.verification_status == status)
     if parent_id:
         stmt = stmt.where(Location.parent_id == parent_id)
-    if search:
-        predicates = [
-            Location.name_bn.ilike("%" + search + "%"),
-            Location.name_en.ilike("%" + search + "%"),
-            cast(Location.aliases, String).ilike("%" + search + "%"),
-        ]
+    ranking = None
+    term = " ".join(unicodedata.normalize("NFKC", search or "").split())
+    if term:
         try:
-            predicates.append(Location.id == uuid.UUID(search))
+            identifier = uuid.UUID(term)
         except ValueError:
-            pass
-        stmt = stmt.where(or_(*predicates))
-
-    result = list_page(
-        db, stmt.order_by(Location.name_en, Location.id), page, page_size, loc_json
-    )
+            identifier = None
+        if identifier:
+            stmt = stmt.where(Location.id == identifier)
+        else:
+            # Each word must match; whitespace, case and literal SQL wildcard
+            # characters cannot turn a specific search into every location.
+            for token in term.split():
+                literal = (
+                    token.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+                )
+                pattern = "%" + literal + "%"
+                stmt = stmt.where(
+                    or_(
+                        Location.name_bn.ilike(pattern, escape="\\"),
+                        Location.name_en.ilike(pattern, escape="\\"),
+                        cast(Location.aliases, String).ilike(pattern, escape="\\"),
+                    )
+                )
+            ranking = case(
+                (
+                    or_(
+                        func.lower(Location.name_bn) == term.lower(),
+                        func.lower(Location.name_en) == term.lower(),
+                        Location.aliases.contains([term]),
+                    ),
+                    0,
+                ),
+                else_=1,
+            )
+    ordering = [Location.name_en, Location.id]
+    if ranking is not None:
+        ordering.insert(0, ranking)
+    result = list_page(db, stmt.order_by(*ordering), page, page_size, loc_json)
     ids = [r["id"] for r in result["items"]]
     paths = {key: [] for key in ids}
     if ids:

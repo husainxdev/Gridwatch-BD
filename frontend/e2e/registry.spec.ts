@@ -43,7 +43,7 @@ test("admin reviews sourced office and feeder mapping, then suspends it", async 
   await page
     .getByLabel("উৎসে লেখা feeder নাম")
     .fill("Fictional feeder for browser test");
-  await page.getByLabel("এলাকার নাম বা ID খুঁজুন").fill("Alternate area alias");
+  await page.getByLabel("এলাকার নাম খুঁজুন").fill("Alternate area alias");
   await page
     .getByRole("button", {
       name: /পরীক্ষামূলক বিভাগ \/ দ্বিতীয় পরীক্ষামূলক জেলা/,

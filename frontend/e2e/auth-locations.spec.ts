@@ -47,9 +47,7 @@ for (const width of [1440, 390]) {
     await expect(
       page.getByRole("button", { name: "এলাকা সংরক্ষণ", exact: true }),
     ).toHaveCount(0);
-    await page
-      .getByLabel("এলাকার নাম বা ID খুঁজুন")
-      .fill("Browser district alias");
+    await page.getByLabel("এলাকার নাম খুঁজুন").fill("Browser district alias");
     await page
       .getByRole("button", { name: /পরীক্ষামূলক বিভাগ \/ পরীক্ষামূলক জেলা/ })
       .click();

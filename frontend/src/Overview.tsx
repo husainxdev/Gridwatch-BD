@@ -131,37 +131,16 @@ export function Overview() {
     : "/dashboard";
   return (
     <>
-      <section className="home-hero" aria-labelledby="home-title">
+      <section className="home-intro" aria-labelledby="home-title">
         <div>
-          <p className="eyebrow">GRIDWATCH BD · বাংলাদেশ</p>
-          <h1 id="home-title">
-            বিদ্যুতের খবর বুঝে,
-            <br />
-            দিনের পরিকল্পনা করুন।
-          </h1>
-          <p>
-            ঘোষিত সময়সূচি দেখুন, নিজের সংযোগের খবর জানান এবং কাজের সময় মিলিয়ে
-            নিন। প্রতিটি তথ্যের উৎস ও সময় আলাদা করে দেখানো হয়।
-          </p>
-          <div className="home-actions">
-            <a className="btn btn-primary" href="#area-picker">
-              <FiMapPin aria-hidden="true" /> এলাকা বাছুন
-            </a>
-            <Link className="btn btn-outline" to={dashboard}>
-              {user ? "আমার ড্যাশবোর্ড" : "প্রবেশ করে রিপোর্ট দিন"}
-              <FiArrowRight aria-hidden="true" />
-            </Link>
-          </div>
+          <p className="eyebrow">GRIDWATCH BD · বিদ্যুৎ তথ্য ও কমিউনিটি</p>
+          <h1 id="home-title">আপনার এলাকার বিদ্যুতের খবর</h1>
+          <p>এলাকা বাছুন, ঘোষিত বন্ধের সময় দেখুন, নিজের সংযোগের খবর জানান।</p>
         </div>
-        <div className="home-principles">
-          <FiShield aria-hidden="true" />
-          <strong>তথ্যের সীমা জানুন</strong>
-          <p>
-            ঘোষণা একটি পরিকল্পনা। একজনের রিপোর্ট তাঁর সংযোগের খবর। রিপোর্ট না
-            থাকলে এলাকার অবস্থা অজানা।
-          </p>
-          <Link to="/sources">উৎস ও যাচাই সম্পর্কে জানুন →</Link>
-        </div>
+        <Link className="btn btn-primary" to={dashboard}>
+          <FiZap aria-hidden="true" />
+          {user ? "আমার সংযোগের রিপোর্ট" : "প্রবেশ করে রিপোর্ট দিন"}
+        </Link>
       </section>
       <Card title="কোন এলাকার তথ্য দেখতে চান?" className="home-picker">
         <div id="area-picker" tabIndex={-1}>
@@ -172,23 +151,6 @@ export function Overview() {
           <LocationPicker value={selected} onChange={choose} />
         </div>
       </Card>
-      <div className="home-workflows" aria-label="ব্যবহারের ধাপ">
-        <Link to={dashboard}>
-          <FiMapPin aria-hidden="true" />
-          <strong>এলাকা ও নিজের সংযোগ</strong>
-          <span>এলাকা সংরক্ষণ ও বিদ্যুতের খবর জানান</span>
-        </Link>
-        <Link to="/activities">
-          <FiCalendar aria-hidden="true" />
-          <strong>কাজের সময় মিলিয়ে নিন</strong>
-          <span>ঘোষিত বন্ধের সঙ্গে সময় মেলে কি না দেখুন</span>
-        </Link>
-        <Link to="/history">
-          <FiZap aria-hidden="true" />
-          <strong>নিজের ইতিহাস</strong>
-          <span>জানা ও অসম্পূর্ণ সময় আলাদা</span>
-        </Link>
-      </div>
       <section
         className="home-board"
         aria-label="নির্বাচিত এলাকার প্রকাশ্য তথ্য"
@@ -446,6 +408,28 @@ export function Overview() {
           </>
         )}
       </section>
+      <p className="home-trust-note">
+        <FiShield aria-hidden="true" />
+        ঘোষণা একটি পরিকল্পনা; একজনের রিপোর্ট তাঁর সংযোগের খবর। রিপোর্ট না থাকলে
+        অবস্থা অজানা। <Link to="/sources">তথ্য কীভাবে যাচাই হয় →</Link>
+      </p>
+      <div className="home-workflows" aria-label="ব্যবহারের ধাপ">
+        <Link to={dashboard}>
+          <FiMapPin aria-hidden="true" />
+          <strong>এলাকা ও নিজের সংযোগ</strong>
+          <span>এলাকা সংরক্ষণ ও বিদ্যুতের খবর জানান</span>
+        </Link>
+        <Link to="/activities">
+          <FiCalendar aria-hidden="true" />
+          <strong>কাজের সময় মিলিয়ে নিন</strong>
+          <span>ঘোষিত বন্ধের সঙ্গে সময় মেলে কি না দেখুন</span>
+        </Link>
+        <Link to="/history">
+          <FiZap aria-hidden="true" />
+          <strong>নিজের ইতিহাস</strong>
+          <span>জানা ও অসম্পূর্ণ সময় আলাদা</span>
+        </Link>
+      </div>
     </>
   );
 }

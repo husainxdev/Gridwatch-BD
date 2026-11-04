@@ -64,3 +64,7 @@ The release guards were additionally checked after the 24-browser run; their pos
 ## Normal website follow-up
 
 The [public interface and launcher work](PUBLIC-WEBSITE-REVIEW.md) replaces the earlier preference for a populated fictional demo. Use `START-WEBSITE.cmd` for the actual normal local database, no seed/accounts. Production now rejects all demo flags; isolated developer fixtures remain local-only. Earlier test counts in this document are historical. Real-source import and public HTTPS acceptance remain incomplete.
+
+## Administrative-source correction
+
+[The area repair](AREA-SEARCH-REVIEW.md) adds independently reviewed government administrative names and a working 42-ward selection flow. Earlier claims that no real Sylhet records are imported are historical. This directory does not resolve the still-missing official outage feed, electrical coverage or actual hosted acceptance.

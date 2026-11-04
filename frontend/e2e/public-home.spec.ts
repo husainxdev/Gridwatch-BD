@@ -192,7 +192,7 @@ test("public home renders real area evidence, preserves stale facts and changes 
   expect(
     await page.locator(".home-report-list li span").first().textContent(),
   ).toBe(observed);
-  await page.getByLabel("এলাকার নাম বা ID খুঁজুন").fill(`Public B ${suffix}`);
+  await page.getByLabel("এলাকার নাম খুঁজুন").fill(`Public B ${suffix}`);
   await page
     .getByRole("button")
     .filter({ hasText: locations[1].name_bn })
