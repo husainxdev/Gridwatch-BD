@@ -225,6 +225,18 @@ def main():
     mail_values, mailbox_url = local_mail_settings()
     backend_env = dict(os.environ, **values)
     backend_env.update(mail_values)
+    # Preserve older private walkthroughs across normal schema updates too.
+    from sqlalchemy.engine import make_url
+
+    run(
+        [
+            str(PYTHON),
+            str(ROOT / "scripts/prepare-local-schema.py"),
+            "--expected-database",
+            make_url(settings.database_url).database,
+        ],
+        env=backend_env,
+    )
     result = run([str(PYTHON), "-m", "app.demo_seed"], env=backend_env, cwd=BACKEND)
     manifest = json.loads(result.stdout)
     print(

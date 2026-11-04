@@ -38,7 +38,7 @@ try:
     run([python, "-m", "alembic", "upgrade", "head"], cwd=backend, env=env)
     run([python, "-m", "alembic", "downgrade", "0001"], cwd=backend, env=env)
     run([python, "-m", "alembic", "upgrade", "head"], cwd=backend, env=env)
-    # Prove populated 0003 -> 0004 -> 0005 -> 0006 upgrades preserve existing records.
+    # Prove populated 0003 -> 0004 -> 0005 -> 0006 -> 0007 upgrades preserve existing records.
     run([python, "-m", "alembic", "downgrade", "0003"], cwd=backend, env=env)
     run(
         [
@@ -72,7 +72,7 @@ with engine.begin() as db:
     db.execute(text("DELETE FROM saved_areas WHERE user_id='00000000-0000-0000-0000-000000000071'"))
     db.execute(text("DELETE FROM locations WHERE id='00000000-0000-0000-0000-000000000072'"))
     db.execute(text("DELETE FROM users WHERE id='00000000-0000-0000-0000-000000000071'"))
-print('Populated 0003 -> 0004 -> 0005 -> 0006 upgrade preserved saved area and location')
+print('Populated 0003 -> 0004 -> 0005 -> 0006 -> 0007 upgrade preserved saved area and location')
 """,
         ],
         cwd=backend,

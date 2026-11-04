@@ -47,7 +47,7 @@ def check(frontend, backend, expected):
             raise ValueError("Frontend shell/security header mismatch")
     for base, path in ((frontend, "/api/health/ready"), (backend, "/api/health/ready")):
         result = get(base, path, True)
-        if result.get("schema") != "0006" or result.get("status") != "ready":
+        if result.get("schema") != "0007" or result.get("status") != "ready":
             raise ValueError("Database/schema not ready")
     web = get(frontend, "/release-info", True)
     proxied = get(frontend, "/api/health/live", True)

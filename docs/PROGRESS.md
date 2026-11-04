@@ -154,3 +154,16 @@ Verification results and screenshots: [public website handoff](PUBLIC-WEBSITE-RE
 - [ ] Real outage notice/provider/feeder evidence and public hosted release remain separate unverified work.
 
 Current checks and known limits: [area search repair](AREA-SEARCH-REVIEW.md).
+
+## Supplied SQLite directory — 2026-11-04
+
+- [x] Read-only integrity, schema, foreign-key, graph and source checks; supplied instructions remain inert data.
+- [x] Preserve original bytes/checksum, 19 sources and review/provenance notes.
+- [x] Migration 0007: nullable missing English labels and separate portal/census source records in PostgreSQL.
+- [x] Transactional, idempotent import preserving prior IDs/reviews; nine unresolved portal records stay unverified.
+- [x] Public source-directory API and `/areas` search/browse with ancestor context, historical warning and source links.
+- [x] Normal startup takes a private local backup before an older populated schema upgrade.
+- [ ] Census per-row/PDF-page reconciliation and current neighborhood/feeder crosswalk remain unverified.
+- [ ] Live official outage feed, external email delivery and public hosted acceptance remain separate incomplete work.
+
+Current handoff: [supplied directory](SUPPLIED-DIRECTORY.md).

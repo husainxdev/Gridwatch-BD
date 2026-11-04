@@ -68,13 +68,15 @@ class LocationInput(BaseModel):
     @field_validator("name_bn", "name_en", check_fields=False)
     @classmethod
     def normalize_name(cls, value):
+        if value is None:
+            return None
         result = " ".join(unicodedata.normalize("NFKC", value).split())
         if not 2 <= len(result) <= 160:
             raise ValueError("Normalized name must contain 2–160 characters")
         return result
 
     name_bn: str = Field(min_length=2, max_length=160)
-    name_en: str = Field(min_length=2, max_length=160)
+    name_en: str | None = Field(default=None, min_length=2, max_length=160)
     slug: str = Field(pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$", max_length=180)
     kind: Literal[
         "division",
@@ -309,7 +311,7 @@ def locations(
                 ),
                 else_=1,
             )
-    ordering = [Location.name_en, Location.id]
+    ordering = [func.coalesce(Location.name_en, Location.name_bn), Location.id]
     if ranking is not None:
         ordering.insert(0, ranking)
     result = list_page(db, stmt.order_by(*ordering), page, page_size, loc_json)
@@ -693,7 +695,7 @@ def location_children(
         db,
         select(Location)
         .where(Location.parent_id == location_id)
-        .order_by(Location.name_en, Location.id),
+        .order_by(func.coalesce(Location.name_en, Location.name_bn), Location.id),
         page,
         page_size,
         loc_json,

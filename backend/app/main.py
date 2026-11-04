@@ -13,10 +13,12 @@ from .auth import router as auth_router
 from .config import get_settings
 from .dashboard import router as dashboard_router
 from .db import get_db
+from .directory import router as directory_router
 from .evidence import router as evidence_router
 from .models import DemoArea
 from .planning import router as planning_router
 from .registry import router as registry_router
+from .schema_version import SCHEMA_HEAD
 from .security import secret_key
 
 settings = get_settings()
@@ -52,7 +54,7 @@ def ready(db: Session = Depends(get_db)):
         revision = db.execute(
             text("SELECT version_num FROM alembic_version")
         ).scalar_one()
-        if revision != "0006":
+        if revision != SCHEMA_HEAD:
             raise HTTPException(503, "Database migration required")
     except SQLAlchemyError:
         raise HTTPException(503, "Database unavailable or migration required") from None
@@ -88,6 +90,7 @@ def demo_areas(db: Session = Depends(get_db)):
 
 app.include_router(auth_router)
 app.include_router(dashboard_router)
+app.include_router(directory_router)
 app.include_router(evidence_router)
 app.include_router(api_router)
 app.include_router(admin_workspace_router)

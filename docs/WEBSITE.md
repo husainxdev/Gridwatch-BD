@@ -84,3 +84,11 @@ The importer uses one transaction and the same advisory locks as Admin hierarchy
 For a hosted operator, use the reviewed backend configuration and actual database name, then run `backend/.venv/bin/python scripts/import-location-catalog.py --expected-database ACTUAL_NAME` as a controlled one-time step. The command reads the bundled reviewed manifest; it never fetches arbitrary submitted URLs.
 
 Search examples that work within this catalog: `সিলেট`, `Ward 1`, `ওয়ার্ড ১`, `ওয়ার্ড ০১`. You can also select the city shortcut and choose any of the 42 ward buttons. A neighborhood name such as আম্বরখানা is not mapped to a ward without an original verified source.
+
+## Supplied full source directory
+
+The normal launcher now applies migration `0007` and imports the checksum-reviewed supplied SQLite directory once into PostgreSQL. It adds 428 portal/source records and keeps 5,765 historical census records in a separate read-only reference branch at **http://localhost:5173/areas**. Existing 45 pilot IDs and all account/report data remain; 419 portal identities have source checks, nine stay unverified. Census references are never automatically linked to current ward/report targets.
+
+On an older populated local database, the launcher automatically creates a private PostgreSQL custom-format backup and checksum receipt under `.private/backups/` before the controlled schema upgrade. Backup creation failure stops the upgrade; no database reset is used. Each backup's restoration is not automatically performed or claimed. Production upgrades remain a separate operator-controlled migration/backup procedure. Do not publish the backup files.
+
+From CMD or PowerShell, close earlier API/frontend terminals, pull, and use `C:\Users\USER\Gridwatch-BD\START-WEBSITE.cmd`. Open **এলাকার পূর্ণ তালিকা** or the location picker's larger-directory link. Search `বালাগঞ্জ` in portal records, or `Ambarkhana` / `আম্বরখানা` in the explicitly labelled 2022 reference branch. Details and exact source links are preserved.

@@ -18,7 +18,7 @@ export type Location = {
   aliases: string[];
   kind: string;
   name_bn: string;
-  name_en: string;
+  name_en: string | null;
   slug: string;
   verification_status: "verified" | "unverified";
   source_url: string | null;

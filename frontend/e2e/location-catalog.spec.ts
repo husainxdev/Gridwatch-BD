@@ -79,11 +79,9 @@ test("source-reviewed Sylhet wards can be found, selected and saved through the 
   ).toBeVisible();
   await page.reload();
   await expect(page.locator(".selected-area")).toContainText("১ নম্বর ওয়ার্ড");
-  const dashboardPicker = page
-    .locator(".panel")
-    .filter({
-      has: page.getByRole("heading", { name: "এলাকা নির্বাচন", exact: true }),
-    });
+  const dashboardPicker = page.locator(".panel").filter({
+    has: page.getByRole("heading", { name: "এলাকা নির্বাচন", exact: true }),
+  });
   await dashboardPicker.getByLabel("এলাকার নাম খুঁজুন").fill("Ward 2");
   await expect(
     dashboardPicker.locator(".location-search-results li").first(),

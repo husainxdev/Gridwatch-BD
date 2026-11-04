@@ -2,7 +2,7 @@
 
 Built with **Next.js App Router, React, TypeScript/JavaScript, Tailwind CSS/DaisyUI, FastAPI and PostgreSQL**.
 
-A Bengali-first website for announced power interruptions, personal connection reports and activity planning. The normal site uses persisted PostgreSQL records, excludes fictional evidence and provides responsive Bengali navigation, help and privacy pages. A source-reviewed Sylhet administrative directory (division/district/city corporation/42 wards) is bundled. No official live outage feed, feeder mapping or public deployment has been verified. Missing power evidence stays unknown.
+A Bengali-first website for announced power interruptions, personal connection reports and activity planning. The normal site uses persisted PostgreSQL records, excludes fictional evidence and provides responsive Bengali navigation, help and privacy pages. The supplied source directory is integrated: 428 portal-listed administrative records and a separate 5,765-record Census 2022 reference branch. 419 portal records matched original sources; nine remain under review. The historical extraction is not a current-boundary crosswalk. No official live outage feed, feeder mapping or public deployment has been verified. Missing power evidence stays unknown.
 
 **Windows: use `START-WEBSITE.cmd` for the normal website at http://localhost:5173.** It starts Docker, checks the normal database schema and launches API/frontend without adding sample electricity records or accounts; an empty administrative directory receives the reviewed real Sylhet catalog. Existing normal users and settings are preserved; old isolated demo accounts do not become real accounts. [Exact startup, Admin setup and publishing prerequisites](docs/WEBSITE.md).
 
@@ -17,6 +17,7 @@ A Bengali-first website for announced power interruptions, personal connection r
 - [Data sources and evidence limits](docs/DATA_SOURCES.md)
 - [Submission acceptance and repository links](docs/SUBMISSION.md)
 - [Presentation/viva/local fallback](docs/DEMO_SCRIPT.md)
+- [Supplied SQLite integration, migration and limitations](docs/SUPPLIED-DIRECTORY.md)
 - [Area search repair and original-source catalog](docs/AREA-SEARCH-REVIEW.md)
 - [Normal public website, UI and startup verification](docs/PUBLIC-WEBSITE-REVIEW.md)
 - [Full application review, fixes and remaining gates (2026-11-04)](docs/FULL-REVIEW-2026-11-04.md)

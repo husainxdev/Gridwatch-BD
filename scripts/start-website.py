@@ -224,14 +224,20 @@ def main():
         )
     command = [
         str(PYTHON),
-        str(ROOT / "scripts/release-migrate.py"),
+        str(ROOT / "scripts/prepare-local-schema.py"),
         "--expected-database",
         database.database,
     ]
     if args.backup_reference:
         command.extend(["--backup-reference", args.backup_reference])
     try:
-        run(command, env=env)
+        prepared = json.loads(run(command, env=env).stdout)
+        if prepared.get("backup_created"):
+            print(
+                "Created a private local backup before schema upgrade: "
+                + prepared["backup_file"],
+                flush=True,
+            )
     except StartupError:
         raise StartupError(
             "Schema check stopped. An older populated database needs a backup first; see docs/WEBSITE.md. No database reset was performed."
@@ -252,6 +258,22 @@ def main():
     if imported["created"]:
         print(
             f"Added {imported['created']} source-reviewed Sylhet administrative locations; no schedules, reports or feeder mappings added.",
+            flush=True,
+        )
+    supplied = json.loads(
+        run(
+            [
+                str(PYTHON),
+                str(ROOT / "scripts/import-supplied-directory.py"),
+                "--expected-database",
+                database.database,
+            ],
+            env=env,
+        ).stdout
+    )
+    if not supplied["already_imported"]:
+        print(
+            f"Imported {supplied['portal']} portal records and {supplied['census2022']} historical census references; existing locations preserved.",
             flush=True,
         )
     if args.create_admin:

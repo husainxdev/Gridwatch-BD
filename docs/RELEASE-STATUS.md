@@ -68,3 +68,7 @@ The [public interface and launcher work](PUBLIC-WEBSITE-REVIEW.md) replaces the 
 ## Administrative-source correction
 
 [The area repair](AREA-SEARCH-REVIEW.md) adds independently reviewed government administrative names and a working 42-ward selection flow. Earlier claims that no real Sylhet records are imported are historical. This directory does not resolve the still-missing official outage feed, electrical coverage or actual hosted acceptance.
+
+## Supplied directory / current schema
+
+[The supplied-directory integration](SUPPLIED-DIRECTORY.md) upgrades the supported schema to `0007`, preserves existing records, adds reviewed portal entries and separates historical reference rows. Earlier `0006` statements in historical evidence describe that earlier revision. Public deployment, official outage-feed coverage and external SMTP acceptance remain incomplete.

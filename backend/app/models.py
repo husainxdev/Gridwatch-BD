@@ -39,7 +39,7 @@ class Location(Record, Base):
     __tablename__ = "locations"
     aliases: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]")
     name_bn: Mapped[str] = mapped_column(String(160))
-    name_en: Mapped[str] = mapped_column(String(160))
+    name_en: Mapped[str | None] = mapped_column(String(160))
     kind: Mapped[str] = mapped_column(String(32))
     parent_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("locations.id", ondelete="RESTRICT"), index=True
@@ -64,6 +64,7 @@ class Location(Record, Base):
             func.lower(func.btrim(name_en)),
             unique=True,
             postgresql_nulls_not_distinct=True,
+            postgresql_where=name_en.is_not(None),
         ),
         CheckConstraint(
             "kind IN ('division','district','upazila','city_corporation','union','ward','village','neighborhood')",
@@ -385,5 +386,54 @@ class FeederMapping(Record, Base):
         CheckConstraint(
             "verification_status != 'verified' OR (verified_by IS NOT NULL AND verified_at IS NOT NULL)",
             name="feeder_mapping_evidence",
+        ),
+    )
+
+
+class DirectoryDataset(Record, Base):
+    __tablename__ = "directory_datasets"
+    checksum: Mapped[str] = mapped_column(String(64), unique=True)
+    label: Mapped[str] = mapped_column(String(160))
+    sources: Mapped[list] = mapped_column(JSONB)
+    review: Mapped[dict] = mapped_column(JSONB)
+    ancillary: Mapped[dict] = mapped_column(JSONB)
+
+
+class DirectoryPlace(Record, Base):
+    __tablename__ = "directory_places"
+    dataset_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("directory_datasets.id", ondelete="RESTRICT"), index=True
+    )
+    branch: Mapped[str] = mapped_column(String(20))
+    external_id: Mapped[str] = mapped_column(String(200))
+    parent_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("directory_places.id", ondelete="RESTRICT"), index=True
+    )
+    kind: Mapped[str] = mapped_column(String(32))
+    name_bn: Mapped[str | None] = mapped_column(String(160))
+    name_en: Mapped[str | None] = mapped_column(String(160))
+    aliases: Mapped[list] = mapped_column(JSONB)
+    source_id: Mapped[str] = mapped_column(String(80))
+    source_url: Mapped[str] = mapped_column(Text)
+    review_status: Mapped[str] = mapped_column(String(30))
+    location_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("locations.id", ondelete="SET NULL"), index=True
+    )
+    original: Mapped[dict] = mapped_column(JSONB)
+    __table_args__ = (
+        UniqueConstraint(
+            "dataset_id", "branch", "external_id", name="uq_directory_identity"
+        ),
+        CheckConstraint("branch IN ('portal','census2022')", name="directory_branch"),
+        CheckConstraint(
+            "review_status IN ('source_checked','needs_review','historical')",
+            name="directory_review",
+        ),
+        CheckConstraint(
+            "name_bn IS NOT NULL OR name_en IS NOT NULL", name="directory_name"
+        ),
+        CheckConstraint(
+            "branch != 'census2022' OR location_id IS NULL",
+            name="census_not_current_location",
         ),
     )

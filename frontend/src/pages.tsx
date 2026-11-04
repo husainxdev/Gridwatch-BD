@@ -586,7 +586,7 @@ function AdminAreas({
       body = {
         version: edit?.version || 1,
         name_bn: f.get("name_bn"),
-        name_en: f.get("name_en"),
+        name_en: f.get("name_en") || null,
         slug: f.get("slug"),
         kind: f.get("kind"),
         parent_id: f.get("parent_id") || null,
@@ -622,12 +622,11 @@ function AdminAreas({
               minLength={2}
             />
           </Field>
-          <Field label="English name">
+          <Field label="English name (ঐচ্ছিক)">
             <input
               name="name_en"
               className="input input-bordered"
-              defaultValue={edit?.name_en}
-              required
+              defaultValue={edit?.name_en || ""}
               minLength={2}
             />
           </Field>

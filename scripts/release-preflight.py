@@ -37,7 +37,7 @@ def main():
     }
     result = {
         "source_revision": os.environ["RELEASE_REVISION"],
-        "schema_target": "0006",
+        "schema_target": "0007",
         "checks": checks,
         "deployed_verification": "not_performed",
         "live_urls": None,

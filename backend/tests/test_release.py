@@ -301,7 +301,7 @@ def test_backup_restore_populated_upgrade_and_target_guards(
                     db.execute(
                         text("SELECT version_num FROM alembic_version")
                     ).scalar_one()
-                    == "0006"
+                    == "0007"
                 )
                 row = db.execute(
                     text("SELECT label,is_default FROM saved_areas WHERE user_id=:id"),

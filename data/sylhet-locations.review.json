@@ -1,0 +1,2164 @@
+{
+  "file_sha256": "452a74777756002e59e39c36b4d47a91faccf764ae8006590aaaabe7cc8fb6a9",
+  "reviewed_at": "2026-11-04T13:57:17.738562+00:00",
+  "sources": [
+    {
+      "source_id": "ban",
+      "url": "https://baniachong.habiganj.gov.bd/pages/static-pages/696cb973c4774958d7ba76eb",
+      "status": 200,
+      "retrieved_at": "2026-11-04T13:52:24.133624+00:00",
+      "sha256": "74f35a90c03c73a0dba58f6fd67917f9037db37bc148761a70e5d85dced4f1ef",
+      "bytes": 104596
+    },
+    {
+      "source_id": "bpdb",
+      "error": "'ascii' codec can't encode characters in position 24-30: ordinal not in range(128)"
+    },
+    {
+      "source_id": "city",
+      "url": "https://scc.gov.bd/pages/static-pages/6922df09933eb65569e1f5f4",
+      "status": 200,
+      "retrieved_at": "2026-11-04T13:52:25.014724+00:00",
+      "sha256": "150ad16edd6dcd6cc5b3f3022796b5caf07da822acb1ddb3def1395adc825c9c",
+      "bytes": 147192
+    },
+    {
+      "source_id": "dak",
+      "error": "HTTP Error 503: Service Unavailable"
+    },
+    {
+      "source_id": "gowa",
+      "error": "HTTP Error 503: Service Unavailable"
+    },
+    {
+      "source_id": "sadar",
+      "error": "HTTP Error 503: Service Unavailable"
+    },
+    {
+      "source_id": "union",
+      "url": "https://sylhetdiv.gov.bd/pages/static-pages/696cb417c4774958d7ba3401",
+      "status": 200,
+      "retrieved_at": "2026-11-04T13:52:26.276156+00:00",
+      "sha256": "7a8778a9e37775aa01dce9d9b34259210548536bfeedbd550ff31a1b59c0a654",
+      "bytes": 202599
+    },
+    {
+      "source_id": "up",
+      "url": "https://sylhetdiv.gov.bd/pages/static-pages/696cb9bfc4774958d7ba981c",
+      "status": 200,
+      "retrieved_at": "2026-11-04T13:52:25.988178+00:00",
+      "sha256": "e1c16992990e9f649d0d73ee8448e09d93db0bca7a1569d71b1ef7ed384eacbe",
+      "bytes": 147016
+    }
+  ],
+  "portal_rows": {
+    "sylhet-division": {
+      "status": "source_checked",
+      "reason": "Official divisional table identifies the division and four district columns."
+    },
+    "sylhet": {
+      "status": "source_checked",
+      "reason": "Official divisional table identifies the division and four district columns."
+    },
+    "sunamganj": {
+      "status": "source_checked",
+      "reason": "Official divisional table identifies the division and four district columns."
+    },
+    "habiganj": {
+      "status": "source_checked",
+      "reason": "Official divisional table identifies the division and four district columns."
+    },
+    "moulvibazar": {
+      "status": "source_checked",
+      "reason": "Official divisional table identifies the division and four district columns."
+    },
+    "sylhet/balaganj": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "বালাগঞ্জ"
+    },
+    "sunamganj/bishwambarpur": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "বিশ্বম্ভরপুর"
+    },
+    "habiganj/ajmiriganj": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "আজমিরীগঞ্জ"
+    },
+    "moulvibazar/barlekha": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "বড়লেখা"
+    },
+    "sylhet/beanibazar": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "বিয়ানীবাজার"
+    },
+    "sunamganj/chhatak": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "ছাতক"
+    },
+    "habiganj/bahubal": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "বাহুবল"
+    },
+    "moulvibazar/kulaura": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "কুলাউড়া"
+    },
+    "sylhet/bishwanath": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "বিশ্বনাথ"
+    },
+    "sunamganj/derai": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "দিরাই"
+    },
+    "habiganj/baniachong": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "বানিয়াচং"
+    },
+    "moulvibazar/kamolganj": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "কমলগঞ্জ"
+    },
+    "sylhet/companiganj": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "কোম্পানীগঞ্জ"
+    },
+    "sunamganj/dharmapasha": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "ধর্মপাশা"
+    },
+    "habiganj/chunarughat": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "চুনারুঘাট"
+    },
+    "moulvibazar/rajnagar": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "রাজনগর"
+    },
+    "sylhet/fenchuganj": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "ফেঞ্চুগঞ্জ"
+    },
+    "sunamganj/dowarabazar": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "দোয়ারাবাজার"
+    },
+    "habiganj/lakhai": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "লাখাই"
+    },
+    "moulvibazar/moulvibazarsadar": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "মৌলভীবাজার সদর"
+    },
+    "sylhet/golapganj": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "গোলাপগঞ্জ"
+    },
+    "sunamganj/jagannathpur": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "জগন্নাথপুর"
+    },
+    "habiganj/madhabpur": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "মাধবপুর"
+    },
+    "moulvibazar/sreemangal": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "শ্রীমঙ্গল"
+    },
+    "sylhet/gowainghat": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "গোয়াইনঘাট"
+    },
+    "sunamganj/jamalganj": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "জামালগঞ্জ"
+    },
+    "habiganj/nabiganj": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "নবীগঞ্জ"
+    },
+    "moulvibazar/juri": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "জুড়ী"
+    },
+    "sylhet/jaintiapur": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "জৈন্তাপুর"
+    },
+    "sunamganj/tahirpur": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "তাহিরপুর"
+    },
+    "habiganj/habiganjsadar": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "হবিগঞ্জ সদর"
+    },
+    "sylhet/zakiganj": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "জকিগঞ্জ"
+    },
+    "sunamganj/sadar": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "সুনামগঞ্জ সদর"
+    },
+    "habiganj/shayestaganj": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "শায়েস্তাগঞ্জ"
+    },
+    "sylhet/kanaighat": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "কানাইঘাট"
+    },
+    "sunamganj/shalla": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "শাল্লা"
+    },
+    "sylhet/sylhetsadar": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "সিলেট সদর"
+    },
+    "sunamganj/southsunamganj": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "শান্তিগঞ্জ"
+    },
+    "sylhet/dakshinsurma": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "দক্ষিণ সুরমা"
+    },
+    "sunamganj/madhyanagar": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "মধ্যনগর"
+    },
+    "sylhet/osmaninagar": {
+      "status": "source_checked",
+      "reason": "Name matched in its original district column.",
+      "matched_source_label": "ওসমানীনগর"
+    },
+    "sylhet/city": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-01": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-02": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-03": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-04": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-05": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-06": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-07": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-08": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-09": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-10": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-11": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-12": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-13": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-14": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-15": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-16": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-17": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-18": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-19": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-20": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-21": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-22": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-23": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-24": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-25": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-26": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-27": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-28": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-29": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-30": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-31": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-32": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-33": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-34": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-35": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-36": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-37": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-38": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-39": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-40": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-41": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/city/ward-42": {
+      "status": "source_checked",
+      "reason": "Previously independently corroborated SCC 42-ward catalog; preserve existing reviewed identities."
+    },
+    "sylhet/balaganj/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পূর্ব পৈলনপুর ইউনিয়ন"
+    },
+    "sylhet/balaganj/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বোয়ালজুড় ইউনিয়ন"
+    },
+    "sylhet/balaganj/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দেওয়ানবাজার ইউনিয়ন"
+    },
+    "sylhet/balaganj/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পশ্চিম গৌরীপুর ইউনিয়ন"
+    },
+    "sylhet/balaganj/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বালাগঞ্জ ইউনিয়ন"
+    },
+    "sylhet/balaganj/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পূর্ব গৌরীপুর ইউনিয়ন"
+    },
+    "sylhet/beanibazar/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আলীনগর ইউনিয়ন"
+    },
+    "sylhet/beanibazar/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কুড়ারবাজার ইউনিয়ন"
+    },
+    "sylhet/beanibazar/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "চরখাই ইউনিয়ন"
+    },
+    "sylhet/beanibazar/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দুবাগ ইউনিয়ন"
+    },
+    "sylhet/beanibazar/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মাথিউরা ইউনিয়ন"
+    },
+    "sylhet/beanibazar/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "তিলপাড়া ইউনিয়ন"
+    },
+    "sylhet/beanibazar/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মুড়িয়া ইউনিয়ন"
+    },
+    "sylhet/beanibazar/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মোল্লাপুর ইউনিয়ন"
+    },
+    "sylhet/beanibazar/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লাউতা ইউনিয়ন"
+    },
+    "sylhet/beanibazar/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "শেওলা ইউনিয়ন"
+    },
+    "sylhet/bishwanath/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লামাকাজী ইউনিয়ন"
+    },
+    "sylhet/bishwanath/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "খাজাঞ্চী ইউনিয়ন"
+    },
+    "sylhet/bishwanath/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "অলংকারী ইউনিয়ন"
+    },
+    "sylhet/bishwanath/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রামপাশা ইউনিয়ন"
+    },
+    "sylhet/bishwanath/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দৌলতপুর ইউনিয়ন"
+    },
+    "sylhet/bishwanath/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বিশ্বনাথ ইউনিয়ন"
+    },
+    "sylhet/bishwanath/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দেওকলস ইউনিয়ন"
+    },
+    "sylhet/bishwanath/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দশঘর ইউনিয়ন"
+    },
+    "sylhet/companiganj/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ইসলামপূর পশ্চিম ইউনিয়ন"
+    },
+    "sylhet/companiganj/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ইসলামপুর পূর্ব ইউনিয়ন"
+    },
+    "sylhet/companiganj/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "তেলিখাল ইউনিয়ন"
+    },
+    "sylhet/companiganj/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ইছাকলস ইউনিয়ন"
+    },
+    "sylhet/companiganj/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "উত্তর রণিখাই ইউনিয়ন"
+    },
+    "sylhet/companiganj/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দক্ষিণ রণিখাই ইউনিয়ন"
+    },
+    "sylhet/fenchuganj/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ফেঞ্চুগঞ্জ ইউনিয়ন"
+    },
+    "sylhet/fenchuganj/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মাইজগাঁও ইউনিয়ন"
+    },
+    "sylhet/fenchuganj/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ঘিলাছড়া ইউনিয়ন"
+    },
+    "sylhet/fenchuganj/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "উত্তর কুশিয়ারা ইউনিয়ন"
+    },
+    "sylhet/fenchuganj/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "উত্তর ফেঞ্চুগঞ্জ ইউনিয়ন"
+    },
+    "sylhet/golapganj/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বাঘা ইউনিয়ন"
+    },
+    "sylhet/golapganj/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "গোলাপগঞ্জ ইউনিয়ন"
+    },
+    "sylhet/golapganj/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ফুলবাড়ী ইউনিয়ন"
+    },
+    "sylhet/golapganj/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লক্ষ্মীপাশা ইউনিয়ন"
+    },
+    "sylhet/golapganj/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ঢাকাদক্ষিণ ইউনিয়ন"
+    },
+    "sylhet/golapganj/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লক্ষণাবন্দ ইউনিয়ন"
+    },
+    "sylhet/golapganj/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ভাদেশ্বর ইউনিয়ন"
+    },
+    "sylhet/golapganj/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পশ্চিম আমুড়া ইউনিয়ন"
+    },
+    "sylhet/golapganj/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "উত্তর বাদেপাশা ইউনিয়ন"
+    },
+    "sylhet/golapganj/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "শরীফগঞ্জ ইউনিয়ন"
+    },
+    "sylhet/golapganj/union-11": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বুধবারী বাজার"
+    },
+    "sylhet/gowainghat/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রুস্তমপুর ইউনিয়ন"
+    },
+    "sylhet/gowainghat/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পশ্চিম জাফলং ইউনিয়ন"
+    },
+    "sylhet/gowainghat/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পূর্ব জাফলং ইউনিয়ন"
+    },
+    "sylhet/gowainghat/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লেঙ্গুঁড়া ইউনিয়ন"
+    },
+    "sylhet/gowainghat/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পূর্ব আলীরগাঁও ইউনিয়ন"
+    },
+    "sylhet/gowainghat/union-06": {
+      "status": "needs_review",
+      "reason": "Source association preserved; original row not independently reconciled."
+    },
+    "sylhet/gowainghat/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ফতেপুর ইউনিয়ন"
+    },
+    "sylhet/gowainghat/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "গোয়াইনঘাট সদর ইউনিয়ন"
+    },
+    "sylhet/gowainghat/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "নন্দিরগাঁও ইউনিয়ন"
+    },
+    "sylhet/gowainghat/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "তোয়াকুল ইউনিয়ন"
+    },
+    "sylhet/gowainghat/union-11": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ডৌবাড়ী ইউনিয়ন"
+    },
+    "sylhet/gowainghat/union-12": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মধ্য জাফলং ইউনিয়ন"
+    },
+    "sylhet/gowainghat/union-13": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বিছনাকান্দি ইউনিয়ন।"
+    },
+    "sylhet/jaintiapur/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "নিজপাট ইউনিয়ন"
+    },
+    "sylhet/jaintiapur/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জৈন্তাপুর ইউনিয়ন"
+    },
+    "sylhet/jaintiapur/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "চারিকাটা ইউনিয়ন"
+    },
+    "sylhet/jaintiapur/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দরবস্ত ইউনিয়ন"
+    },
+    "sylhet/jaintiapur/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ফতেহপুর ইউনিয়ন"
+    },
+    "sylhet/jaintiapur/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "চিকনাগুল ইউনিয়ন"
+    },
+    "sylhet/kanaighat/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পূর্ব লক্ষ্মীপ্রাসাদ ইউনিয়ন"
+    },
+    "sylhet/kanaighat/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পশ্চিম লক্ষ্মীপ্রাসাদ ইউনিয়ন"
+    },
+    "sylhet/kanaighat/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পূর্ব দিঘীরপার ইউনিয়ন"
+    },
+    "sylhet/kanaighat/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সাতবাঁক ইউনিয়ন"
+    },
+    "sylhet/kanaighat/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বড়চতুল ইউনিয়ন"
+    },
+    "sylhet/kanaighat/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কানাইঘাট ইউনিয়ন"
+    },
+    "sylhet/kanaighat/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দক্ষিণ বাণীগ্রাম ইউনিয়ন"
+    },
+    "sylhet/kanaighat/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ঝিঙ্গাবাড়ী ইউনিয়ন"
+    },
+    "sylhet/kanaighat/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রাজাগঞ্জ ইউনিয়ন"
+    },
+    "sylhet/sylhetsadar/union-01": {
+      "status": "needs_review",
+      "reason": "Sadar roster/boundary inconsistency after city expansion; keep available for review, not automatically reportable.",
+      "matched_source_label": "কান্দিগাঁও ইউনিয়ন"
+    },
+    "sylhet/sylhetsadar/union-02": {
+      "status": "needs_review",
+      "reason": "Sadar roster/boundary inconsistency after city expansion; keep available for review, not automatically reportable.",
+      "matched_source_label": "খাদিমনগর ইউনিয়ন"
+    },
+    "sylhet/sylhetsadar/union-03": {
+      "status": "needs_review",
+      "reason": "Sadar roster/boundary inconsistency after city expansion; keep available for review, not automatically reportable.",
+      "matched_source_label": "খাদিমপাড়া ইউনিয়ন"
+    },
+    "sylhet/sylhetsadar/union-04": {
+      "status": "needs_review",
+      "reason": "Sadar roster/boundary inconsistency after city expansion; keep available for review, not automatically reportable.",
+      "matched_source_label": "জালালাবাদ ইউনিয়ন"
+    },
+    "sylhet/sylhetsadar/union-05": {
+      "status": "needs_review",
+      "reason": "Sadar roster/boundary inconsistency after city expansion; keep available for review, not automatically reportable.",
+      "matched_source_label": "টুকের বাজার ইউনিয়ন"
+    },
+    "sylhet/sylhetsadar/union-06": {
+      "status": "needs_review",
+      "reason": "Sadar roster/boundary inconsistency after city expansion; keep available for review, not automatically reportable.",
+      "matched_source_label": "মোগলগাঁও ইউনিয়ন"
+    },
+    "sylhet/sylhetsadar/union-07": {
+      "status": "needs_review",
+      "reason": "Sadar roster/boundary inconsistency after city expansion; keep available for review, not automatically reportable.",
+      "matched_source_label": "হাটখোলা ইউনিয়ন"
+    },
+    "sylhet/zakiganj/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বারহাল ইউনিয়ন"
+    },
+    "sylhet/zakiganj/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বীরশ্রী ইউনিয়ন"
+    },
+    "sylhet/zakiganj/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কাজলসার ইউনিয়ন"
+    },
+    "sylhet/zakiganj/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "খলাছড়া ইউনিয়ন"
+    },
+    "sylhet/zakiganj/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জকিগঞ্জ সদর ইউনিয়ন"
+    },
+    "sylhet/zakiganj/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সুলতানপুর ইউনিয়ন"
+    },
+    "sylhet/zakiganj/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বারঠাকুরী ইউনিয়ন"
+    },
+    "sylhet/zakiganj/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কসকনকপুর ইউনিয়ন"
+    },
+    "sylhet/zakiganj/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মানিকপুর ইউনিয়ন"
+    },
+    "sylhet/dakshinsurma/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মোল্লারগাঁও ইউনিয়ন"
+    },
+    "sylhet/dakshinsurma/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "তেতলী ইউনিয়ন"
+    },
+    "sylhet/dakshinsurma/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লালাবাজার ইউনিয়ন"
+    },
+    "sylhet/dakshinsurma/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জালালপুর ইউনিয়ন"
+    },
+    "sylhet/dakshinsurma/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মোগলাবাজার ইউনিয়ন"
+    },
+    "sylhet/dakshinsurma/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দাউদপুর ইউনিয়ন"
+    },
+    "sylhet/dakshinsurma/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কামালবাজার ইউনিয়ন"
+    },
+    "sylhet/osmaninagar/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "উমরপুর ইউনিয়ন"
+    },
+    "sylhet/osmaninagar/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "তাজপুর ইউনিয়ন"
+    },
+    "sylhet/osmaninagar/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পশ্চিম পৈলনপুর ইউনিয়ন"
+    },
+    "sylhet/osmaninagar/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বুরুঙ্গাবাজার ইউনিয়ন"
+    },
+    "sylhet/osmaninagar/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "গোয়ালাবাজার ইউনিয়ন"
+    },
+    "sylhet/osmaninagar/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সাদীপুর ইউনিয়ন"
+    },
+    "sylhet/osmaninagar/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "উসমানপুর ইউনিয়ন"
+    },
+    "sylhet/osmaninagar/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দয়ামীর ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ছাতক সদর ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "নোয়ারাই ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ইসলামপুর ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কালারুকা ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "খুরমা উত্তর ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "খুরমা দক্ষিণ ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জাউয়া বাজার ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "চরমহল্লা ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ভাতগাঁও ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সিংচাপইড় ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-11": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "গোবিন্দগঞ্জ-সৈদের গাঁও ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-12": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দোলারবাজার ইউনিয়ন"
+    },
+    "sunamganj/chhatak/union-13": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ছৈলা আফজালাবাদ ইউনিয়ন"
+    },
+    "sunamganj/jagannathpur/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কলকলিয়া ইউনিয়ন"
+    },
+    "sunamganj/jagannathpur/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পাটলী ইউনিয়ন"
+    },
+    "sunamganj/jagannathpur/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মীরপুর ইউনিয়ন"
+    },
+    "sunamganj/jagannathpur/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "চিলাউড়া-হলদিপুর ইউনিয়ন"
+    },
+    "sunamganj/jagannathpur/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রাণীগঞ্জ ইউনিয়ন"
+    },
+    "sunamganj/jagannathpur/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সৈয়দপুর শাহারপাড়া ইউনিয়ন"
+    },
+    "sunamganj/jagannathpur/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আশারকান্দি ইউনিয়ন"
+    },
+    "sunamganj/jagannathpur/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পাইলগাঁও ইউনিয়ন"
+    },
+    "sunamganj/jamalganj/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বেহেলী ইউনিয়ন"
+    },
+    "sunamganj/jamalganj/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জামালগঞ্জ ইউনিয়ন"
+    },
+    "sunamganj/jamalganj/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ফেনারবাঁক ইউনিয়ন"
+    },
+    "sunamganj/jamalganj/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সাচনা বাজার ইউনিয়ন"
+    },
+    "sunamganj/jamalganj/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ভীমখালী ইউনিয়ন"
+    },
+    "sunamganj/jamalganj/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জামালগঞ্জ উত্তর ইউনিয়ন"
+    },
+    "sunamganj/tahirpur/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বাদাঘাট ইউনিয়ন"
+    },
+    "sunamganj/tahirpur/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "তাহিরপুর ইউনিয়ন"
+    },
+    "sunamganj/tahirpur/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বালিজুরি ইউনিয়ন"
+    },
+    "sunamganj/tahirpur/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "উত্তর শ্রীপুর ইউনিয়ন"
+    },
+    "sunamganj/tahirpur/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দক্ষিণ শ্রীপুর ইউনিয়ন"
+    },
+    "sunamganj/tahirpur/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দক্ষিণ বড়দল ইউনিয়ন"
+    },
+    "sunamganj/tahirpur/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "উত্তর বড়দল ইউনিয়ন"
+    },
+    "sunamganj/southsunamganj/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "শিমুলবাক ইউনিয়ন"
+    },
+    "sunamganj/southsunamganj/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পশ্চিম পাগলা ইউনিয়ন"
+    },
+    "sunamganj/southsunamganj/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পূর্ব পাগলা ইউনিয়ন"
+    },
+    "sunamganj/southsunamganj/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জয়কলস ইউনিয়ন"
+    },
+    "sunamganj/southsunamganj/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পাথারিয়া ইউনিয়ন"
+    },
+    "sunamganj/southsunamganj/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দরগাপাশা ইউনিয়ন"
+    },
+    "sunamganj/southsunamganj/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পূর্ব বীরগাঁও ইউনিয়ন"
+    },
+    "sunamganj/southsunamganj/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পশ্চিম বীরগাঁও ইউনিয়ন"
+    },
+    "sunamganj/derai/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রফিনগর ইউনিয়ন"
+    },
+    "sunamganj/derai/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ভাটিপাড়া ইউনিয়ন"
+    },
+    "sunamganj/derai/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রাজানগর ইউনিয়ন"
+    },
+    "sunamganj/derai/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "চরনারচর ইউনিয়ন"
+    },
+    "sunamganj/derai/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দিরাই সরমঙ্গল ইউনিয়ন"
+    },
+    "sunamganj/derai/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "করিমপুর ইউনিয়ন"
+    },
+    "sunamganj/derai/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জগদল ইউনিয়ন"
+    },
+    "sunamganj/derai/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "তাড়ল ইউনিয়ন"
+    },
+    "sunamganj/derai/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কুলঞ্জ ইউনিয়ন"
+    },
+    "sunamganj/dowarabazar/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বাংলাবাজার ইউনিয়ন"
+    },
+    "sunamganj/dowarabazar/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দোয়ারাবাজার সদর ইউনিয়ন"
+    },
+    "sunamganj/dowarabazar/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "নরসিংপুর ইউনিয়ন"
+    },
+    "sunamganj/dowarabazar/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মান্নারগাঁও ইউনিয়ন"
+    },
+    "sunamganj/dowarabazar/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পাণ্ডারগাঁও ইউনিয়ন"
+    },
+    "sunamganj/dowarabazar/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দোহালিয়া ইউনিয়ন"
+    },
+    "sunamganj/dowarabazar/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লক্ষ্মীপুর ইউনিয়ন"
+    },
+    "sunamganj/dowarabazar/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বোগলাবাজার ইউনিয়ন"
+    },
+    "sunamganj/dowarabazar/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সুরমা ইউনিয়ন"
+    },
+    "sunamganj/dharmapasha/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পাইকুরাটি ইউনিয়ন"
+    },
+    "sunamganj/dharmapasha/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সেলবরষ ইউনিয়ন"
+    },
+    "sunamganj/dharmapasha/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ধর্মপাশা ইউনিয়ন"
+    },
+    "sunamganj/dharmapasha/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জয়শ্রী ইউনিয়ন"
+    },
+    "sunamganj/dharmapasha/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সুখাইড় রাজাপুর উত্তর ইউনিয়ন"
+    },
+    "sunamganj/dharmapasha/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সুখাইড় রাজাপুর দক্ষিণ ইউনিয়ন"
+    },
+    "sunamganj/madhyanagar/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বংশীকুণ্ডা উত্তর ইউনিয়ন"
+    },
+    "sunamganj/madhyanagar/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বংশীকুণ্ডা দক্ষিণ ইউনিয়ন"
+    },
+    "sunamganj/madhyanagar/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "চামরদানী ইউনিয়ন"
+    },
+    "sunamganj/madhyanagar/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মধ্যনগর ইউনিয়ন"
+    },
+    "sunamganj/bishwambarpur/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সলুকাবাদ ইউনিয়ন"
+    },
+    "sunamganj/bishwambarpur/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ধনপুর ইউনিয়ন"
+    },
+    "sunamganj/bishwambarpur/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পলাশ ইউনিয়ন"
+    },
+    "sunamganj/bishwambarpur/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ফতেপুর ইউনিয়ন"
+    },
+    "sunamganj/bishwambarpur/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বাদাঘাট দক্ষিণ ইউনিয়ন"
+    },
+    "sunamganj/shalla/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আটগাঁও ইউনিয়ন"
+    },
+    "sunamganj/shalla/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "হবিবপুর ইউনিয়ন"
+    },
+    "sunamganj/shalla/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বাহাড়া ইউনিয়ন"
+    },
+    "sunamganj/shalla/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "শাল্লা ইউনিয়ন"
+    },
+    "sunamganj/sadar/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লক্ষণশ্রী ইউনিয়ন"
+    },
+    "sunamganj/sadar/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মোহনপুর ইউনিয়ন"
+    },
+    "sunamganj/sadar/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কাঠইর ইউনিয়ন"
+    },
+    "sunamganj/sadar/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "গৌরারং ইউনিয়ন"
+    },
+    "sunamganj/sadar/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সুরমা ইউনিয়ন"
+    },
+    "sunamganj/sadar/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জাহাঙ্গীরনগর ইউনিয়ন"
+    },
+    "sunamganj/sadar/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রংগারচর ইউনিয়ন"
+    },
+    "sunamganj/sadar/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কুরবাননগর ইউনিয়ন"
+    },
+    "sunamganj/sadar/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মোল্লাপাড়া ইউনিয়ন"
+    },
+    "habiganj/ajmiriganj/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আজমিরীগঞ্জ সদর ইউনিয়ন"
+    },
+    "habiganj/ajmiriganj/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বদলপুর ইউনিয়ন"
+    },
+    "habiganj/ajmiriganj/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জলসুখা ইউনিয়ন"
+    },
+    "habiganj/ajmiriganj/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "শিবপাশা ইউনিয়ন"
+    },
+    "habiganj/ajmiriganj/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কাকাইলছেও ইউনিয়ন"
+    },
+    "habiganj/chunarughat/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "গাজীপুর ইউনিয়ন"
+    },
+    "habiganj/chunarughat/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আহম্মদাবাদ ইউনিয়ন"
+    },
+    "habiganj/chunarughat/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দেওরগাছ ইউনিয়ন"
+    },
+    "habiganj/chunarughat/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পাইকপাড়া ইউনিয়ন"
+    },
+    "habiganj/chunarughat/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "শানখলা ইউনিয়ন"
+    },
+    "habiganj/chunarughat/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "চুনারুঘাট ইউনিয়ন"
+    },
+    "habiganj/chunarughat/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "উবাহাটা ইউনিয়ন"
+    },
+    "habiganj/chunarughat/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সাটিয়াজুরী ইউনিয়ন"
+    },
+    "habiganj/chunarughat/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রাণীগাঁও ইউনিয়ন"
+    },
+    "habiganj/chunarughat/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মিরাশী ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বড়ভাকৈর পশ্চিম ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বড়ভাকৈর পূর্ব ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ইনাতগঞ্জ ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দীঘলবাক ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আউশকান্দি ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কুর্শি ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "করগাঁও ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "নবীগঞ্জ সদর ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বাউসা ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দেবপাড়া ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-11": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "গজনাইপুর ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-12": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কালিয়ারভাঙ্গা ইউনিয়ন"
+    },
+    "habiganj/nabiganj/union-13": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পানিউমদা ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বানিয়াচং উত্তর পূর্ব ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বানিয়াচং উত্তর পশ্চিম ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বানিয়াচং দক্ষিণ পূর্ব ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বানিয়াচং দক্ষিণ পশ্চিম ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দৌলতপুর ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কাগাপাশা ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বড়ইউড়ি ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "খাগাউড়া ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পুকড়া ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-11": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সুবিদপুর ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-12": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মক্রমপুর ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-13": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সুজাতপুর ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-14": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মন্দরী ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-15": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মুরাদপুর ইউনিয়ন"
+    },
+    "habiganj/baniachong/union-16": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পৈলারকান্দি ইউনিয়ন"
+    },
+    "habiganj/bahubal/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "স্নানঘাট ইউনিয়ন"
+    },
+    "habiganj/bahubal/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পুটিজুরী ইউনিয়ন"
+    },
+    "habiganj/bahubal/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সাতকাপন ইউনিয়ন"
+    },
+    "habiganj/bahubal/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বাহুবল সদর ইউনিয়ন"
+    },
+    "habiganj/bahubal/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লামাতাশী ইউনিয়ন"
+    },
+    "habiganj/bahubal/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মীরপুর ইউনিয়ন"
+    },
+    "habiganj/bahubal/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ভাদেশ্বর ইউনিয়ন"
+    },
+    "habiganj/madhabpur/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আদাঐর ইউনিয়ন"
+    },
+    "habiganj/madhabpur/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আন্দিউড়া ইউনিয়ন"
+    },
+    "habiganj/madhabpur/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "চৌমুহনী ইউনিয়ন"
+    },
+    "habiganj/madhabpur/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ছাতিয়াইন ইউনিয়ন"
+    },
+    "habiganj/madhabpur/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জগদীশপুর ইউনিয়ন"
+    },
+    "habiganj/madhabpur/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ধর্মঘর ইউনিয়ন"
+    },
+    "habiganj/madhabpur/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "নোয়াপাড়া ইউনিয়ন"
+    },
+    "habiganj/madhabpur/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বাঘাসুরা ইউনিয়ন"
+    },
+    "habiganj/madhabpur/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বহরা ইউনিয়ন"
+    },
+    "habiganj/madhabpur/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "শাহজাহানপুর ইউনিয়ন"
+    },
+    "habiganj/madhabpur/union-11": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বুল্লা ইউনিয়ন"
+    },
+    "habiganj/lakhai/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লাখাই ইউনিয়ন"
+    },
+    "habiganj/lakhai/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মোড়াকরি ইউনিয়ন"
+    },
+    "habiganj/lakhai/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মুড়িয়াউক ইউনিয়ন"
+    },
+    "habiganj/lakhai/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বামৈ ইউনিয়ন"
+    },
+    "habiganj/lakhai/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "করাব ইউনিয়ন"
+    },
+    "habiganj/lakhai/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বুল্লা ইউনিয়ন"
+    },
+    "habiganj/shayestaganj/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "নূরপুর ইউনিয়ন"
+    },
+    "habiganj/shayestaganj/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "শায়েস্তাগঞ্জ ইউনিয়ন"
+    },
+    "habiganj/shayestaganj/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ব্রাহ্মনডোরা ইউনিয়ন"
+    },
+    "habiganj/habiganjsadar/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লোকরা ইউনিয়ন"
+    },
+    "habiganj/habiganjsadar/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রিচি ইউনিয়ন"
+    },
+    "habiganj/habiganjsadar/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "তেঘরিয়া ইউনিয়ন"
+    },
+    "habiganj/habiganjsadar/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পৈল ইউনিয়ন"
+    },
+    "habiganj/habiganjsadar/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "গোপায়া ইউনিয়ন"
+    },
+    "habiganj/habiganjsadar/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রাজিউরা ইউনিয়ন"
+    },
+    "habiganj/habiganjsadar/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "নিজামপুর ইউনিয়ন"
+    },
+    "habiganj/habiganjsadar/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "লস্করপুর ইউনিয়ন"
+    },
+    "moulvibazar/barlekha/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বড়লেখা ইউনিয়ন"
+    },
+    "moulvibazar/barlekha/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বর্ণি ইউনিয়ন"
+    },
+    "moulvibazar/barlekha/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দক্ষিণ শাহবাজপুর ইউনিয়ন"
+    },
+    "moulvibazar/barlekha/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দক্ষিণ দক্ষিণভাগ ইউনিয়ন"
+    },
+    "moulvibazar/barlekha/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "দাসের বাজার ইউনিয়ন"
+    },
+    "moulvibazar/barlekha/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "নিজ বাহাদুরপুর ইউনিয়ন"
+    },
+    "moulvibazar/barlekha/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সুজানগর ইউনিয়ন"
+    },
+    "moulvibazar/barlekha/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কাটাল তলী ইউনিয়ন"
+    },
+    "moulvibazar/barlekha/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "উত্তর শাহবাজপুর ইউনিয়ন"
+    },
+    "moulvibazar/barlekha/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "তালিমপুর ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "বরমচাল ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ভূকশিমইল ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জয়চন্ডী ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ব্রাহ্মণবাজার ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কাদিপুর ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কুলাউড়া ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রাউৎগাঁও ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "টিলাগাঁও ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "শরীফপুর ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পৃথিমপাশা ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-11": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কর্মধা ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-12": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ভাটেরা ইউনিয়ন"
+    },
+    "moulvibazar/kulaura/union-13": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "হাজীপুর ইউনিয়ন"
+    },
+    "moulvibazar/rajnagar/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ফতেপুর ইউনিয়ন"
+    },
+    "moulvibazar/rajnagar/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "উত্তরভাগ ইউনিয়ন"
+    },
+    "moulvibazar/rajnagar/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মুন্সিবাজার ইউনিয়ন"
+    },
+    "moulvibazar/rajnagar/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পাঁচগাঁও ইউনিয়ন"
+    },
+    "moulvibazar/rajnagar/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রাজনগর ইউনিয়ন"
+    },
+    "moulvibazar/rajnagar/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "টেংরা ইউনিয়ন"
+    },
+    "moulvibazar/rajnagar/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কামারচাক ইউনিয়ন"
+    },
+    "moulvibazar/rajnagar/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মনসুরনগর ইউনিয়ন"
+    },
+    "moulvibazar/kamolganj/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রহিমপুর ইউনিয়ন"
+    },
+    "moulvibazar/kamolganj/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পতনঊষার ইউনিয়ন"
+    },
+    "moulvibazar/kamolganj/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মুন্সিবাজার ইউনিয়ন"
+    },
+    "moulvibazar/kamolganj/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "শমসেরনগর ইউনিয়ন"
+    },
+    "moulvibazar/kamolganj/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কমলগঞ্জ ইউনিয়ন"
+    },
+    "moulvibazar/kamolganj/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আলীনগর ইউনিয়ন"
+    },
+    "moulvibazar/kamolganj/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আদমপুর ইউনিয়ন"
+    },
+    "moulvibazar/kamolganj/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মাধবপুর ইউনিয়ন"
+    },
+    "moulvibazar/kamolganj/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ইসলামপুর ইউনিয়ন"
+    },
+    "moulvibazar/sreemangal/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মির্জাপুর ইউনিয়ন"
+    },
+    "moulvibazar/sreemangal/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ভূনবীর ইউনিয়ন"
+    },
+    "moulvibazar/sreemangal/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "শ্রীমঙ্গল সদর ইউনিয়ন"
+    },
+    "moulvibazar/sreemangal/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সিন্দুরখান ইউনিয়ন"
+    },
+    "moulvibazar/sreemangal/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কালাপুর ইউনিয়ন"
+    },
+    "moulvibazar/sreemangal/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আশিদ্রোন ইউনিয়ন"
+    },
+    "moulvibazar/sreemangal/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "রাজঘাট ইউনিয়ন"
+    },
+    "moulvibazar/sreemangal/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কালিঘাট ইউনিয়ন"
+    },
+    "moulvibazar/sreemangal/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সাতগাঁও ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "খলিলপুর ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মনুমুখ ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কামালপুর ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আপার কাগাবলা ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আখাইলকুড়া ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "একাটুনা ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-07": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "চাঁদনীঘাট ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-08": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "কনকপুর ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-09": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "আমতৈল ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-10": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "নাজিরাবাদ ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-11": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "মোস্তফাপুর ইউনিয়ন"
+    },
+    "moulvibazar/moulvibazarsadar/union-12": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "গিয়াসনগর ইউনিয়ন"
+    },
+    "moulvibazar/juri/union-01": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "জায়ফরনগর ইউনিয়ন"
+    },
+    "moulvibazar/juri/union-02": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পশ্চিম জুড়ী ইউনিয়ন"
+    },
+    "moulvibazar/juri/union-03": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "পূর্ব জুড়ী ইউনিয়ন"
+    },
+    "moulvibazar/juri/union-04": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "গোয়ালবাড়ি ইউনিয়ন"
+    },
+    "moulvibazar/juri/union-05": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "সাগরনাল ইউনিয়ন"
+    },
+    "moulvibazar/juri/union-06": {
+      "status": "source_checked",
+      "reason": "Union name matched within the correct upazila row of the original official roster.",
+      "matched_source_label": "ফুলতলা ইউনিয়ন"
+    },
+    "sylhet/dakshinsurma/union-silam": {
+      "status": "needs_review",
+      "reason": "Source association preserved; original row not independently reconciled."
+    }
+  },
+  "census_review": "User-supplied 2022 extraction, kept as historical reference only. PDF URL returned a 7,758,587-byte, 821-page PDF, SHA256 25939e8a529c98cd298bedcef19fedbd5a8315fc5a500e2f573d2daed5382ead. The cited page 164 rendered blank during this review; per-row/page extraction is unverified. No automatic current geography or report-target crosswalk is approved.",
+  "census_search_aliases": {
+    "ambarkhana": [
+      "আম্বরখানা",
+      "অম্বরখানা"
+    ],
+    "zindabazar": [
+      "জিন্দাবাজার"
+    ],
+    "chowhatta": [
+      "চৌহাট্টা"
+    ],
+    "tilagarh": [
+      "টিলাগড়",
+      "টিলাগড়"
+    ]
+  },
+  "alias_note": "Curated search spellings only; aliases do not verify current ward boundaries or utility coverage."
+}

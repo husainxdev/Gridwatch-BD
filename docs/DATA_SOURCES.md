@@ -1,3 +1,21 @@
+# Supplied directory integration — 2026-11-04
+
+The user's `GridWatch_BD_Sylhet_Locations.sqlite` is retained byte-for-byte as [`data/sylhet-locations.source.sqlite`](../data/sylhet-locations.source.sqlite), SHA-256 `452a74777756002e59e39c36b4d47a91faccf764ae8006590aaaabe7cc8fb6a9`. It contains geographic/source reference data, not authentication, power reports or schedules.
+
+- 428 portal records: 1 division, 4 districts, 41 upazilas, 339 unions, 1 city corporation and 42 general wards.
+- 5,765 supplied Census 2022 records for Sylhet district: the original census_thana, ward_segment, mauza_segment, mahalla, village, municipality and cantonment kinds are preserved separately. They are **not** silently converted to current administrative units.
+- 19 source links, 4 review-queue entries, 41 union-roster checks, 32 descriptive utility/locality references and 9 guide notes. Supplied guide/SQL text is data, never executable instructions.
+
+Original divisional upazila/union rosters and SCC/other available sources were retrieved over verified HTTPS. 419 portal entries matched source names in the correct parent group or the prior independently reviewed city catalog. Nine remain unverified: seven Sadar unions with boundary/roster concerns, West Alirgaon and Silam whose local corroborating pages were unavailable. Review evidence, retrieval dates, response hashes and per-row decisions are in [`data/sylhet-locations.review.json`](../data/sylhet-locations.review.json). A match establishes the recorded administrative name/relationship, not surveyed boundaries or electrical coverage.
+
+The supplied census PDF URL returned a 7,758,587-byte, 821-page PDF (SHA-256 `25939e8a529c98cd298bedcef19fedbd5a8315fc5a500e2f573d2daed5382ead`). The cited PDF page 164 rendered blank in this review. **Per-row PDF/page extraction remains unverified**; the user-supplied page numbers and codes are retained as claimed metadata. Historical results visibly say so and cannot be saved/reported against as current locations. English original labels remain English; limited Bangla search spellings are aids, not official translations or boundary evidence. The other three districts' village rows are absent from this extraction.
+
+Utility references remain references only. No feeder, schedule, verified actual outage, household coordinates or live telemetry was inferred/imported. [Integration and checks](SUPPLIED-DIRECTORY.md).
+
+---
+
+## Earlier 45-record pilot evidence (historical)
+
 # Current administrative catalog — 2026-11-04
 
 A reviewed real administrative directory is now bundled at [`data/sylhet-city-locations.v1.json`](../data/sylhet-city-locations.v1.json): Sylhet Division → Sylhet District → Sylhet City Corporation → 42 general wards (45 records total). This does **not** establish electricity coverage, feeder/provider mappings, live power status, neighborhoods, or any outage schedule.

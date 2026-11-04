@@ -11,48 +11,26 @@ export function Sources() {
         সিদ্ধান্ত নিন।
       </p>
       <div className="reading">
-        <Card title="সিলেট সিটির প্রশাসনিক এলাকার তালিকা">
+        <Card title="সিলেট বিভাগের প্রশাসনিক ও ঐতিহাসিক তালিকা">
           <p>
-            সিলেট বিভাগ → সিলেট জেলা → সিলেট সিটি কর্পোরেশন → ৪২টি ওয়ার্ডের নাম
-            ও সম্পর্ক সরকারি মূল উৎস দেখে যাচাই করা হয়েছে (৪ নভেম্বর ২০২৬)।
-            এলাকা খুঁজতে “সিলেট”, “Ward 1” বা “ওয়ার্ড ১” লিখুন।
+            প্রদত্ত database-এ ৪ জেলা, ৪১ উপজেলা, ৩৩৯ ইউনিয়ন, সিটি কর্পোরেশন ও
+            ৪২ ওয়ার্ডসহ ৪২৮টি portal record আছে। মূল portal-এর সঙ্গে ৪১৯টি
+            entry মিলেছে; ৯টির যাচাই বাকি। বিদ্যমান Admin review বা পরিবর্তন
+            import দিয়ে overwrite করা হয় না।
           </p>
           <p>
-            এটি প্রশাসনিক পরিচয়ের তালিকা—সরাসরি বিদ্যুৎ পর্যবেক্ষণ বা ফিডার
-            কভারেজ নয়। মহল্লা থেকে ওয়ার্ডের মানচিত্র এবং অন্য উপজেলার তালিকা
-            এখনো যুক্ত হয়নি; অনুমান করে কোনো ঠিকানা যোগ করা হয় না।
+            আলাদা তালিকায় সিলেট জেলার ২০২২ census extraction-এর ৫,৭৬৫টি place
+            record আছে। এগুলো ঐতিহাসিক reference; বর্তমান ward, thana বা feeder
+            mapping নয়। প্রতিটি PDF row/page পুনরায় যাচাই সম্পন্ন হয়নি। অন্য
+            তিন জেলার গ্রাম এই extraction-এ নেই।
           </p>
-          <ul>
-            <li>
-              <a
-                href="https://sylhetdiv.gov.bd/pages/static-pages/696cb9bfc4774958d7ba981e"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                বিভাগীয় কমিশনারের দপ্তর: এক নজরে সিলেট বিভাগ ↗
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://scc.gov.bd/pages/static-pages/6922df09933eb65569e1f5f4"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                সিলেট সিটি কর্পোরেশন: বর্তমান নগর পরিচিতি ↗
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://scc.gov.bd/pages/static-pages/6922dcfd933eb65569e1310d"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                সিটি কর্পোরেশনের ওয়ার্ডভিত্তিক তালিকা ↗
-              </a>
-            </li>
-          </ul>
-          <Link to="/#area-picker" className="btn btn-outline">
-            এলাকা খুঁজুন →
+          <p>
+            কিছু মূল নাম শুধু বাংলায় বা শুধু English-এ আছে। অনুপস্থিত অনুবাদ বা
+            বর্তমান সীমানা বানিয়ে যোগ করা হয় না। তালিকায় record-এর পূর্বসূরি,
+            source ও যাচাইয়ের সীমা দেখুন।
+          </p>
+          <Link to="/areas" className="btn btn-outline">
+            বড় তালিকা ও ১৯টি source link দেখুন →
           </Link>
         </Card>
         <Card title="তিন ধরনের তথ্য, তিনটি অর্থ">

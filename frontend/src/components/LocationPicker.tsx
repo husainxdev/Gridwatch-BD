@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { FiArrowRight, FiCheck, FiMapPin, FiSearch, FiX } from "react-icons/fi";
+import { Link } from "../navigation";
 import { api, shortTime, type Location, type Page } from "../client";
 
 export function LocationPicker({
@@ -273,7 +274,8 @@ export function LocationPicker({
                         {node.name_bn}
                       </span>
                       <small>
-                        {node.name_en} · {locationKind(node.kind)}
+                        {node.name_en ? node.name_en + " · " : ""}
+                        {locationKind(node.kind)}
                         {node.verification_status !== "verified"
                           ? " · যাচাই বাকি"
                           : ""}
@@ -286,6 +288,14 @@ export function LocationPicker({
             </ul>
           )}
         </>
+      )}
+      {term && !searchLoading && !searchError && results.length === 0 && (
+        <Link
+          className="directory-discovery"
+          to={`/areas?branch=census2022&search=${encodeURIComponent(term)}`}
+        >
+          বর্তমান তালিকায় নেই? গ্রাম / মহল্লার ২০২২ reference-এ খুঁজুন →
+        </Link>
       )}
       {error && (
         <div className="alert alert-error" role="alert">
@@ -432,6 +442,16 @@ export function LocationPicker({
           পাবেন।
         </p>
       )}
+      <Link
+        className="directory-discovery"
+        to={
+          term
+            ? `/areas?branch=census2022&search=${encodeURIComponent(term)}`
+            : "/areas"
+        }
+      >
+        উপজেলা, ইউনিয়ন, গ্রাম ও মহল্লার বড় তালিকা খুঁজুন →
+      </Link>
       {total > 100 && (
         <div className="inline-actions">
           <button

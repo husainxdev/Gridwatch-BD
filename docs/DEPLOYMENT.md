@@ -132,3 +132,7 @@ Use [WEBSITE.md](WEBSITE.md) for the seed-free local launcher and Admin provisio
 ## Reviewed administrative directory
 
 After migration, a fresh normal pilot can receive the bundled source-reviewed Sylhet division/district/city/42-ward directory using `backend/.venv/bin/python scripts/import-location-catalog.py --expected-database ACTUAL_NAME --only-if-empty`. For an existing directory, review the manifest and use the explicit merge command without `--only-if-empty`; exact matching identities are preserved, conflicting parents/types roll back, and no existing review is silently refreshed. This adds no electrical coverage, notices, schedules or observations. Review [source evidence](DATA_SOURCES.md) and [operator instructions](WEBSITE.md) before hosted acceptance.
+
+## Supplied source import / schema 0007
+
+After the backed-up controlled migration to head `0007`, run `backend/.venv/bin/python scripts/import-supplied-directory.py --expected-database ACTUAL_NAME` once in the authorized backend environment. It imports into PostgreSQL and requires the committed SQLite bytes to match the independent review manifest. Repeating the command is a no-op; it does not overwrite Admin changes or add accounts/power data. The bundled binary is reference input, not a replacement runtime SQLite database. Never run the local automatic-backup launcher against production. [Checks, API and caveats](SUPPLIED-DIRECTORY.md).

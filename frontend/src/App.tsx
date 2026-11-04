@@ -8,6 +8,7 @@ import {
   FiGrid,
   FiHelpCircle,
   FiMenu,
+  FiMapPin,
   FiShield,
   FiX,
   FiZap,
@@ -91,6 +92,9 @@ export default function App({ children }: { children: ReactNode }) {
           </NavLink>
           <NavLink to="/dashboard">
             <FiActivity aria-hidden="true" /> ড্যাশবোর্ড
+          </NavLink>
+          <NavLink to="/areas" className="secondary-route">
+            <FiMapPin aria-hidden="true" /> এলাকার পূর্ণ তালিকা
           </NavLink>
           <NavLink to="/activities" className="secondary-route">
             <FiCalendar aria-hidden="true" /> কাজের সময়
