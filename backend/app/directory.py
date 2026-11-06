@@ -5,13 +5,32 @@ import uuid
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import String, cast, func, or_, select, text
+from sqlalchemy import String, case, cast, func, literal, or_, select, text
 from sqlalchemy.orm import Session
 
 from .db import get_db
 from .models import DirectoryDataset, DirectoryPlace, Location
 
 router = APIRouter(prefix="/api/directory", tags=["source directory"])
+
+
+DIGITS = str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
+
+
+def search_term(value):
+    return " ".join(
+        unicodedata.normalize("NFKC", value).translate(DIGITS).replace("-", " ").split()
+    ).casefold()
+
+
+def normalized_sql(value):
+    return func.lower(
+        func.replace(func.translate(value, "০১২৩৪৫৬৭৮৯", "0123456789"), "-", " ")
+    )
+
+
+def escape_like(value):
+    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
 def dataset(db):
@@ -99,7 +118,7 @@ def render(row, current_status, path):
 @router.get("")
 def places(
     db: Session = Depends(get_db),
-    branch: Literal["portal", "census2022"] = "portal",
+    branch: Literal["portal", "census2022", "all"] = "portal",
     search: str = Query("", max_length=100),
     parent_id: uuid.UUID | None = None,
     roots_only: bool = False,
@@ -113,11 +132,17 @@ def places(
     stmt = (
         select(DirectoryPlace, Location.verification_status)
         .outerjoin(Location, Location.id == DirectoryPlace.location_id)
-        .where(DirectoryPlace.dataset_id == item.id, DirectoryPlace.branch == branch)
+        .where(DirectoryPlace.dataset_id == item.id)
     )
+    if branch != "all":
+        stmt = stmt.where(DirectoryPlace.branch == branch)
     if parent_id:
         parent = db.get(DirectoryPlace, parent_id)
-        if not parent or parent.branch != branch or parent.dataset_id != item.id:
+        if (
+            not parent
+            or (branch != "all" and parent.branch != branch)
+            or parent.dataset_id != item.id
+        ):
             raise HTTPException(422, "Choose a parent in the same source snapshot")
         stmt = stmt.where(DirectoryPlace.parent_id == parent_id)
     if roots_only:
@@ -140,26 +165,77 @@ def places(
                 "union",
             }
         )
+        if branch == "all":
+            allowed |= {"division", "ward"}
         if kind not in allowed:
             raise HTTPException(422, "Unsupported type in this source snapshot")
         stmt = stmt.where(DirectoryPlace.kind == kind)
-    term = " ".join(unicodedata.normalize("NFKC", search).split())
-    for word in term.split():
-        value = (
-            "%"
-            + word.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-            + "%"
+    term = search_term(search)
+    # Search the supplied hierarchy in one bounded recursive query, without
+    # merging historical identities into current administrative/report targets.
+    if term:
+        own_text = func.concat_ws(
+            " ",
+            DirectoryPlace.name_bn,
+            DirectoryPlace.name_en,
+            cast(DirectoryPlace.aliases, String),
         )
-        stmt = stmt.where(
-            or_(
-                DirectoryPlace.name_bn.ilike(value, escape="\\"),
-                DirectoryPlace.name_en.ilike(value, escape="\\"),
-                cast(DirectoryPlace.aliases, String).ilike(value, escape="\\"),
+        paths = (
+            select(
+                DirectoryPlace.id,
+                normalized_sql(own_text).label("words"),
+                literal(0).label("depth"),
+            )
+            .where(
+                DirectoryPlace.dataset_id == item.id,
+                DirectoryPlace.parent_id.is_(None),
+            )
+            .cte("search_paths", recursive=True)
+        )
+        paths = paths.union_all(
+            select(
+                DirectoryPlace.id,
+                func.concat_ws(" ", paths.c.words, normalized_sql(own_text)),
+                paths.c.depth + 1,
+            )
+            .join(paths, DirectoryPlace.parent_id == paths.c.id)
+            .where(
+                DirectoryPlace.dataset_id == item.id,
+                paths.c.depth < 20,
             )
         )
+        stmt = stmt.join(paths, paths.c.id == DirectoryPlace.id)
+        for word in term.split():
+            value = "%" + escape_like(word) + "%"
+            stmt = stmt.where(paths.c.words.ilike(value, escape="\\"))
+    # Exact names and prefixes precede broad ancestor matches. Each source
+    # identity remains visible with its own provenance; ordering is stable.
+    names = [
+        normalized_sql(DirectoryPlace.name_bn),
+        normalized_sql(DirectoryPlace.name_en),
+    ]
+    rank = (
+        case(
+            (or_(*(name == term for name in names)), 0),
+            (
+                or_(
+                    *(
+                        name.ilike(escape_like(term) + "%", escape="\\")
+                        for name in names
+                    )
+                ),
+                1,
+            ),
+            else_=2,
+        )
+        if term
+        else literal(0)
+    )
     total = db.scalar(select(func.count()).select_from(stmt.subquery()))
     rows = db.execute(
         stmt.order_by(
+            rank,
+            case((DirectoryPlace.branch == "portal", 0), else_=1),
             func.coalesce(DirectoryPlace.name_bn, DirectoryPlace.name_en),
             DirectoryPlace.id,
         )

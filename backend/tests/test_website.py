@@ -73,3 +73,37 @@ def test_normal_launcher_preserves_port_secrets_and_disables_inherited_demo(
 def test_normal_launcher_refuses_demo_test_remote_or_weak_configuration(changes):
     with pytest.raises((website.StartupError, ValueError)):
         website.normal_configuration(configuration(**changes), Settings)
+
+
+def test_launcher_checks_real_directory_not_only_a_healthy_server(monkeypatch):
+    import io
+    import json
+    from urllib.error import HTTPError
+
+    calls = []
+
+    def available(url, timeout):
+        calls.append(url)
+        payload = (
+            {"available": True, "counts": {"portal": 428, "census2022": 5765}}
+            if url.endswith("summary")
+            else {"items": [{"branch": "census2022"}]}
+        )
+        return io.BytesIO(json.dumps(payload).encode())
+
+    monkeypatch.setattr(website, "urlopen", available)
+    assert website.verify_directory("http://localhost:5173")["portal"] == 428
+    assert "branch=all" in calls[1]
+
+    def old_backend(url, timeout):
+        raise HTTPError(url, 404, "Not Found", {}, None)
+
+    monkeypatch.setattr(website, "urlopen", old_backend)
+    with pytest.raises(website.StartupError, match="Area search is not ready"):
+        website.verify_directory("http://localhost:5173")
+
+    monkeypatch.setattr(
+        website, "urlopen", lambda *args, **kwargs: io.BytesIO(b'{"available": false}')
+    )
+    with pytest.raises(website.StartupError, match="Area search is not ready"):
+        website.verify_directory("http://localhost:5173")

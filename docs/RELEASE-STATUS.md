@@ -72,3 +72,7 @@ The [public interface and launcher work](PUBLIC-WEBSITE-REVIEW.md) replaces the 
 ## Supplied directory / current schema
 
 [The supplied-directory integration](SUPPLIED-DIRECTORY.md) upgrades the supported schema to `0007`, preserves existing records, adds reviewed portal entries and separates historical reference rows. Earlier `0006` statements in historical evidence describe that earlier revision. Public deployment, official outage-feed coverage and external SMTP acceptance remain incomplete.
+
+## Current candidate — 6 November 2026
+
+Use [the final release review](FINAL-RELEASE-REVIEW.md) for current code, source-directory UI, test evidence and limitations. Head is `0007`. The owner confirmed Vercel/Render projects have **not** been created, so public HTTPS, actual provider database/cookie behavior and external SMTP delivery remain unverified. [The dashboard guide](DASHBOARD_SETUP.md) now targets the normal production website with demo/test flags disabled. Earlier demo counts and schema numbers in this historical document are not current release settings.

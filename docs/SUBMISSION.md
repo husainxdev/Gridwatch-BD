@@ -10,7 +10,7 @@
 | Live frontend | **Not available — no verified deployment URL** | Blocked |
 | Live backend | **Not available — no verified deployment URL** | Blocked |
 | Deployment configuration | Vercel Next.js + Render FastAPI/PostgreSQL; `frontend/vercel.json`, `deploy/provider-settings.json`, release scripts | Implemented but externally unverified |
-| Schema | Alembic `0006`; no new schema change in release preparation | Implemented and locally verified |
+| Schema | Alembic `0007`; separate historical directory added after original release preparation | Implemented and locally verified |
 | Local private Admin/User accounts | Separate newly created `gridwatch_demo_...` database; unique generated passwords; browser login/reload/roles/logout checked | Implemented and locally verified; deployed accounts externally unverified |
 | Hosted demo accounts | Not created/tested on a deployed service | Blocked |
 | Real pilot/source data | No verified real Sylhet dataset/official API | Blocked on source verification |
@@ -45,7 +45,7 @@ For a populated local presentation, [the launcher](LOCAL-DEMO.md) generates an i
 Record actual URL/source SHA/date/browser/results before changing these statuses:
 
 - [ ] Frontend HTTPS, certificate/security headers, deep-link reload and intended backend proxy.
-- [ ] Direct/proxied health/readiness `0006`, matching frontend/backend source commit and demo label.
+- [ ] Direct/proxied health/readiness `0007`, matching frontend/backend source commit and demo label.
 - [ ] Dedicated Admin/User login; reload refresh; logout clears cookies/revokes access; direct User→Admin API denied.
 - [ ] Area selection, save/default and persistence after reload plus actual restart/redeploy.
 - [ ] Private draft → reviewed/published notice/schedule → User display → revision/cancellation reflected.

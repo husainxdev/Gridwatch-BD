@@ -6,6 +6,7 @@ A Bengali-first website for announced power interruptions, personal connection r
 
 **Windows: use `START-WEBSITE.cmd` for the normal website at http://localhost:5173.** It starts Docker, checks the normal database schema and launches API/frontend without adding sample electricity records or accounts; an empty administrative directory receives the reviewed real Sylhet catalog. Existing normal users and settings are preserved; old isolated demo accounts do not become real accounts. [Exact startup, Admin setup and publishing prerequisites](docs/WEBSITE.md).
 
+- [Latest release checks, fixed defects and hosting prerequisites](docs/FINAL-RELEASE-REVIEW.md)
 - [Scope, sources, user flows and data rules](docs/SCOPE.md)
 - [Progress and seven-day work sequence](docs/PROGRESS.md)
 - [Sections 5–6 implementation and API guide](docs/SECTIONS-5-6.md)

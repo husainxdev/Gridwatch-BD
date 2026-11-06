@@ -92,3 +92,9 @@ The normal launcher now applies migration `0007` and imports the checksum-review
 On an older populated local database, the launcher automatically creates a private PostgreSQL custom-format backup and checksum receipt under `.private/backups/` before the controlled schema upgrade. Backup creation failure stops the upgrade; no database reset is used. Each backup's restoration is not automatically performed or claimed. Production upgrades remain a separate operator-controlled migration/backup procedure. Do not publish the backup files.
 
 From CMD or PowerShell, close earlier API/frontend terminals, pull, and use `C:\Users\USER\Gridwatch-BD\START-WEBSITE.cmd`. Open **এলাকার পূর্ণ তালিকা** or the location picker's larger-directory link. Search `বালাগঞ্জ` in portal records, or `Ambarkhana` / `আম্বরখানা` in the explicitly labelled 2022 reference branch. Details and exact source links are preserved.
+
+## Search and matching service versions
+
+`/areas` now searches both source branches by default as you type; results retain their current/historical labels. Name parts, ancestor names, Bengali digits and English case are supported, with exact names before broad ancestor matches. Filters, breadcrumbs, keyboard access and URL-restored searches work against PostgreSQL. Missing Bengali translations or unprovided villages cannot be found under invented names.
+
+A 404/422 on the directory API means the web/API versions may differ, not that no area exists. Stop both earlier server terminals with Ctrl+C, pull the matching code, then run START-WEBSITE.cmd. Startup verifies the unified search directly and through the frontend proxy before opening the website. It never kills unrelated processes or resets existing records.

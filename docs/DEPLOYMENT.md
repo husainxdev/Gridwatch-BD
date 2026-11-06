@@ -69,7 +69,7 @@ MAIL_FROM=REPLACE_WITH_VERIFIED_SENDER
 
 `postgres://` and `postgresql://` provider URLs normalize to SQLAlchemy `postgresql+psycopg://`; existing encoded passwords are preserved. Production requires explicit `sslmode=require`, `verify-ca` or `verify-full`. **`require` encrypts transport but does not prove hostname identity**; prefer `verify-full` with the provider's trusted CA/hostname after confirming their certificate instructions. Configure `sslrootcert`/certificate files securely when necessary. Actual Render TLS connectivity/chain is unverified without credentials/network access.
 
-Pool maximum = 3 + 2 = **5 connections per process**, plus temporary migration/operator connections; size the selected DB accordingly. The release entry point handles provider `PORT`, requires production configuration, derives/checks a full source commit, and runs one worker without access-body/token logging. `/api/health/live` exposes only status/service/revision/instance mode; readiness checks database/schema `0006` without diagnostics.
+Pool maximum = 3 + 2 = **5 connections per process**, plus temporary migration/operator connections; size the selected DB accordingly. The release entry point handles provider `PORT`, requires production configuration, derives/checks a full source commit, and runs one worker without access-body/token logging. `/api/health/live` exposes only status/service/revision/instance mode; readiness checks database/schema `0007` without diagnostics.
 
 Proxy headers are **not trusted by default**. Configure `TRUSTED_PROXY_IPS` only from the actual provider's verified ingress networks; arbitrary `*` trust is rejected. Without trusted forwarding, the process-local limiter may group users by proxy address rather than actual visitor IP. No per-visitor or deployment-wide rate guarantee is claimed. Before a public launch verify provider forwarding policy and deploy shared ingress limits for both proxy and direct-backend exposure. Keep a single backend instance until shared rate protection is verified.
 
@@ -98,14 +98,14 @@ backend/.venv/bin/python scripts/db-archive.py restore --expected-database gridw
 
 The script checks the archive against its private SHA-256 receipt, refuses a populated target or a non-restore namespace, uses `--exit-on-error` and never cleans/drops existing tables. Verify schema and expected records, then upgrade that isolated restored DB with the backup reference and run private smoke checks. Record results before marking a backup restore-verified. Local Compose-only tests use `--local-compose`, which verifies loopback host/port mapping and never targets Render.
 
-**Actually tested locally:** custom dump/restore of populated `0003`, preservation of user/location/saved-area references, safe upgrade to `0006`, wrong-target/backup-gate/nonempty-restore refusal and process restart/session/default persistence. This does not verify provider backups or a Render redeploy. No upload feature exists, so no permanent file-upload storage is configured.
+**Actually tested locally:** custom dump/restore of populated `0003`, preservation of user/location/saved-area references, safe upgrade to `0006` in the original release checks (the current candidate additionally verifies populated upgrades to `0007`), wrong-target/backup-gate/nonempty-restore refusal and process restart/session/default persistence. This does not verify provider backups or a Render redeploy. No upload feature exists, so no permanent file-upload storage is configured.
 
 ## 6. Release and real-site acceptance
 
 1. Record `git rev-parse HEAD`, clean source, successful local/CI checks and the selected account settings. `scripts/release-preflight.py --manual-provider-setup --output artifacts/preflight.json` checks sanitized configuration/presence only; it never deploys or verifies account authority.
 2. Configure persistent DB, TLS, pool bounds and provider secrets. Use a separate marked DB for a private disposable demo; do not expose a shared Admin on real-user data.
 3. Execute the controlled migration/pre-deploy once. Deploy Render from the exact revision; inspect health/revision and sanitized logs.
-4. Build/deploy Vercel from the same revision with the actual HTTPS backend origin and matching demo label. Confirm deployment policy/limits in the account.
+4. Build/deploy Vercel from the same revision with the actual HTTPS backend origin and both demo flags disabled. Confirm deployment policy/limits in the account.
 5. Run the following only with the **actual assigned URLs**:
 
 ```bash
@@ -114,14 +114,14 @@ backend/.venv/bin/python scripts/live-smoke.py --frontend ACTUAL_HTTPS_FRONTEND_
 
 It checks valid HTTPS, safe same-origin redirects, frontend/deep-link shells, security headers, direct/proxied readiness, matching source revisions and instance-mode labels. It performs a few read-only GETs; **it does not verify login, email, write journeys or persistence**. Do not substitute localhost output for this result.
 
-6. Use dedicated private demo/test accounts on an isolated hosted demo. Execute the A–F journey checklist in [submission acceptance](SUBMISSION.md): roles/direct API 403, refresh/logout/cookies/CSRF, saved/default reload, notice publication/revision/cancel, independent reports, fresh activity conflict/history and controlled-recipient reset/single use. Confirm Asia/Dhaka times, sources, mobile/error states and no secret-bearing console/network/server diagnostics. Never send real fake outage reports. Cancel/archive only verification records created for this purpose; preserve audit history and never reset real users.
+6. Use dedicated private test accounts and fictional observations only on an isolated staging database/environment, never the real-user production database. Public production rejects demo flags. Execute the A–F journey checklist in [submission acceptance](SUBMISSION.md): roles/direct API 403, refresh/logout/cookies/CSRF, saved/default reload, notice publication/revision/cancel, independent reports, fresh activity conflict/history and controlled-recipient reset/single use. Confirm Asia/Dhaka times, sources, mobile/error states and no secret-bearing console/network/server diagnostics. Never send real fake outage reports. Cancel/archive only verification records created for this purpose; preserve audit history and never reset real users.
 7. Restart/redeploy the actual backend and confirm a known saved/default record and session policy persist. Record actual domains, revision, time/browser and results. Until these pass, Sections 13–14 and the live submission are **partial/blocked**.
 
 ## 7. Operations and rollback
 
 Inspect Render runtime/deploy logs and Vercel build/function logs for the recorded revision; do not enable SMTP debug, request-body, Authorization/cookie or reset-link logging. Restart through the service dashboard; state belongs in PostgreSQL, not the ephemeral app filesystem. Cold-start, sleep, timeout and retention properties must come from the selected actual plan, currently unknown.
 
-Revert application code by selecting a previously verified immutable provider deployment/commit after checking schema compatibility. This phase still targets schema `0006`; a prior code revision may require the normalized psycopg URI and environment it supports. **Application rollback does not reverse migrations.** Never automatically run `alembic downgrade` on real data. For incompatible changes, keep traffic off, restore into an isolated new DB, validate and plan a controlled cutover rather than overwriting the original.
+Revert application code by selecting a previously verified immutable provider deployment/commit after checking schema compatibility. This candidate targets schema `0007`; a prior code revision may require the normalized psycopg URI and environment it supports. **Application rollback does not reverse migrations.** Never automatically run `alembic downgrade` on real data. For incompatible changes, keep traffic off, restore into an isolated new DB, validate and plan a controlled cutover rather than overwriting the original.
 
 Rotate database/SMTP credentials through provider secrets and restart affected pools/services. Rotate signing keys privately; when revocation is required, use an authorized DB maintenance session to revoke active `refresh_sessions` before resuming access. Rotating only JWT signing material does not erase valid hashed refresh sessions. Revoke exposed demo sessions and provision a new isolated demo namespace/credentials; do not reuse personal passwords or print passwords in logs.
 

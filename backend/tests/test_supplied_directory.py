@@ -330,3 +330,67 @@ def test_historical_reference_cannot_be_used_as_saved_or_report_location(
             )
     finally:
         app.dependency_overrides.clear()
+
+
+def test_unified_search_names_ancestor_context_ranking_and_source_separation(
+    directory_engine,
+):
+    with Session(directory_engine) as db, db.begin():
+        import_catalog(db)
+        import_supplied_directory(db)
+        app.dependency_overrides[get_db] = lambda: db
+        try:
+            with TestClient(app) as client:
+
+                def search(term, **kwargs):
+                    response = client.get(
+                        "/api/directory",
+                        params={"branch": "all", "search": term, **kwargs},
+                    )
+                    assert response.status_code == 200, response.text
+                    return response.json()
+
+                for term in [
+                    "আম্বরখানা",
+                    "Ambarkhana",
+                    "ambarkhana airport",
+                    "Airport Ambarkhana",
+                ]:
+                    result = search(term)
+                    assert result["total"] > 0
+                    assert all(
+                        row["branch"] == "census2022"
+                        and not row["reportable"]
+                        and row["location_id"] is None
+                        for row in result["items"]
+                    )
+                result = search("বালাগঞ্জ")
+                assert result["items"][0]["name_bn"] == "বালাগঞ্জ"
+                assert result["items"][0]["branch"] == "portal"
+                assert result["items"][0]["reportable"]
+                assert (
+                    search("বালাগঞ্জ", page_size=2)["items"]
+                    == search("বালাগঞ্জ", page_size=2)["items"]
+                )
+                first = search("Sylhet", page_size=12)
+                second = search("Sylhet", page_size=12, page=2)
+                assert not {r["id"] for r in first["items"]} & {
+                    r["id"] for r in second["items"]
+                }
+                for term in ["%", "_", "this-name-does-not-exist-xyzz"]:
+                    assert search(term)["total"] == 0
+                assert search("ওয়ার্ড ০১", kind="ward")["total"] > 0
+                assert search("", kind="division")["total"] == 1
+                assert search("", kind="village")["total"] == 3318
+                assert (
+                    client.get(
+                        "/api/directory?branch=all&kind=sql-injection"
+                    ).status_code
+                    == 422
+                )
+                assert (
+                    client.get("/api/directory?branch=all&page_size=5000").status_code
+                    == 422
+                )
+        finally:
+            app.dependency_overrides.clear()

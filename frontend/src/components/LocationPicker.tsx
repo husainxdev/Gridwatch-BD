@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { FiArrowRight, FiCheck, FiMapPin, FiSearch, FiX } from "react-icons/fi";
 import { Link } from "../navigation";
+import type { DirectoryPlace } from "../AreaDirectory";
 import { api, shortTime, type Location, type Page } from "../client";
 
 export function LocationPicker({
@@ -21,6 +22,8 @@ export function LocationPicker({
   const [featured, setFeatured] = useState<Location[]>([]);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Location[]>([]);
+  const [historical, setHistorical] = useState<DirectoryPlace[]>([]);
+  const [historicalError, setHistoricalError] = useState(false);
   const [browseError, setBrowseError] = useState("");
   const [searchError, setSearchError] = useState("");
   const [choiceError, setChoiceError] = useState("");
@@ -97,6 +100,28 @@ export function LocationPicker({
           if (!controller.signal.aborted) setSearchLoading(false);
         });
     }, 250);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [term, attempt]);
+  useEffect(() => {
+    const controller = new AbortController();
+    setHistorical([]);
+    setHistoricalError(false);
+    if (!term) return () => controller.abort();
+    const timer = setTimeout(() => {
+      api<Page<DirectoryPlace>>(
+        `/api/directory?branch=census2022&search=${encodeURIComponent(term)}&page_size=3`,
+        { signal: controller.signal },
+      )
+        .then((data) => {
+          if (!controller.signal.aborted) setHistorical(data.items);
+        })
+        .catch(() => {
+          if (!controller.signal.aborted) setHistoricalError(true);
+        });
+    }, 300);
     return () => {
       clearTimeout(timer);
       controller.abort();
@@ -227,7 +252,7 @@ export function LocationPicker({
                 ? "অনুসন্ধান সম্পন্ন হয়নি। আবার চেষ্টা করুন।"
                 : results.length
                   ? `${results.length.toLocaleString("bn-BD")}টি ফলাফল · বেছে নিতে ক্লিক বা Tab ব্যবহার করুন`
-                  : "এই নামে কোনো এলাকা পাওয়া যায়নি। নিচে সিটি বেছে ওয়ার্ডের তালিকা দেখতে পারেন।"}
+                  : "বর্তমান প্রশাসনিক তালিকায় এই নামে এলাকা নেই। গ্রাম ও মহল্লার ফল নিচে দেখুন, অথবা নামের অংশ দিয়ে খুঁজুন।"}
           </p>
           {results.length > 0 && (
             <ul
@@ -289,12 +314,45 @@ export function LocationPicker({
           )}
         </>
       )}
-      {term && !searchLoading && !searchError && results.length === 0 && (
+      {term && historical.length > 0 && (
+        <section
+          className="finder-historical"
+          aria-label="গ্রাম ও মহল্লার পরিচয়"
+        >
+          <h3>গ্রাম ও মহল্লার তালিকায় পাওয়া গেছে</h3>
+          <p>
+            ২০২২ সালের পরিচয়। বর্তমান বিদ্যুৎ রিপোর্ট দেওয়ার এলাকা হিসেবে
+            যাচাই করা হয়নি।
+          </p>
+          <ul>
+            {historical.map((place) => (
+              <li key={place.id}>
+                <Link
+                  to={`/areas?branch=census2022&search=${encodeURIComponent(place.name_en || place.name_bn || term)}`}
+                >
+                  <FiMapPin aria-hidden="true" />
+                  <span>
+                    <strong>{place.name_bn || place.name_en}</strong>
+                    <small>
+                      {place.ancestors.map((node) => node.name).join(" › ")}
+                    </small>
+                  </span>
+                  <FiArrowRight aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {term && !searchLoading && !searchError && (
         <Link
           className="directory-discovery"
-          to={`/areas?branch=census2022&search=${encodeURIComponent(term)}`}
+          to={`/areas?search=${encodeURIComponent(term)}`}
         >
-          বর্তমান তালিকায় নেই? গ্রাম / মহল্লার ২০২২ reference-এ খুঁজুন →
+          {historicalError
+            ? "গ্রাম ও মহল্লার সেবায় সংযোগ হয়নি।"
+            : "আরও এলাকা ও পরিচয় দেখুন।"}{" "}
+          সব তালিকায় খুঁজুন →
         </Link>
       )}
       {error && (

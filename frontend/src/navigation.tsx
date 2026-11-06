@@ -66,7 +66,10 @@ export function useSearchParams() {
   const query = current.toString();
   const params = useMemo(() => new URLSearchParams(query), [query]);
   const setParams = useCallback(
-    (value: QueryInput | ((previous: URLSearchParams) => QueryInput)) => {
+    (
+      value: QueryInput | ((previous: URLSearchParams) => QueryInput),
+      options?: { replace?: boolean },
+    ) => {
       // Next integrates native history updates with useSearchParams. Using the
       // current URL avoids losing rapid consecutive changes to separate filters.
       const previous = new URLSearchParams(window.location.search);
@@ -74,7 +77,7 @@ export function useSearchParams() {
         typeof value === "function" ? value(previous) : value,
       );
       const suffix = next.toString();
-      window.history.pushState(
+      window.history[options?.replace ? "replaceState" : "pushState"](
         null,
         "",
         window.location.pathname +

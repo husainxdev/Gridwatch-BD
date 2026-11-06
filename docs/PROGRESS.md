@@ -167,3 +167,15 @@ Current checks and known limits: [area search repair](AREA-SEARCH-REVIEW.md).
 - [ ] Live official outage feed, external email delivery and public hosted acceptance remain separate incomplete work.
 
 Current handoff: [supplied directory](SUPPLIED-DIRECTORY.md).
+
+## Final candidate repair — 2026-11-06
+
+- [x] Unified Bengali/English area discovery with preserved source boundaries, ancestor matching, exact-name ranking and automatic search.
+- [x] Public directory redesign, direct homepage historical matches, primary mobile area navigation and source details.
+- [x] Repair stale pagination rendering, first-import query planning and old-API 404/retry behavior; startup checks the real proxied search.
+- [x] Review normal production setup instructions; correct old demo flags and schema to 0007.
+- [x] Full backend suite, normal production build, strict types, formatting, release configuration and bounded source/build secret checks.
+- [ ] Public HTTPS services, hosted persistence/backup restoration and external email acceptance: owner confirmed hosting projects have not been created.
+
+Current evidence and remaining data limits: [final release review](FINAL-RELEASE-REVIEW.md).
+- [x] Final full production-browser run: 34 passed, 3 separate-demo cases skipped; four viewport/keyboard/axe journeys and normal reset/publication flows passed.

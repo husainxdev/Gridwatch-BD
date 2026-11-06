@@ -173,6 +173,29 @@ def wait_ready(url, process):
     )
 
 
+def verify_directory(origin):
+    """Check the actual browser API route, not just an HTML 200 or live PID."""
+    try:
+        with urlopen(origin + "/api/directory/summary", timeout=10) as response:
+            summary = json.load(response)
+        with urlopen(
+            origin + "/api/directory?branch=all&search=Ambarkhana&page_size=1",
+            timeout=10,
+        ) as response:
+            result = json.load(response)
+        if not summary.get("available") or not summary.get("counts", {}).get("portal"):
+            raise ValueError("Directory missing")
+        if not result.get("items") or result["items"][0].get("branch") != "census2022":
+            raise ValueError("Unified search unavailable")
+    except (OSError, ValueError, KeyError, TypeError):
+        raise StartupError(
+            "Area search is not ready. Stop earlier frontend/backend terminals with Ctrl+C, "
+            "pull the matching latest code and run START-WEBSITE.cmd again. "
+            "No records were reset."
+        ) from None
+    return summary["counts"]
+
+
 def main():
     if not PYTHON.is_file():
         raise StartupError(
@@ -337,6 +360,7 @@ def main():
             "backend.log",
         )
         wait_ready(API + "/api/health/ready", api)
+        direct_counts = verify_directory(API)
         web_env = {
             key: value
             for key, value in env.items()
@@ -371,6 +395,14 @@ def main():
             "frontend.log",
         )
         wait_ready(WEB, web)
+        if verify_directory(WEB) != direct_counts:
+            raise StartupError(
+                "Frontend points to a different area database. Check GRIDWATCH_API_TARGET."
+            )
+        print(
+            "Area search verified through the website: current names and historical village references available.",
+            flush=True,
+        )
         print("Website: " + WEB, flush=True)
         mail = (
             run(["docker", "compose", "port", "mail", "8025"]).stdout.decode().strip()

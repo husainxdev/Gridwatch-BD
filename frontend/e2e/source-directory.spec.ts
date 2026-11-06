@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-test("supplied current and census directories remain distinct through real API and browser", async ({
+test("unified directory finds real source records without making historical report targets", async ({
   page,
   request,
 }) => {
@@ -12,53 +12,75 @@ test("supplied current and census directories remain distinct through real API a
   expect(summary.counts).toEqual({ portal: 428, census2022: 5765 });
   await page.goto("/areas");
   await expect(
-    page.getByRole("heading", {
-      name: "উপজেলা, ইউনিয়ন, গ্রাম ও মহল্লা খুঁজুন",
-    }),
+    page.getByRole("heading", { name: /আপনার এলাকা খুঁজে নিন/ }),
   ).toBeVisible();
-  await page.getByLabel("তালিকায় নাম খুঁজুন").fill("বালাগঞ্জ");
-  await page.getByRole("button", { name: "খুঁজুন", exact: true }).click();
+  await expect(page.locator(".directory-results > li")).toHaveCount(4);
+  const input = page.getByLabel("কোন এলাকা খুঁজছেন?");
+  await input.fill("আম্বরখানা");
+  // No Enter, submit, or source switch is required.
+  await expect(page.locator(".directory-results")).toContainText("Ambarkhana");
+  await expect(page.locator(".directory-results")).toContainText(
+    "Airport Thana",
+  );
+  await expect(
+    page.locator(".directory-results .explorer-power-link"),
+  ).toHaveCount(0);
+  await page.locator(".explorer-source summary").first().click();
+  await expect(
+    page.getByRole("link", { name: "জনশুমারির মূল PDF" }).first(),
+  ).toHaveAttribute("href", /#page=164$/);
+  await input.fill("Airport Ambarkhana");
+  await expect(page.locator(".directory-results")).toContainText("Ambarkhana");
+  await input.fill("বালাগঞ্জ");
   await expect(page.locator(".directory-results")).toContainText("বালাগঞ্জ");
   await expect(
-    page
-      .locator(".directory-results")
-      .getByRole("link", { name: "এলাকার বিদ্যুৎ তথ্য →" })
-      .first(),
+    page.locator(".directory-results .explorer-power-link").first(),
   ).toBeVisible();
   await page.getByRole("button", { name: "উপ-এলাকা (৬)", exact: true }).click();
   await expect(page.locator(".directory-results > li")).toHaveCount(6);
   await expect(
     page.getByRole("navigation", { name: "তালিকার পূর্বসূরি" }),
   ).toContainText("বালাগঞ্জ");
-  await page.getByRole("button", { name: /গ্রাম \/ মহল্লা · ২০২২/ }).click();
-  await page.getByLabel("তালিকায় নাম খুঁজুন").fill("আম্বরখানা");
-  await page.getByRole("button", { name: "খুঁজুন", exact: true }).click();
+  await page.goBack();
+  await expect(input).toHaveValue("বালাগঞ্জ");
+  await page.reload();
+  await expect(input).toHaveValue("বালাগঞ্জ");
+  await expect(
+    page.locator(".directory-results .explorer-power-link").first(),
+  ).toBeVisible();
+  // Keyboard access: ArrowDown goes to a real result action; Escape clears.
+  await input.focus();
+  await input.press("ArrowDown");
+  expect(
+    await page
+      .locator("#directory-results")
+      .evaluate((node) => node.contains(document.activeElement)),
+  ).toBe(true);
+  await input.focus();
+  await input.press("Escape");
+  await expect(input).toHaveValue("");
+  await expect(page.locator(".directory-results > li")).toHaveCount(4);
+  await input.fill("no-such-place-xyzz");
+  await expect(
+    page.getByRole("heading", { name: "এই অনুসন্ধানে এলাকা পাওয়া যায়নি" }),
+  ).toBeVisible();
+  // Search from the actual homepage also shows village identities directly.
+  await page.goto("/");
+  await page.getByLabel("এলাকার নাম খুঁজুন").fill("আম্বরখানা");
+  await expect(
+    page.getByRole("region", { name: "গ্রাম ও মহল্লার পরিচয়" }),
+  ).toContainText("Ambarkhana");
+  await page.getByRole("link", { name: /সব তালিকায় খুঁজুন/ }).click();
   await expect(page.locator(".directory-results")).toContainText("Ambarkhana");
-  await expect(page.locator(".directory-warning")).toContainText(
-    "বর্তমান রিপোর্টের এলাকা নয়",
-  );
-  await expect(
-    page
-      .locator(".directory-results")
-      .getByRole("link", { name: "এলাকার বিদ্যুৎ তথ্য →" }),
-  ).toHaveCount(0);
-  await expect(page.locator(".directory-results")).toContainText(
-    "Airport Thana",
-  );
-  await expect(
-    page
-      .locator(".directory-results")
-      .getByRole("link", { name: "দেওয়া PDF লিংক ↗" })
-      .first(),
-  ).toHaveAttribute("href", /#page=164$/);
-  for (const branch of ["portal", "census2022"]) {
-    await page.goto(
-      "/areas?" +
-        new URLSearchParams({
-          branch,
-          search: branch === "portal" ? "বালাগঞ্জ" : "আম্বরখানা",
-        }),
-    );
+  expect(errors).toEqual([]);
+});
+
+test("directory is readable and keyboard accessible at four viewport widths", async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  for (const search of ["", "বালাগঞ্জ", "আম্বরখানা"]) {
+    await page.goto("/areas?" + new URLSearchParams({ search }));
     await expect(page.locator(".directory-results > li").first()).toBeVisible();
     for (const width of [360, 390, 768, 1440]) {
       await page.setViewportSize({ width, height: 900 });
@@ -78,19 +100,80 @@ test("supplied current and census directories remain distinct through real API a
       ).toEqual([]);
     }
   }
-  const after = await (
-    await request.get("/api/directory?branch=census2022&search=Ambarkhana")
-  ).json();
-  expect(
-    after.items.every(
-      (row: { reportable: boolean; location_id: string | null }) =>
-        !row.reportable && row.location_id === null,
-    ),
-  ).toBe(true);
-  await page.goto("/?location_id=");
-  await page.getByLabel("এলাকার নাম খুঁজুন").fill("আম্বরখানা");
-  await page.getByRole("link", { name: /বর্তমান তালিকায় নেই/ }).click();
-  await expect(page).toHaveURL(/\/areas\?branch=census2022&search=/);
+});
+
+test("old backend 404 is actionable, preserves the search, and recovers without false empty results", async ({
+  page,
+}) => {
+  await page.route("**/api/directory?**", (route) =>
+    route.fulfill({
+      status: 404,
+      contentType: "application/json",
+      body: JSON.stringify({ detail: "Not Found" }),
+    }),
+  );
+  await page.goto("/areas?search=আম্বরখানা");
+  await expect(page.locator(".explorer-error[role=alert]")).toContainText(
+    "একই সংস্করণে চলছে না",
+  );
+  await expect(
+    page.getByRole("heading", { name: "এই অনুসন্ধানে এলাকা পাওয়া যায়নি" }),
+  ).toHaveCount(0);
+  await expect(page.getByLabel("কোন এলাকা খুঁজছেন?")).toHaveValue("আম্বরখানা");
+  await page.unroute("**/api/directory?**");
+  await page
+    .getByRole("button", { name: "আবার চেষ্টা করুন", exact: true })
+    .click();
   await expect(page.locator(".directory-results")).toContainText("Ambarkhana");
-  expect(errors).toEqual([]);
+  await expect(page.locator(".explorer-error[role=alert]")).toHaveCount(0);
+});
+
+test("obsolete searches never replace newer results and pagination/filtering use the real API", async ({
+  page,
+}) => {
+  let release: (() => void) | undefined;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let intercepted = false;
+  await page.route("**/api/directory?**", async (route) => {
+    const url = new URL(route.request().url());
+    if (url.searchParams.get("search") === "Ambarkhana") {
+      intercepted = true;
+      await held;
+    }
+    await route.continue().catch(() => {}); // An obsolete fetch is deliberately aborted.
+  });
+  await page.goto("/areas");
+  const input = page.getByLabel("কোন এলাকা খুঁজছেন?");
+  await input.fill("Ambarkhana");
+  await expect.poll(() => intercepted).toBe(true);
+  await input.fill("বালাগঞ্জ");
+  await expect(page.locator(".directory-results")).toContainText("বালাগঞ্জ");
+  release!();
+  await expect(page.locator(".directory-results")).not.toContainText(
+    "Ambarkhana",
+  );
+  await input.fill("");
+  await page.getByLabel("ধরন", { exact: true }).selectOption("village");
+  await expect(page.locator(".directory-results > li")).toHaveCount(12);
+  const first = await page.locator(".directory-results h3").allTextContents();
+  const nextResponse = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return (
+      url.pathname === "/api/directory" &&
+      url.searchParams.get("page") === "2" &&
+      url.searchParams.get("kind") === "village"
+    );
+  });
+  await page.getByRole("button", { name: "পরের পৃষ্ঠা" }).click();
+  await expect(page).toHaveURL(/page=2/);
+  const next = await (await nextResponse).json();
+  expect(next.page).toBe(2);
+  const names = next.items.map(
+    (row: { name_bn: string | null; name_en: string | null }) =>
+      row.name_bn || row.name_en,
+  );
+  expect(names).not.toEqual(first);
+  await expect(page.locator(".directory-results h3")).toHaveText(names);
 });

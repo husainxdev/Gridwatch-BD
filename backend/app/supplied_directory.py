@@ -306,6 +306,8 @@ def import_supplied_directory(db, path=SOURCE_FILE):
             )
     for start in range(0, len(records), 500):
         db.execute(insert(DirectoryPlace), records[start : start + 500])
+    # Fresh bulk loads need planner statistics before the first hierarchy search.
+    db.execute(text("ANALYZE directory_places"))
     return {
         "already_imported": False,
         "portal": len(data["locations"]),

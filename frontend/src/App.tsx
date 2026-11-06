@@ -87,14 +87,14 @@ export default function App({ children }: { children: ReactNode }) {
           <NavLink to="/" end>
             <FiGrid aria-hidden="true" /> এলাকার তথ্য
           </NavLink>
+          <NavLink to="/areas">
+            <FiMapPin aria-hidden="true" /> এলাকা খুঁজুন
+          </NavLink>
           <NavLink to="/notices">
             <FiBookOpen aria-hidden="true" /> নোটিশ
           </NavLink>
           <NavLink to="/dashboard">
             <FiActivity aria-hidden="true" /> ড্যাশবোর্ড
-          </NavLink>
-          <NavLink to="/areas" className="secondary-route">
-            <FiMapPin aria-hidden="true" /> এলাকার পূর্ণ তালিকা
           </NavLink>
           <NavLink to="/activities" className="secondary-route">
             <FiCalendar aria-hidden="true" /> কাজের সময়

@@ -53,6 +53,11 @@ test("admin publication and personal outage restoration use real backend", async
   await page.getByRole("button", { name: "প্রকাশ", exact: true }).click();
   await expect(page.getByText("published · সংস্করণ 2")).toBeVisible();
   await page.getByRole("button", { name: "লগআউট", exact: true }).click();
+  // Full-document navigation must wait for confirmed server-side logout,
+  // otherwise it can cancel the queued session request before it is sent.
+  await expect(
+    page.getByRole("link", { name: "প্রবেশ", exact: true }),
+  ).toBeVisible();
   await page.goto("/register");
   await page.locator("input[name=name]").fill("Observation tester");
   await page
@@ -64,6 +69,9 @@ test("admin publication and personal outage restoration use real backend", async
     page.getByRole("heading", { name: "স্বাগতম, Observation tester" }),
   ).toBeVisible();
   await page.goto("/notices");
+  // Allow cookie rotation/session restoration to finish before the next
+  // deliberate full-document navigation (the app normally uses Next links).
+  await expect(page.locator(".account-name")).toHaveText("Observation tester");
   await expect(page.getByText("Fictional browser notice")).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "ঘোষিত সময়সূচি" }),
