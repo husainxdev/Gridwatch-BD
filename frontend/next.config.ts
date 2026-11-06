@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 import path from "node:path";
 
+const netlify = process.env.NETLIFY === "true";
+const hosted = netlify || process.env.VERCEL === "1";
+if (netlify && process.env.CONTEXT !== "production") {
+  throw new Error(
+    "Netlify deploy previews require a separate trusted backend; only production context is configured",
+  );
+}
 const apiTarget = process.env.GRIDWATCH_API_TARGET || "http://127.0.0.1:8000";
 const url = new URL(apiTarget);
 if (
@@ -16,15 +23,15 @@ if (
   );
 }
 if (
-  process.env.VERCEL === "1" &&
+  hosted &&
   (!process.env.GRIDWATCH_API_TARGET || url.protocol !== "https:")
 ) {
   throw new Error(
-    "Vercel deployments require the explicit HTTPS backend origin",
+    "Hosted deployments require the explicit HTTPS backend origin",
   );
 }
 if (
-  process.env.VERCEL === "1" &&
+  hosted &&
   (process.env.NEXT_PUBLIC_E2E_TEST === "1" ||
     process.env.GRIDWATCH_LOCAL_DEMO === "1" ||
     process.env.NEXT_PUBLIC_DEMO_INSTANCE === "true" ||
@@ -33,16 +40,19 @@ if (
 ) {
   throw new Error("Do not deploy demo, browser-test or local website builds");
 }
-if (process.env.VERCEL === "1") {
+if (hosted) {
   const commit =
-    process.env.RELEASE_REVISION || process.env.VERCEL_GIT_COMMIT_SHA || "";
+    process.env.RELEASE_REVISION ||
+    (netlify ? process.env.COMMIT_REF : process.env.VERCEL_GIT_COMMIT_SHA) ||
+    "";
   if (
     !/^[0-9a-f]{40}$/.test(commit) ||
     (process.env.RELEASE_REVISION &&
-      process.env.VERCEL_GIT_COMMIT_SHA &&
-      process.env.RELEASE_REVISION !== process.env.VERCEL_GIT_COMMIT_SHA)
+      (netlify ? process.env.COMMIT_REF : process.env.VERCEL_GIT_COMMIT_SHA) &&
+      process.env.RELEASE_REVISION !==
+        (netlify ? process.env.COMMIT_REF : process.env.VERCEL_GIT_COMMIT_SHA))
   ) {
-    throw new Error("Vercel release requires one matching full source commit");
+    throw new Error("Hosted release requires one matching full source commit");
   }
 }
 const config: NextConfig = {
@@ -66,7 +76,7 @@ const config: NextConfig = {
       {
         source: "/:path*",
         headers: [
-          ...(process.env.VERCEL === "1"
+          ...(hosted
             ? [{ key: "Strict-Transport-Security", value: "max-age=31536000" }]
             : []),
           { key: "X-Content-Type-Options", value: "nosniff" },

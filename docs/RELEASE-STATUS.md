@@ -76,3 +76,7 @@ The [public interface and launcher work](PUBLIC-WEBSITE-REVIEW.md) replaces the 
 ## Current candidate — 6 November 2026
 
 Use [the final release review](FINAL-RELEASE-REVIEW.md) for current code, source-directory UI, test evidence and limitations. Head is `0007`. The owner confirmed Vercel/Render projects have **not** been created, so public HTTPS, actual provider database/cookie behavior and external SMTP delivery remain unverified. [The dashboard guide](DASHBOARD_SETUP.md) now targets the normal production website with demo/test flags disabled. Earlier demo counts and schema numbers in this historical document are not current release settings.
+
+## Current hosting selection — Netlify
+
+The owner explicitly selected **Netlify frontend + Render backend** on 6 November 2026. [NETLIFY.md](NETLIFY.md) supersedes older Vercel-specific frontend instructions. Root netlify.toml and production guards use NETLIFY/CONTEXT/COMMIT_REF; old Vercel guard support remains compatible. No provider access or actual assigned frontend/backend origins are available, so public deployment is still unverified.

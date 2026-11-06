@@ -1,20 +1,21 @@
 """Local consistency checks only; not provider account/schema/billing validation."""
 
 import json
+import tomllib
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 provider = json.loads((root / "deploy/provider-settings.json").read_text())
-web = json.loads((root / "frontend/vercel.json").read_text())
+web = tomllib.loads((root / "netlify.toml").read_text())
 package = json.loads((root / "frontend/package.json").read_text())
 assert (
-    provider["frontend"]["provider"] == "Vercel"
+    provider["frontend"]["provider"] == "Netlify"
     and provider["backend"]["provider"] == "Render"
 )
 assert (
-    web["framework"] == "nextjs"
-    and web["installCommand"] == "npm ci"
-    and web["buildCommand"] == "npm run build"
+    web["build"]["base"] == "frontend"
+    and web["build"]["publish"] == ".next"
+    and web["build"]["command"] == "npm run build"
 )
 assert provider["backend"]["workers"] == provider["backend"]["instances"] == 1
 assert provider["backend"]["auto_deploy"] is False

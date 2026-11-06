@@ -1,0 +1,13 @@
+# Repository-root configuration. Deploy the real Next.js app, not a static SPA.
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NPM_FLAGS = "--include=dev"
+  NEXT_TELEMETRY_DISABLED = "1"
+# Netlify detects Next.js and installs its current OpenNext adapter automatically.
+# Set GRIDWATCH_API_TARGET in the dashboard; no guessed host or secrets here.
+# Keep /api rewrites in next.config.ts; do not add a /* -> /index.html fallback.

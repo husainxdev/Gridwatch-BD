@@ -67,7 +67,7 @@ The administrative catalog now uses three successfully retrieved original govern
 
 ## Before public publishing
 
-Use [DEPLOYMENT.md](DEPLOYMENT.md) and [DASHBOARD_SETUP.md](DASHBOARD_SETUP.md) for actual hosting accounts, HTTPS frontend/backend URLs, persistent PostgreSQL, trusted same-origin `/api` routing, external SMTP, backups, ingress rate protection and live acceptance. Configure `DEMO_INSTANCE=false`, `DEMO_ENABLED=false`, `NEXT_PUBLIC_DEMO_INSTANCE=false`; remove all browser/local build flags. Public production rejects demo mode rather than hiding its banner.
+Use [NETLIFY.md](NETLIFY.md), [DEPLOYMENT.md](DEPLOYMENT.md) and [DASHBOARD_SETUP.md](DASHBOARD_SETUP.md) for actual hosting accounts, HTTPS frontend/backend URLs, persistent PostgreSQL, trusted same-origin `/api` routing, external SMTP, backups, ingress rate protection and live acceptance. Configure `DEMO_INSTANCE=false`, `DEMO_ENABLED=false`, `NEXT_PUBLIC_DEMO_INSTANCE=false`; remove all browser/local build flags. Public production rejects demo mode rather than hiding its banner.
 
 The public interface now contains no project-progress checklist or demo CTA. `/help` explains real workflows; `/privacy` describes actual fields and retention limits. Legacy `/progress` shows the same help content for old links. Missing real records display actionable empty states instead of fake status cards.
 

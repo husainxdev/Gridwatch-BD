@@ -9,6 +9,9 @@ const source = transpileModule(
 ).outputText;
 const keys = [
   "VERCEL",
+  "NETLIFY",
+  "CONTEXT",
+  "COMMIT_REF",
   "GRIDWATCH_API_TARGET",
   "NEXT_PUBLIC_E2E_TEST",
   "RELEASE_REVISION",
@@ -57,6 +60,45 @@ try {
     { RELEASE_REVISION: "b".repeat(40) },
   ])
     await assert.rejects(config({ ...base, ...invalid }));
+  const netlifyBase = {
+    NETLIFY: "true",
+    CONTEXT: "production",
+    GRIDWATCH_API_TARGET: "https://backend.example.com",
+    COMMIT_REF: "c".repeat(40),
+  };
+  const netlify = await config(netlifyBase);
+  assert.equal(netlify.distDir, ".next");
+  assert.deepEqual(await netlify.rewrites(), await good.rewrites());
+  const netlifyHeaders = await netlify.headers();
+  assert(
+    netlifyHeaders[0].headers.some(
+      (h) => h.key === "Strict-Transport-Security",
+    ),
+  );
+  assert.equal(netlifyHeaders[1].source, "/api/:path*");
+  assert(
+    netlifyHeaders[1].headers.some(
+      (h) => h.key === "Cache-Control" && h.value === "no-store",
+    ),
+  );
+  for (const invalid of [
+    { GRIDWATCH_API_TARGET: "" },
+    { GRIDWATCH_API_TARGET: "http://backend.example.com" },
+    { GRIDWATCH_API_TARGET: "https://backend.example.com/api" },
+    { GRIDWATCH_API_TARGET: "https://user:secret@backend.example.com" },
+    { NEXT_PUBLIC_E2E_TEST: "1" },
+    { GRIDWATCH_LOCAL_DEMO: "1" },
+    { NEXT_PUBLIC_DEMO_INSTANCE: "true" },
+    { GRIDWATCH_TEST_BUILD: "1" },
+    { GRIDWATCH_LOCAL_WEBSITE: "1" },
+    { COMMIT_REF: "" },
+    { COMMIT_REF: "wrong" },
+    { RELEASE_REVISION: "b".repeat(40) },
+    { CONTEXT: "deploy-preview" },
+    { CONTEXT: "branch-deploy" },
+  ])
+    await assert.rejects(config({ ...netlifyBase, ...invalid }));
+  await config({ ...netlifyBase, RELEASE_REVISION: netlifyBase.COMMIT_REF });
   const demo = await config({ GRIDWATCH_LOCAL_DEMO: "1" });
   assert.equal(demo.distDir, ".next-demo");
   const local = await config({});
@@ -66,7 +108,7 @@ try {
     ),
   );
   console.log(
-    "13 release-config cases passed: HTTPS, source identity, no test build, rewrite and HSTS; no provider contacted.",
+    `${run} release-config cases passed: Netlify/Vercel HTTPS, source identity, no test/preview builds, rewrite and HSTS; no provider contacted.`,
   );
 } finally {
   for (const key of keys) {

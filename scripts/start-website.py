@@ -371,6 +371,9 @@ def main():
                 "SMTP_PASSWORD",
                 "SMTP_USERNAME",
                 "POSTGRES_PASSWORD",
+                "NETLIFY",
+                "CONTEXT",
+                "COMMIT_REF",
                 "VERCEL",
                 "VERCEL_GIT_COMMIT_SHA",
             }

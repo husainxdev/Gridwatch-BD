@@ -27,7 +27,7 @@ def main():
             and settings.smtp_password
         ),
         "provider_credentials_present": bool(
-            os.environ.get("VERCEL_TOKEN") and os.environ.get("RENDER_API_KEY")
+            os.environ.get("NETLIFY_AUTH_TOKEN") and os.environ.get("RENDER_API_KEY")
         ),
         "provider_origins_recorded": bool(
             os.environ.get("LIVE_FRONTEND_ORIGIN")

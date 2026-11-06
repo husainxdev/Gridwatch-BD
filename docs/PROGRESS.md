@@ -179,3 +179,13 @@ Current handoff: [supplied directory](SUPPLIED-DIRECTORY.md).
 
 Current evidence and remaining data limits: [final release review](FINAL-RELEASE-REVIEW.md).
 - [x] Final full production-browser run: 34 passed, 3 separate-demo cases skipped; four viewport/keyboard/axe journeys and normal reset/publication flows passed.
+
+## Frontend provider change — 2026-11-06
+
+- [x] Owner selected Netlify instead of Vercel; Render remains the backend host.
+- [x] Root netlify.toml, automatic OpenNext adapter workflow, production-only context and HTTPS/source/test-build guards.
+- [x] Netlify COMMIT_REF release identity and same-origin API rewrite/cache/security settings.
+- [x] Current Netlify dashboard instructions and provider manifest/preflight updates; previous Neon skill/MCP setup files preserved separately.
+- [ ] Netlify project access, assigned stable HTTPS origin and actual hosted cookie/auth/mail acceptance remain unavailable.
+
+See [Netlify setup](NETLIFY.md). A local simulated-provider build is not a Netlify deployment.

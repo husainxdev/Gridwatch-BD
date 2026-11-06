@@ -1,14 +1,16 @@
+> Current frontend: **Netlify**. Follow [the exact Netlify dashboard settings](NETLIFY.md), including root netlify.toml, automatic COMMIT_REF and production-only context.
+
 # Selected release path — prepared, not publicly deployed
 
-**Status:** Vercel frontend + Render native Python backend + persistent Render PostgreSQL 17. No live URLs or successful provider deployment exist in this handoff. Review [provider evidence and unverified limits](PROVIDER_CHECKS.md). Current local evidence is in [the release handoff](RELEASE-STATUS.md), not a claim of live verification.
+**Status:** Netlify frontend + Render native Python backend + persistent Render PostgreSQL 17. No live URLs or successful provider deployment exist in this handoff. Review [provider evidence and unverified limits](PROVIDER_CHECKS.md). Current local evidence is in [the release handoff](RELEASE-STATUS.md), not a claim of live verification.
 
 The app is now Next.js App Router, as explicitly requested by the user. Vite's `dist`, React Router SPA fallback and `VITE_API_BASE_URL` are not used. Keep this monorepo; provider frontend root is `frontend`, backend service root is the repository root. Historical self-host examples are retained but are not the selected deployment.
 
 ## 1. Account prerequisites and billing boundary
 
-Use existing authorized Vercel/Render projects and a persistent PostgreSQL instance, or let the owner review/create them. No service purchase, plan upgrade, domain transfer or repository visibility change is authorized by preparation. Record the actual selected plan/price, PostgreSQL storage retention, sleep/cold-start and timeout behavior from the current account before release. Availability is account-specific and currently unverified.
+Use existing authorized Netlify/Render projects and a persistent PostgreSQL instance, or let the owner review/create them. No service purchase, plan upgrade, domain transfer or repository visibility change is authorized by preparation. Record the actual selected plan/price, PostgreSQL storage retention, sleep/cold-start and timeout behavior from the current account before release. Availability is account-specific and currently unverified.
 
-Reserve/select the Vercel project's actual production origin, obtain the Render service's actual HTTPS origin and choose the database **before final release**. Enter those actual values below; do not treat examples/placeholders as working domains. Configure only the stable production frontend origin; preview-domain login is unsupported until explicitly configured as a separate test environment.
+Reserve/select the Netlify project's actual production origin, obtain the Render service's actual HTTPS origin and choose the database **before final release**. Enter those actual values below; do not treat examples/placeholders as working domains. Configure only the stable production frontend origin; preview-domain login is unsupported until explicitly configured as a separate test environment.
 
 ## 2. Exact service settings
 
@@ -16,22 +18,22 @@ The machine-readable companion is [`deploy/provider-settings.json`](../deploy/pr
 
 | Component | Settings |
 | --- | --- |
-| Vercel | Root `frontend`; framework `Next.js`; Node 22+ supported by the locked app (local verification used Node 24); install `npm ci`; build `npm run build`; leave output on the Next.js default `.next`/adapter. No static export, no `dist` and no custom SPA fallback. `frontend/vercel.json` pins install/build/framework. |
+| Netlify | Repository-root `netlify.toml`: base `frontend`, Node 22, automatic dependency installation, build `npm run build`, publish `.next`, automatic OpenNext adapter. No static export, no `dist` and no custom SPA fallback. `netlify.toml` selects the frontend base, build and publish directory. |
 | Render API | Root repository `.`; Python 3.12 (select a supported 3.12 native runtime in Render; the build also explicitly requests 3.12; record the actual patch and verify the venv exists after deploy); build `pip install uv==0.12.23 && uv sync --project backend --python 3.12 --frozen --no-dev`; start `backend/.venv/bin/python scripts/serve.py`; health `/api/health/ready`; **one instance, one Uvicorn worker**, no reload. |
 | Controlled pre-deploy | `backend/.venv/bin/python scripts/release-migrate.py --expected-database "$EXPECTED_DATABASE_NAME"`. Confirm pre-deploy access on the selected plan. If unavailable, run the same one-shot command in an authorized operator environment **before** switching traffic; never move it into each worker's startup. |
 | Render PostgreSQL | Persistent PostgreSQL 17, appropriately private network/firewall access, database credentials in provider secrets; explicit TLS query setting. No application filesystem database or uploads. Select an actual plan/retention policy in the account. |
 
-Disable automatic production deployment until account configuration and smoke verification are complete. No CI job deploys anything, and PR checks receive no production credentials. On Render use manual deploy/auto-deploy disabled. Configure Vercel Git deployment policy in the account or deploy the selected immutable commit manually. Do not automatically deploy untrusted PRs with production secrets.
+Disable automatic production deployment until account configuration and smoke verification are complete. No CI job deploys anything, and PR checks receive no production credentials. On Render use manual deploy/auto-deploy disabled. Configure Netlify Git deployment policy in the account or deploy the selected immutable commit manually. Do not automatically deploy untrusted PRs with production secrets.
 
 ## 3. Frontend settings and same-origin authentication
 
-Set in Vercel **Production** settings, then rebuild:
+Set in Netlify **Production** settings, then rebuild:
 
-- `GRIDWATCH_API_TARGET`: actual Render HTTPS origin, with no path/query/userinfo. Server-side rewrite target; never a database URL or signing key. Vercel builds reject a missing/insecure target.
-- `RELEASE_REVISION`: full 40-character source commit, matching the backend. The release-info handler also supports provider `VERCEL_GIT_COMMIT_SHA`; configure/verify the system variable if relying on it.
+- `GRIDWATCH_API_TARGET`: actual Render HTTPS origin, with no path/query/userinfo. Server-side rewrite target; never a database URL or signing key. Netlify builds reject a missing/insecure target.
+- Leave frontend `RELEASE_REVISION` unset to use Netlify's automatic `COMMIT_REF`. An explicitly configured RELEASE_REVISION must match that full 40-character source SHA. Deploy the same source revision on the backend.
 - `NEXT_PUBLIC_DEMO_INSTANCE=false` for a real pilot. Public production rejects demo configuration. Use fictional data only in an isolated local developer/test environment.
 - Optional `NEXT_PUBLIC_POLL_INTERVAL_MS=30000`. No secrets in `NEXT_PUBLIC_*`.
-- Never set `NEXT_PUBLIC_E2E_TEST` or `GRIDWATCH_TEST_BUILD` on a deployed project. Vercel refuses test-helper, test-build, local-website and demo flags.
+- Never set `NEXT_PUBLIC_E2E_TEST` or `GRIDWATCH_TEST_BUILD` on a deployed project. Netlify refuses test-helper, test-build, local-website and demo flags.
 
 Browser requests stay on **frontend `/api/*`**. Next rewrites to Render over HTTPS. Backend refresh cookies have no Domain attribute, so forwarded Set-Cookie belongs to the frontend origin: Secure, HttpOnly refresh token, SameSite Strict, Path `/api/auth`; readable CSRF cookie at `/`. The frontend's existing `credentials: same-origin` is correct for this topology. Cross-site direct browser API calls are not the supported setup.
 
@@ -105,7 +107,7 @@ The script checks the archive against its private SHA-256 receipt, refuses a pop
 1. Record `git rev-parse HEAD`, clean source, successful local/CI checks and the selected account settings. `scripts/release-preflight.py --manual-provider-setup --output artifacts/preflight.json` checks sanitized configuration/presence only; it never deploys or verifies account authority.
 2. Configure persistent DB, TLS, pool bounds and provider secrets. Use a separate marked DB for a private disposable demo; do not expose a shared Admin on real-user data.
 3. Execute the controlled migration/pre-deploy once. Deploy Render from the exact revision; inspect health/revision and sanitized logs.
-4. Build/deploy Vercel from the same revision with the actual HTTPS backend origin and both demo flags disabled. Confirm deployment policy/limits in the account.
+4. Build/deploy Netlify from the same revision with the actual HTTPS backend origin and both demo flags disabled. Confirm deployment policy/limits in the account.
 5. Run the following only with the **actual assigned URLs**:
 
 ```bash
@@ -119,7 +121,7 @@ It checks valid HTTPS, safe same-origin redirects, frontend/deep-link shells, se
 
 ## 7. Operations and rollback
 
-Inspect Render runtime/deploy logs and Vercel build/function logs for the recorded revision; do not enable SMTP debug, request-body, Authorization/cookie or reset-link logging. Restart through the service dashboard; state belongs in PostgreSQL, not the ephemeral app filesystem. Cold-start, sleep, timeout and retention properties must come from the selected actual plan, currently unknown.
+Inspect Render runtime/deploy logs and Netlify build/function logs for the recorded revision; do not enable SMTP debug, request-body, Authorization/cookie or reset-link logging. Restart through the service dashboard; state belongs in PostgreSQL, not the ephemeral app filesystem. Cold-start, sleep, timeout and retention properties must come from the selected actual plan, currently unknown.
 
 Revert application code by selecting a previously verified immutable provider deployment/commit after checking schema compatibility. This candidate targets schema `0007`; a prior code revision may require the normalized psycopg URI and environment it supports. **Application rollback does not reverse migrations.** Never automatically run `alembic downgrade` on real data. For incompatible changes, keep traffic off, restore into an isolated new DB, validate and plan a controlled cutover rather than overwriting the original.
 
@@ -127,7 +129,7 @@ Rotate database/SMTP credentials through provider secrets and restart affected p
 
 ## Normal website presentation
 
-Use [WEBSITE.md](WEBSITE.md) for the seed-free local launcher and Admin provisioning. Public navigation, help/privacy pages and metadata have no student-project/demo branding. Production rejects `DEMO_INSTANCE=true` or `DEMO_ENABLED=true`; Vercel also rejects `NEXT_PUBLIC_DEMO_INSTANCE=true`. These flags cannot be used to present fictional evidence as real. No migration removes or converts old records. Local website startup is not public deployment.
+Use [WEBSITE.md](WEBSITE.md) for the seed-free local launcher and Admin provisioning. Public navigation, help/privacy pages and metadata have no student-project/demo branding. Production rejects `DEMO_INSTANCE=true` or `DEMO_ENABLED=true`; Netlify also rejects `NEXT_PUBLIC_DEMO_INSTANCE=true`. These flags cannot be used to present fictional evidence as real. No migration removes or converts old records. Local website startup is not public deployment.
 
 ## Reviewed administrative directory
 

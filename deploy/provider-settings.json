@@ -3,15 +3,17 @@
   "status": "prepared_not_deployed",
   "source_revision": "derive_from_git_HEAD_before_release",
   "frontend": {
-    "provider": "Vercel",
+    "provider": "Netlify",
     "root_directory": "frontend",
     "framework": "nextjs",
     "install_command": "npm ci",
     "build_command": "npm run build",
-    "output": "Next.js framework default (.next); not static export",
+    "output": "frontend/.next via the automatic OpenNext adapter; not static export",
     "public_origin": null,
     "api_proxy": "same-origin /api using server-only GRIDWATCH_API_TARGET",
-    "automatic_production_deployment": "disabled_until_owner_configures_and_verifies"
+    "automatic_production_deployment": "disabled_until_owner_configures_and_verifies",
+    "config_file": "netlify.toml",
+    "production_branch": "main"
   },
   "backend": {
     "provider": "Render",

@@ -14,6 +14,7 @@ A Bengali-first website for announced power interruptions, personal connection r
 - [Database design](docs/DATABASE.md)
 - [Sections 3–4 API, security, email and testing guide](docs/AUTH-LOCATIONS.md)
 - [Selected Vercel/Render deployment and operations](docs/DEPLOYMENT.md)
+- [Netlify frontend setup and hosted checks](docs/NETLIFY.md)
 - [Owner dashboard setup](docs/DASHBOARD_SETUP.md)
 - [Data sources and evidence limits](docs/DATA_SOURCES.md)
 - [Submission acceptance and repository links](docs/SUBMISSION.md)
@@ -38,7 +39,7 @@ flowchart LR
   A --> M[SMTP adapter: local sink tested, external delivery unverified]
 ```
 
-No verified frontend/backend live URL is available. The selected future path is Vercel + Render API + persistent Render PostgreSQL; this is **prepared, not deployed**. See [release status](docs/RELEASE-STATUS.md).
+No verified frontend/backend live URL is available. The selected future path is Netlify + Render API + persistent PostgreSQL; this is **prepared, not deployed**. See [release status](docs/RELEASE-STATUS.md).
 
 ## Local requirements and setup
 

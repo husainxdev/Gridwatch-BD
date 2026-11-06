@@ -1,3 +1,5 @@
+> Current frontend: **Netlify**. Follow [the exact Netlify dashboard settings](NETLIFY.md), including root netlify.toml, automatic COMMIT_REF and production-only context.
+
 # Publish the normal GridWatch BD website
 
 Use the existing `husainxdev/Gridwatch-BD` repository, branch `main`. This guide is for real accounts and reviewed administrative data. It does not publish fictional outages or test accounts. No hosted service or external email delivery has been verified from this workspace.
@@ -17,9 +19,9 @@ Connect the repository and select Python 3.12, root directory `.`. Disable autom
 
 If the selected plan has no pre-deploy/shell access, use an authorized operator environment for the same one-time migration before serving traffic. Never run migrations from every worker. Set `APP_ENV=production`, `DEMO_INSTANCE=false`, `DEMO_ENABLED=false`, database URL, exact database name, a new strong random JWT signing secret, full release commit SHA, trusted frontend HTTPS origin and explicit CORS allowlist. Use backend/.env.example and DEPLOYMENT.md for all settings. Configure actual trusted proxy addresses; do not use wildcard forwarding trust. Readiness must report schema **0007**.
 
-## 3. Vercel frontend
+## 3. Netlify frontend
 
-Import the same repository, root `frontend`, Next.js framework, `npm ci`, `npm run build`, default output directory. Set server-only `GRIDWATCH_API_TARGET` to the actual assigned Render HTTPS origin. Set `RELEASE_REVISION` to the exact full deployed source commit (must match Vercel's source SHA). Set `NEXT_PUBLIC_DEMO_INSTANCE=false`. Remove `GRIDWATCH_TEST_BUILD`, `NEXT_PUBLIC_E2E_TEST`, `GRIDWATCH_LOCAL_DEMO` and `GRIDWATCH_LOCAL_WEBSITE`. Deploy, then use its actual stable HTTPS origin in the backend's `FRONTEND_URL` and single-entry `CORS_ORIGINS` array. Cookies use the same-origin `/api` proxy, Secure and the documented SameSite/Path settings.
+Follow [NETLIFY.md](NETLIFY.md). Import the existing repository from GitHub; root `netlify.toml` selects base `frontend`, build `npm run build`, publish `.next`, Node 22 and the automatic current OpenNext adapter. Set GRIDWATCH_API_TARGET to the actual Render HTTPS origin, NEXT_PUBLIC_DEMO_INSTANCE=false, and leave RELEASE_REVISION unset so COMMIT_REF supplies the exact source identity. Remove test/local flags and disable deploy previews/branch deploys. Use the actual stable assigned Netlify origin in backend FRONTEND_URL and CORS_ORIGINS. Same-origin `/api` routing preserves the application cookie/CSRF design; actual hosted behavior remains to be verified.
 
 ## 4. Import reviewed area identities
 
